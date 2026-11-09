@@ -1,0 +1,106 @@
+{
+  "nodes": [
+    {
+      "id": "a",
+      "type": "text",
+      "x": 40,
+      "y": 110,
+      "width": 340,
+      "height": 160,
+      "text": "1. AI 연산과 병목\n\nCNN / Transformer\n\n메모리와 Roofline",
+      "color": "4"
+    },
+    {
+      "id": "b",
+      "type": "text",
+      "x": 470,
+      "y": 110,
+      "width": 340,
+      "height": 160,
+      "text": "2. 실행 환경\n\n모델 / 프레임워크\n\nGPU·NPU / 지원 커널",
+      "color": "4"
+    },
+    {
+      "id": "c",
+      "type": "text",
+      "x": 900,
+      "y": 110,
+      "width": 340,
+      "height": 160,
+      "text": "3. 양자화 기초\n\n비트·scale·zero point\n\n정수 연산과 Q/DQ",
+      "color": "4"
+    },
+    {
+      "id": "d",
+      "type": "text",
+      "x": 900,
+      "y": 410,
+      "width": 340,
+      "height": 160,
+      "text": "4. PTQ 오차 제어\n\n분포·calibration\n\nrounding·granularity",
+      "color": "4"
+    },
+    {
+      "id": "e",
+      "type": "text",
+      "x": 470,
+      "y": 410,
+      "width": 340,
+      "height": 160,
+      "text": "5. QAT\n\nfake quantization\n\nSTE와 재학습",
+      "color": "4"
+    },
+    {
+      "id": "f",
+      "type": "text",
+      "x": 40,
+      "y": 410,
+      "width": 340,
+      "height": 160,
+      "text": "6. LLM 적용 판단\n\noutlier와 고급 기법\n\n정확도·용량·실측 성능",
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "fromNode": "a",
+      "fromSide": "right",
+      "toNode": "b",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e1",
+      "fromNode": "b",
+      "fromSide": "right",
+      "toNode": "c",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e2",
+      "fromNode": "c",
+      "fromSide": "bottom",
+      "toNode": "d",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e3",
+      "fromNode": "d",
+      "fromSide": "left",
+      "toNode": "e",
+      "toSide": "right",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e4",
+      "fromNode": "e",
+      "fromSide": "left",
+      "toNode": "f",
+      "toSide": "right",
+      "toEnd": "arrow"
+    }
+  ]
+}

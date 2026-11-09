@@ -1,0 +1,322 @@
+[
+  {
+    "page": 1,
+    "text": "On-Device AI \nPart 1\n성균관대신동군교수\n"
+  },
+  {
+    "page": 2,
+    "text": "강의구성\n시간\n주제\n내용\n실습\n1-1\nAI Workload & \nPerformance\nCNN, LLM (prefill/decode, attention, KV cache)\nFLOPs/Memory, GEMM/GEMV, Roofline\n1-2\nOn-Device AI\nSmall Models, llama.cpp, ExecuTorch, NPU\n1-3\nQuantization\nData Representation, Linear/Non-Linear Quantization,\nQuantization Granularity, PTQ/QAT\nCNN Quant  \nLlama.cpp Quant 기법\n1-4\nAdvanced \nQuantization\nSmoothQuant, GPTQ, AWQ, \nRotation (QuaRot, SpinQuant), QLora\nLMM Quant\n2-1\nPruning & Sparsity\nUnstructured, Structured, N:M, \nLLM pruning (Wanda, SparseGPT)\nLLM pruning\n2-2\nKnowledge Distillation \nResponse-based KD, Feature-based KD, LLM KD\nKnowledge Distillation\n2-3\nEfficient LLM \nInference\nKV Quantization (KIVI,TurboQuant)\nKV Pruning (H2O, SnapKV, Quest) \nSpeculative Decoding (Eagle, MTP, DFlash)\nSnapKV, Eagle, DFlash\n2-4\nHW-aware \nOptimization\nTiling/Fusion, FlashAttention\n2\n"
+  },
+  {
+    "page": 3,
+    "text": "Deep Neural Network\n3\nhttps://insights.sei.cmu.edu/blog/deep-learning-going-\ndeeper-toward-meaningful-patterns-in-complex-data/ \nEfficient Processing of Deep Neural Networks: A Tutorial and Survey [Sze et al. 2017]\n𝑦= 𝑅𝑒𝐿𝑈(෍𝑤𝑖𝑥𝑖+ 𝑏)\n"
+  },
+  {
+    "page": 4,
+    "text": "Convolutional Neural Networks (CNNs)\n• Processing of 2-D features\n• Conv layer, Pooling layer, FC layer\n• Each layer generates a successively higher-\nlevel abstraction of the input data, called a \nfeature map (fmap)\n4\nResults from the ImageNet Challenge \nEfficient Processing of Deep Neural Networks: A Tutorial and Survey [Sze et al. 2017]\n"
+  },
+  {
+    "page": 5,
+    "text": "Transformer\n5\nEncoder\nDecoder\nAttention Is All You Need [Vaswani et al. 2017]\nhttps://benjaminwarner.dev/2023/07/01/attention-mechanism \n"
+  },
+  {
+    "page": 6,
+    "text": "LLM Operations\n• Prefill phase\n• Process the input tokens to compute the \nintermediate states (keys and values)\n• Masked GEMM  \n• Decode phase\n• Generate output tokens autoregressively \none at a time.\n• Each sequential output token needs to \nknow all the previous iterations’ output \nstates (KV Cache). \n• GEMV (underutilize GPU) \n• Memory-bound: data (weights, keys, \nvalues, activations) are transferred to the \nGPU from memory \n• Can improve GPU utilization by request \nbatching\nhttps://developer.nvidia.com/blog/mastering-llm-techniques-inference-optimization/ \n6\nhttps://arxiv.org/pdf/2209.10797 \n"
+  },
+  {
+    "page": 7,
+    "text": "Large Language Models \n7\n"
+  },
+  {
+    "page": 8,
+    "text": "Vision Language Model\n8\n"
+  },
+  {
+    "page": 9,
+    "text": "Cloud AI vs. On-Device AI\n9\n대용량AI 모델\n고성능컴퓨팅환경\n클라우드인프라\nCloud GPU Server\nUser\nDevice\n데이터입력\nAI 연산결과\n데이터입력\nAI 연산결과\nUser\nDevice\n데이터입력\nAI 연산결과\n지능형반도체\n(NPU, PIM)\n경량화된AI 모델\n1. 빠른응답\n2. 보안강화\n3. 네트워크연결불필요\n4. 비용절감\n5. 개인화된서비스\n"
+  },
+  {
+    "page": 10,
+    "text": "Model\nParameters\nFP16\nINT4\nGemma4\n2.3B, 4.5B, 12B\n4, 8, 24GB\n1, 2, 6GB\nLlama3.2\n1B, 3B, 11B\n2, 6, 22GB\n0.5, 1.5, 5.5GB\nMemory Capacity\n10\nS26\n16/12GB\nS24\n12/8GB\n"
+  },
+  {
+    "page": 11,
+    "text": "Performance\n11\nArithmetic Intensity= FLOPs / Memory Traffic\nP = min(𝑃𝑝𝑒𝑎𝑘, 𝐵𝑊× 𝐴𝐼)\n•\nCNN: Conv, GEMM\n✓high data reuse\n✓often compute-bound\n•\nLLM Prefill: GEMM\n✓relatively high arithmetic intensity\n✓compute utilization 중요\n•\nLLM Decode: GEMV\n✓low weight reuse at batch=1\n✓memory-bandwidth bound\n"
+  },
+  {
+    "page": 12,
+    "text": "Parameters, Activations, FLOPs\n12\nImage (3x244x224)\n3×3 Conv, channel 384, pad 1, groups 2\n3×3 Conv, channel 256, pad 1, groups 2\n3×3 Conv, channel 384, pad 1\n5×5 Conv, channel 256, pad 2, groups 2\n11×11 Conv, channel 96, stride 4, pad 2\n3×3 MaxPool, stride 2\n3×3 MaxPool, stride 2\n3×3 MaxPool, stride 2\nLinear, channel 4096\nLinear, channel 4096\nLinear, channel 1000\nAlexNet\n3x244x224\n384x13x13\n256x13x13\n384x13x13\n256x27x27\n96x55x55\n96x27x27\n256x13x13\n256x6x6\n4096\n4096\n1000\nC x H x W = #Activations\n384x384x3x3/2 = 663,552\n256x384x3x3/2 = 442,368\n384x256x3x3 = 884,736\n256x96x5x5/2 = 307,200\n96x3x11x11 = 24,848\n4096x(256x6x6) = 37,748,736\n4096x4096 = 16,777,216\n1000x4096 = 4,096,000\n#Parameters\n(bias is ignored)\n𝒄𝒐𝒖𝒕× 𝒄𝒊𝒏× 𝒌𝟐/𝒈\nTotal 61M = 224MB (32bits)\n= 150,528\n= 64,896\n= 43,264\n= 64,896\n= 186,624\n= 290,400\n= 69,984\n= 43,264\n= 9,216\n= 4,096\n= 4,096\n= 1,000\nTotal 932,264 = 3.7MB (32bits)\n150,528+290,400=440,928 (peak)\n384×384×3×3×13×13/2 = 112,140,288\n256×384×3×3×13×13/2 = 74,760,192\n384x256x3x3x13x13 = 149,520,384\n256x96x5x5x27x27/2 = 223,948,800\n96x3x11x11x55x55 = 105,415,200\n4096x(256x6x6) = 37,748,736\n4096x4096 = 16,777,216\n1000x4096 = 4,096,000\nMACs\n(one MAC = two FLOPs)\n𝒄𝒐𝒖𝒕× 𝒄𝒊𝒏× 𝒌𝟐× 𝒉× 𝒘/𝒈\nTotal 724M = 1.4G FLOPs\nFrom https://efficientml.ai \n𝒄𝒐𝒖𝒕× 𝒄𝒊𝒏 (𝒌= 𝟏)\n𝒄𝒐𝒖𝒕× 𝒄𝒊𝒏 (𝒌, 𝒉, 𝒘= 𝟏)\n"
+  },
+  {
+    "page": 13,
+    "text": "Memory\n13\nMobileNetV2 reduces model size \nbut not peak memory.\nFrom https://efficientml.ai \n"
+  },
+  {
+    "page": 14,
+    "text": "Memory - LLM Inference\n14\nLLM Inference Unveiled: Survey and Roofline Model Insights [ArXiv 2024]\nLlama-2-13b\n"
+  },
+  {
+    "page": 15,
+    "text": "Memory - LLM Inference\n• Llama2-7B, 16-bit precision (FP16 or BF16)\n• Model weights: 7BFP16 ~= 14 GB.\n• KV cache: 2BSLDP\n• B: Batch Size, S: Sequence Length, L: #Layers, D: Hidden Dimension, P: Precision\n• if batch size = 1, 2140963240962B ~ 2 GB (0.5MB/token)\n• How to reduce KV cache?\n• Reduce batch size? Low GPU utilization\n• Reduce sequence length (token pruning, sparse attention)? Accuracy drop\n• Reduce layers? Smaller models usually have less layers\n• Reduce attention heads? \n• Multi-query attention (MQA), \n• Grouped-query attention (GQA)\n• Reduce precision? KV Quantization\n• How about memory offloading?\n15\nmean \npooling\nmean \npooling\n"
+  },
+  {
+    "page": 16,
+    "text": "On-Device AI Enablers\n16\nHardware Accelerators\nGPU, NPU, PIM, …\nEdge AI Frameworks\nLlama.cpp ExecuTorch, MLC-LLM, \nGoogle LiteRT, ONNX Runtime, \nApple MLX, Intel OpenVINO GenAI  \nEfficient AI Models\nSmall Models, Model Compression\n"
+  },
+  {
+    "page": 17,
+    "text": "Model Compression Techniques \nEfficient Large Language Models: A Survey [Wan et al., arXiv 2023]\n17\n"
+  },
+  {
+    "page": 18,
+    "text": "Small LLMs\n• Google Gemini\n• Nano-1: 1.8B, Nano-2: 3.25B \n• Google Gemma 4\n• E2B(2.3B, +embedding 5.1B)\n• E4B(4.5B, +embedding 8B)\n• 12B\n• Meta\n• Llama3.2\n• Lightweight: 1B, 3B\n• Multimodal: 11B\n• MobileLLM\n• 125M, 350M for on-device\n• MobileLLM-Pro: 1B\n• MS Phi  \n• Phi-4-mini (3.8B)\n• Mistral\n• Ministral 3B\n• NVIDIA\n• Minitron 4B\n• Alibaba \n• Qwen3: 0.6B, 1.7B, 4B, 8B, 14B\n18\n"
+  },
+  {
+    "page": 19,
+    "text": "Llama.cpp\n• Georgi Gerganov implemented Meta's LLaMa architecture within \nthe versatile and widely-used C/C++ programming languages. \n• Broad compatibility (Apple M, Intel AVX512, NVIDIA)\n• Performance optimizations inherent to C/C++.\n• Integer Quantization (1.5b, 2b, 3b, 4b, 5b, 6b, 8b)\n• Support CPU+GPU hybrid inference\n• GGUF and GGML: tensor library used by llama.cpp\n• Backed by an active open-source community, continuous \nimprovements and collaborative development.\n• https://github.com/ggerganov/llama.cpp \n19\n"
+  },
+  {
+    "page": 20,
+    "text": "Llama.cpp\n20\n"
+  },
+  {
+    "page": 21,
+    "text": "ExecuTorch\n21\n• PyTorch's official, end-to-end\nsolution designed for on-device\nAI inference\n• Ahead-of-Time (AOT) compilation\n• Hardware Acceleration (Backend\nDelegation): Apple, Qualcomm, \nARM, Exynos, MediaTek, and \nVulkan\nEXIR = ExecuTorch Export\nIntermediate Representation\n"
+  },
+  {
+    "page": 22,
+    "text": "NPU\n22\nhttps://plena-cam.github.io/\n"
+  },
+  {
+    "page": 23,
+    "text": "Hailo Software Stack\n23\n"
+  },
+  {
+    "page": 24,
+    "text": "Quantization\n"
+  },
+  {
+    "page": 25,
+    "text": "Quantization\n• Mapping data to a smaller set of \nquantization levels\n• FP32 → FP16 → Int8 → Int4 → Int2 → \nBinary\n• Reduced storage cost, reduced \ncomputation requirements.\n• Must minimize the quantization error  \n• The number of quantization levels \nreflects the precision and the number \nof bits required to represent the data \n25\nhttps://developer.nvidia.com/blog/mastering-llm-techniques-inference-optimization/ \n"
+  },
+  {
+    "page": 26,
+    "text": "Numeric Data Types\n26\n8/23\n5/10\n8/7\nhttps://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization \n"
+  },
+  {
+    "page": 27,
+    "text": "MX (Microscaling)\n• OCP(Open Compute Project) standard Group Quantization\n• MXFP8, MXFP6, MXFP4, MXINT8 \n• MXFP4: E2M1 FP4 + UE8M0 scale (Block 32)\n• Per-block scaling: 32 elements in a block share 8bits scale (E8M0).\n• UE8M0 scale K (8bits)\n• 𝟐𝑲 → exponent add\nS\n−1 𝑆× 2exp −1 × (1 +\n𝑀\n2)\nexp\nM\nExp\nM=0\nM=1\n00\n0\n0.5\n01\n1\n1.5\n10\n2\n3\n11\n4\n6\n"
+  },
+  {
+    "page": 28,
+    "text": "NVFP4\n• MXFP4의NVIDIA NextGen\n• Block size: 16\n• FP8 block scale + FP32 Tensor scale\n• NVIDIA Hardware native\nMXFP4\nNVFP4\n실제element\nE2M1 FP4\nE2M1 FP4\nblock size\n32개\n16개\nblock scale\nE8M0, 8bit\nE4M3, 8bit\nscale 특성\n2𝑠𝑐𝑎𝑙𝑒 정밀도↓\n정밀도↑\nglobal scale\n없음\nFP32 per-tensor\n유효저장량\n4.25 bit/value\n약4.5 bit/value\n"
+  },
+  {
+    "page": 29,
+    "text": "29\n"
+  },
+  {
+    "page": 30,
+    "text": "Uniform vs Non-Uniform\n• Uniform Quant (Linear Quant)\n• Affine mapping of integers to real numbers, r = S(q − Z)\n• Cannot match the realistic data distribution well\n• Non-Uniform Quant (Log Quant)\n• Higher accuracy by focusing more on important value regions\n• 27.8% loss for 4b uniform quant vs. 5% loss for log-2 quant (VGG-16 LogNet)\n• Variable step length => difficult to deploy efficiently on real H/W\n• Logarithmic approach\n• Exponential variance on step length. Multiplication ➔ bit-shift\n• Accumulation needs a full precision storage.\n30\nWeighted-Entropy-based Quantization for Deep Neural Networks  (CVPR’17)\n𝑄𝑟= 𝑋𝑖, if 𝑟∈[∆𝑖, ∆𝑖+1) \n"
+  },
+  {
+    "page": 31,
+    "text": "Linear Quantization\n𝑞= 𝐼𝑛𝑡𝑟\n𝑆+ 𝑍\n෤𝑟= 𝑆(𝑞− 𝑍) \nQuantization\nDequantization\nr : real valued input (activation or weight)\nS : real valued scaling factor = max_real /max_quant\nZ : integer zero point\nInt : rounding operation (e.g., round to nearest and truncation)\n31\nIf Z= 0, max|X| = 3.2, 8-bit linear quantization,\nA weight of 0.1 is quantized to round(0.1 × 127/3.2) = 4. \n4 is dequantized to 4 × 3.2/127 = 0.1008 (quantization error = 0.0008) \nr\nq\n0\n0.1\n3.2\n0\n4\n127\n+0.0008\n"
+  },
+  {
+    "page": 32,
+    "text": "Linear Quantization\n32\nr         =  (       q            –     Z )         S\nFrom https://efficientml.ai \n"
+  },
+  {
+    "page": 33,
+    "text": "Linear Quantization\n33\n• An affine mapping of integers to real numbers 𝑟 = 𝑆(𝑞 − 𝑍)\n𝑟𝑚𝑎𝑥 = 𝑆(𝑞𝑚𝑎𝑥 − 𝑍)\n𝑟𝑚𝑖𝑛 = 𝑆(𝑞𝑚𝑖𝑛 − 𝑍)\n𝑟𝑚𝑎𝑥−𝑟𝑚𝑖𝑛= 𝑆𝑞𝑚𝑎𝑥 −𝑞𝑚𝑖𝑛\n𝑆 = 𝑟𝑚𝑎𝑥−𝑟𝑚𝑖𝑛\n𝑞𝑚𝑎𝑥 −𝑞𝑚𝑖𝑛\n \n𝑟𝑚𝑖𝑛 = 𝑆(𝑞𝑚𝑖𝑛 − 𝑍)\n𝑍= 𝑞𝑚𝑖𝑛−𝑟𝑚𝑖𝑛\n𝑆\n𝑍= 𝑟𝑜𝑢𝑛𝑑𝑞𝑚𝑖𝑛−𝑟𝑚𝑖𝑛\n𝑆\n"
+  },
+  {
+    "page": 34,
+    "text": "Linear Quantization\n34\nhttps://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization \n𝑆= 𝑟𝑚𝑎𝑥−𝑟𝑚𝑖𝑛\n𝑞𝑚𝑎𝑥 −𝑞𝑚𝑖𝑛\n= 10.8 −(−7.59)\n127 −(−128) = 18.39\n255 = 0.072 \n𝑍= 𝑟𝑜𝑢𝑛𝑑𝑞𝑚𝑖𝑛−𝑟𝑚𝑖𝑛\n𝑆\n= 𝑟𝑜𝑢𝑛𝑑−128 −−7.59\n0.072\n= 𝑟𝑜𝑢𝑛𝑑−22.58 = −23\nQuantize: 𝑞= 𝑟𝑜𝑢𝑛𝑑\n𝑟\n𝑆+ 𝑍\n= 𝑟𝑜𝑢𝑛𝑑\n5.47\n0.072 −23 = 53\nDequnatize: 𝑟 = 𝑆𝑞 − 𝑍\n= 0.072 53 + 23 = 5.472\n"
+  },
+  {
+    "page": 35,
+    "text": "Linear Quantized Matrix Multiplication\n35\nQuantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference [Jacob et al., CVPR 2018]\n𝑟 = 𝑆(𝑞 − 𝑍)\nY = WX\nSY qY −ZY = SW(qW −ZW) ∙SX(qX −ZX)\nqY = SWSX\nSY\nqW −ZW\nqX −ZX + ZY\nqY = SWSX\nSY\nqWqX −ZWqX −ZXqW + ZWZX + ZY\nThe only \nnon-integer\nN-bit Integer Multiplication\n32-bit Integer Addition/Subtraction\nN-bit Integer \nAddition\nEmpirically, \nSWSX\nSY\n∈(0,1).\nSWSX\nSY\n= 2−𝑛𝑀0, 𝑀0 ∈[0.5,1)\n(bit shift & fixed-point multiplication)\nPrecompute\n"
+  },
+  {
+    "page": 36,
+    "text": "Asymmetric vs. Symmetric\n• The quantization range is fully \nused.\n• The implementation is complex.\n• The quantized range will be \nwasted for biased float range.\n• The implementation is simpler.\n36\nFrom https://efficientml.ai \nAsymmetric Linear Quantization\nSymmetric Linear Quantization\n"
+  },
+  {
+    "page": 37,
+    "text": "Symmetric Quantization\n37\nhttps://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization \n𝑆= 𝑟𝑚𝑎𝑥\n𝑞𝑚𝑎𝑥\n= 10.8\n127 = 0.085 \nQuantize: 𝑞= 𝑟𝑜𝑢𝑛𝑑\n𝑟\n𝑆\n= 𝑟𝑜𝑢𝑛𝑑\n5.47\n0.085\n= 64\nDequnatize: 𝑟 = 𝑆𝑞\n= 0.085 × 64 = 5.44\n"
+  },
+  {
+    "page": 38,
+    "text": "Quant/Dequant Overhead\nSmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [Xiao et al., ICML 2023]\nLayerNorm and SoftMax layers \nare still computed in FP16\n38\nOperation fusion to hide \nquant/dequant overhead\n"
+  },
+  {
+    "page": 39,
+    "text": "Non-Uniform Quantization - NF4 \n• NormalFloat (NF) data type builds on Quantile Quantization\n• Information-theoretically optimal data type\n• Ensures each quantization bin has an equal number of values assigned \nfrom the input tensor\n• Assume the standard \n  normal distribution\n• Codebook-based \n39\nQLoRA: Efficient Finetuning of Quantized LLMs [Dettmers et al., NeurIPS 2023]\nIndex (4-bit) NF4 Quantile Level\n0000 (0)\n-1\n0001 (1)\n-0.6961928\n0010 (2)\n-0.5250929\n0011 (3)\n-0.3949175\n0100 (4)\n-0.2844414\n0101 (5)\n-0.1847734\n0110 (6)\n-0.09105\n0111 (7)\n0\n1000 (8)\n0.0795802\n1001 (9)\n0.1609302\n1010 (10)\n0.2471467\n1011 (11)\n0.3392461\n1100 (12)\n0.4407098\n1101 (13)\n0.5580939\n1110 (14)\n0.7076249\n1111 (15)\n1\n"
+  },
+  {
+    "page": 40,
+    "text": "Non-Uniform Quantization – 2K\n• Incremental network quantization \n(INQ)\n• At each iteration, the unquantized \nweights are partitioned into two disjoint \ngroups (random or magnitude-aware)\n• One group is quantized into powers of \ntwo or zero while the other remained in \nhigh precision \n• Retraining to compensate the accuracy \nloss. \n• The portion of quantized weights \ngradually increases until it covers all \nweights. \n40\nIncremental Network Quantization: Towards Lossless CNNs with Low-Precision Weights (ICLR’17)\n"
+  },
+  {
+    "page": 41,
+    "text": "Non-Uniform Quantization\n• Binarycode-based Quantization \n• a real-number vector 𝒓∈ℝ𝑛 is quantized into 𝑚 binary vectors \n• 𝒓≈σ𝑖=1\n𝑚𝛼𝑖𝒃𝑖\n• Scaling factors 𝛼𝑖∈ℝ, Binary vectors 𝒃𝑖∈{−1, +1}𝑛. \n41\nLQ-Nets (ECCV’18)\nBiQGEMM: Matrix Multiplication with Lookup Table For Binary-Coding-based Quantized DNNs (SC’20)\n"
+  },
+  {
+    "page": 42,
+    "text": "Learned Quantization (Codebook)\n• Weight sharing\n• Weights are grouped using a hashing function \nor a k-means algorithm\n• One value is assigned to each group \n• Reduce # of unique weights in a filter\n• Codebook-based mapping\n• Each group of weights has an index \n• The index is stored for each position in the \nfilter rather than a weight value. \n• Two-step process to fetch the weight\n• Reduce the cost of weight access\n• if bitwidth of group index < bitwidth of weight\n• not reduce the precision of the MAC \ncomputation itself\nDeep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding (ICLR’16)\n42\nCRSM: filter size\n"
+  },
+  {
+    "page": 43,
+    "text": "Learned Quantization \n43\nDeep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding (ICLR’16)\n"
+  },
+  {
+    "page": 44,
+    "text": "Vector Quantization\n• QuIP#\n①Randomized Hadamard Transform\n• ෩\n𝑊= 𝑈𝑊𝑉𝑇\n• 𝑈= 𝐻𝑚𝑆𝑈, 𝑉= 𝐻𝑛𝑆𝑉\n• H: normalized Hadamard matrix, \n• S: random ±1 diagonal matrix\n• outlier-heavy distribution → \nmore Gaussian / isotropic distribution\n②E8 Vector Quantization\n• 𝑤= [𝑤1, 𝑤2, … , 𝑤8] ∈𝑅8, 𝑤→𝑐𝑘∈𝐶\n• 256-entry codebook (not 64K entries)\n44\nQuIP#: Even Better LLM Quantization with Hadamard Incoherence and Lattice Codebooks [ICML’24]\n1.2\n-0.4\n0.1\n2.8\n-1.5\n0.6\n-0.2\n1.0\n0.52\n-0.68\n0.44\n0.17\n-0.39\n0.63\n-0.58\n0.29\n0.50\n-0.75\n0.50\n0.25\n-0.50\n0.75\n-0.50\n0.25\nLUT index\n(8 bit)\nSign \n(7 bit)\nShift \n(1 bit)\n00110101\n0100101\n1\n16-bit codeword (2 bits per weight)\nRHT\nE8 VQ\n¼ \n1\n¼ \n0\n¾ \n½ \n¾ \n0\nFrom Codebook\nSign \n½ \n-¾ \n½ \n¼ \n-½ \n¾ \n-½ \n¼ \nShift (add ¼)\n¼ \n-1\n¼ \n0\n-¾ \n½ \n-¾ \n0\n"
+  },
+  {
+    "page": 45,
+    "text": "Vector Quantization\n• AQLM\n• Learned multi-codebook, Additive VQ\n45\nExtreme Compression of Large Language Models via Additive Quantization [ICML’24]\n"
+  },
+  {
+    "page": 46,
+    "text": "Post-Training Quantization (PTQ)\n• Perform the quantization and the adjustments of the weights, \nwithout any fine-tuning\n• A pre-trained model is calibrated using calibration data (e.g., a \nsmall subset of training data) to compute the clipping ranges \nand the scaling factors.\n• Low overhead, but lower accuracy as compared to QAT, \nespecially for low-precision \n• How should we get the optimal linear quantization parameters \n(S, Z)?\n46\n"
+  },
+  {
+    "page": 47,
+    "text": "Range Mapping and Clipping\n47\nhttps://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization \n"
+  },
+  {
+    "page": 48,
+    "text": "Static vs Dynamic Quantization\n• Static quantization\n• Clipping range (min/max) is pre-calculated and static during inference. \n• No runtime computational overhead.\n• Weights are essentially always static. \n• Activations can also be determined via calibration data.\n• Vulnerable to distribution shift.\n• Pre-calculation method\n• minimizing Mean Squared Error (MSE) between original unquantized weight \ndistribution and the corresponding quantized values or entropy  \n• Dynamic quantization\n• Clipping range is dynamically calculated for each activation map during \nruntime\n• real-time computation of the signal statistics (min, max, percentile, etc.) \n• Higher accuracy\n48\n"
+  },
+  {
+    "page": 49,
+    "text": "Rounding\n• RTN: project to the nearest discrete level\n• Adaptive rounding: AdaRound, BRECQ\n• 𝑞𝑖=\n𝑤𝑖\nΔ\n+ ℎ𝛼𝑖, ℎ𝛼𝑖∈{0,1} \n• Find ℎ𝛼𝑖 to minimize ∥WX −෡\n𝑊(𝛼)X ∥2\n• Using Calibration data\n49\nUp or Down? Adaptive Rounding for Post-Training Quantization [ICML’20]\nBRECQ: Pushing the Limit of Post-Training Quantization by Block Reconstruction\n"
+  },
+  {
+    "page": 50,
+    "text": "Optimal Brain Quantization (OBQ)\n50\n• A second-order PTQ method minimizing the increase in loss \n• Uses Hessian (curvature) information, not just nearest rounding.\n• Selects the weight with the smallest estimated loss increase.\n• After quantizing one weight, it adjusts the others to reduce output error.\n"
+  },
+  {
+    "page": 51,
+    "text": "Per-Channel Weight Quantization\n• Common failure results from\n• Large differences (more than 100×) in \nranges of weights for different output \nchannels\n• Outlier weight values that make all \nremaining weights less precise after \nquantization\n• Solution: Per-Channel Quantization\n51\nstrong differences btwn channel weight ranges\nData-Free Quantization Through Weight Equalization and Bias \nCorrection [ICCV 2019]\n• Using single scale for whole weight tensor (Per-Tensor \nQuantization)\n• works sufficiently well for large models\n• leads to significant accuracy drops for small models\n"
+  },
+  {
+    "page": 52,
+    "text": "Per-Channel Weight Quantization\n52\nSmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [Xiao et al., ICML 2023]\n"
+  },
+  {
+    "page": 53,
+    "text": "Weight Equalization\n• Scaling equivariance\n• scaling down layer 𝑘 weights of \noutput channel 𝑐𝑖 by 𝑠𝑖\n• scaling up layer 𝑘+ 1 weights of \ninput channel 𝑑𝑖 by 𝑠𝑖 \n• How to determine 𝑠𝑖\n• 𝑠𝑖=\n1\n𝑟𝑑𝑖\n𝑘+1\n𝑟𝑐𝑖\n𝑘𝑟𝑑𝑖\n𝑘+1\n• 𝑟𝑐𝑖\n𝑘: quantization weight range of \noutput channel 𝑖 (𝑐𝑖) in Layer 𝑘\n• 𝑟𝑑𝑖\n𝑘+1: quantization weight range of \ninput channel 𝑖 (𝑑𝑖) in Layer 𝑘+ 1\n53\nSame, Same But Different - Recovering Neural Network Quantization Error Through Weight Factorization [ICML 2019]\nData-Free Quantization Through Weight Equalization and Bias Correction [ICCV 2019]\nǁ𝑟𝑐𝑖\n𝑘=\n𝑟𝑐𝑖\n𝑘\n𝑠𝑖\n=\n𝑟𝑐𝑖\n𝑘∙𝑟𝑑𝑖\n𝑘+1\n𝑟𝑐𝑖\n𝑘𝑟𝑑𝑖\n𝑘+1\n=\n𝑟𝑐𝑖\n𝑘𝑟𝑑𝑖\n𝑘+1\nǁ𝑟𝑑𝑖\n𝑘+1 = 𝑟𝑑𝑖\n𝑘+1 ∙𝑠𝑖=\n𝑟𝑐𝑖\n𝑘𝑟𝑑𝑖\n𝑘+1\n• Rescaling to equalize the weight ranges of different output channels\nActivation function must be linear. (e.g., ReLU)\n"
+  },
+  {
+    "page": 54,
+    "text": "Post-Training INT8 Linear Quantization\n54\nSmaller models seem to not respond as well to post-training quantization, \npresumabley due to their smaller representational capacity\n➔ How should we improve performance of quantized models?\nFrom https://efficientml.ai \n"
+  },
+  {
+    "page": 55,
+    "text": "Quantization-Aware Training (QAT)\nHow should we improve performance of quantized models?\n"
+  },
+  {
+    "page": 56,
+    "text": "Fine-tuning Methods\n• Quantization may introduce a perturbation to the trained model \nparameters\n• Need to adjust the parameters in the NN after quantization\n• Quantization-Aware Training (QAT)\n• A pre-trained model is quantized and then fine-tuned using training \ndata to adjust parameters and recover accuracy degradation\nQAT\nPTQ\n56\nA Survey of Quantization Methods for Efficient Neural Network Inference\n"
+  },
+  {
+    "page": 57,
+    "text": "Quantization-Aware Training\n• Train the model taking quantization into consideration\n• A full precision copy of the weights W is maintained throughout the \ntraining\n• The small gradients are accumulated without loss of precision\n• Once the model is trained, only the quantized weights are used for \ninference\n57\nHow should gradients \nback-propagate \nthrough the (simulated) \nquantization? \nFrom https://efficientml.ai \n"
+  },
+  {
+    "page": 58,
+    "text": "Gradient of Quantization Function\n• Quantization function is nondifferentiable with respect to its input\n• Gradient presented as delta-spikes at the transition points \n• Not friendly to the SGD learning\n• Straight Through Estimator (STE) \n• Ignore the rounding operation and approximates it with an identity function\n• Simply bypasses the quantization function during the gradient BP. \n• Take the gradient at the quantized value and perform the update on the \noriginal real value\n• Works well in practice, except for ultra low-precision quantization such as \nbinary quantization\n58\nEstimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation [Bengio, arXiv 2013]\n"
+  },
+  {
+    "page": 59,
+    "text": "Quantization-Aware Training\n59\nA Survey of Quantization Methods for Efficient Neural Network Inference\n"
+  },
+  {
+    "page": 60,
+    "text": "INT8 Linear Quantization-Aware Training\n• An affine mapping of integers to real numbers 𝑟 = 𝑆(𝑞 − 𝑍)\n60\nWeight update during training\n32-bit floating-point \narithmetic\nQuantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference [Jacob et al., CVPR 2018]\n"
+  },
+  {
+    "page": 61,
+    "text": "INT8 Linear Quantization-Aware Training\n61\nFrom https://efficientml.ai \n"
+  },
+  {
+    "page": 62,
+    "text": "Approximation for Nonlinear OPs\n62\nI-BERT: Integer-only BERT Quantization (ICML’21)\nInteger-Only Approximation for non-linear operations of BERT\n"
+  },
+  {
+    "page": 63,
+    "text": "LLM Quantization\n• CNN Quantization\n• FP32 → Int8 → Int4 → 2/1b (XNOR-Net, BinaryNet)\n• QAT is reasonable\n• Bert quantization also followed CNN’s approaches\n• LLM Quantization\n• FP16 → Int8 → Int4 → 1b (BitNet)\n• PTQ is popular (Llama-2 have the cost of >$20 million (278억) to train)\n• QLora: Quantization at fine-tuning for downstream task\n• Weight-only, Weight-Activation, KV Cache\n63\n"
+  },
+  {
+    "page": 64,
+    "text": "Weight/Activation Variance\n• Highly dynamic range in the activations (tokens) between layers\n• A very diverse distribution of activations depending on input token\n• Token-wise, Dynamic\n• Calibrate token-wise min/max ranges dynamically during inference\n• Weight matrices have long-tailed ranges\n• Each head is independently trained and has significantly different \ndistributions.\n• Group-wise quantization\n64\nZeroQuant: Efficient and Affordable Post-Training Quantization for Large-Scale Transformers [Z Yao et al., NeurlIPS 2024] \n"
+  },
+  {
+    "page": 65,
+    "text": "LLM.int8 - Mixed Precision\n• W8A8\n• Vector-wise quantization granularity.\n• scaling by row and column-wise absolute maximum (𝐶𝑥, 𝐶𝑤) \n• Separate outlier and normal values into two matrices\n• Outlier feature matrices are multiplied in 16-bit\n65\nLLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale [NeurIPS’22]\nExisting PTQ \nmethods fail for \nlarge transformers \n(≥6.7B) due to the \nextreme outliers.\n"
+  },
+  {
+    "page": 66,
+    "text": "SmoothQuant\n• Outliers persist in fixed channels.\n• Transfer appropriate outliers from activation to weight offline \nthrough channel-wise smoothing scales\nSmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [Xiao et al., ICML 2023]\n66\n"
+  },
+  {
+    "page": 67,
+    "text": "SmoothQuant\n67\nSmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [Xiao et al., ICML 2023]\n"
+  },
+  {
+    "page": 68,
+    "text": "SmoothQuant\n• Smoothing activation to reduce quantization error\n𝐘= 𝐗𝐖= 𝐗𝑑𝑖𝑎𝑔𝑠−1 ⋅𝑑𝑖𝑎𝑔𝑠𝐖= ෡𝐗෡\n𝐖\nSmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [Xiao et al., ICML 2023]\n68\n"
+  },
+  {
+    "page": 69,
+    "text": "SmoothQuant\n• Well maintains the accuracy without fine-tuning.\n• Can both accelerate inference and halve the memory footprint.\nSmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [Xiao et al., ICML 2023]\nlosslessly quantize LLaMA families \nThe scaling factor is calibrated offline\nEqual performance to LLM.int8() without the need \nfor mixed-precision decomposition of the activation.\n69\n"
+  },
+  {
+    "page": 70,
+    "text": "QuaRot\n• Make the activations easy to quantize by rotating them using \nrandomized Hadamard transformation (remove outlier features)\n• Enable 4-bit LLM inference by quantizing all weights, activations, \nand KV caches (cf. SmoothQuant cannot implement A4W4)\n70\nQuaRot: Outlier-Free 4-Bit Inference in Rotated LLMs [NeurIPS’24] \nRotated Runtime Smooth: Training-Free Activation Smoother for \naccurate INT4 inference [ICLR’25]\n𝐘= 𝐗𝐑\n𝐑−𝟏𝐖−𝟏= 𝐗𝐖𝐓\nA rotation matrix is an orthogonal matrix 𝐑 satisfied 𝐑𝐑𝐓= 1 and 𝐑= 1\nOstQuant: Refining Large Language Model Quantization with Orthogonal \nand Scaling Transformations for Better Distribution Fitting [ICLR’25]\n"
+  },
+  {
+    "page": 71,
+    "text": "SpinQuant\n• Optimize the rotation matrix to minimize the final loss of the \nquantized network\n• Cayley SGD for optimizing orthonormal matrices.\n71\nSpinQuant: LLM quantization with learned rotations [ICLR’25]\n"
+  },
+  {
+    "page": 72,
+    "text": "Weight-Only Quantization\n• W8A8 quantization is still memory-bounded.\n• W4A16 low-bit weight-only quantization  \n• No efficiency gains in the multiplication operations, \ndue to the mixed-precision interactions with the non-\nquantized activations.\n• Reduced memory traffic can speed up inference\n72\n"
+  },
+  {
+    "page": 73,
+    "text": "GPTQ\n• Based on OBQ (Optimal Brain Quantization)\n• Layer-Wise Quantization\n• minimizes local layer-output reconstruction.\n• The curvature of the reconstruction loss can \nbe estimated from the activation covariance\n• Quantize rows of W independently\n• Quantize column-by-column (fixed order)\n• Perform the update of 𝐇𝐹\n−1 only 𝑑col times (once \nper column)  \n• 𝐇𝐹\n−1 = 𝑼𝑻𝑼 (Cholesky decomposition)\n• Lazy Batch-Updates\n• Apply the update to columns in the block\nGPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers [Frantar et al., ICLR 2023]\n73\nfixed order\n𝐿𝑟𝑒𝑐=\n𝑊𝑋−෡\n𝑊𝑋𝐹\n2 =\n𝛿𝑊𝑋𝐹\n2,\n𝐿𝑟𝑒𝑐,𝑟𝑜𝑤=\n𝛿𝑤𝑋2\n2 = 𝛿𝑤𝑋𝑋𝑇𝛿𝑤𝑇\n∆𝐿≈\n1\n2 𝛿𝑤𝐻𝛿𝑤𝑇, 𝐻𝑟𝑜𝑤∝𝑋𝑋𝑇,\n𝐻1 = 𝐻2 = 𝐻3 = ⋯= 𝑋𝑋𝑇 \n(row에무관하게동일𝐻)\n"
+  },
+  {
+    "page": 74,
+    "text": "GPTQ\n74\nCholesky factorization eliminates the need for explicit Schur-complement updates of H-1.\n"
+  },
+  {
+    "page": 75,
+    "text": "AWQ\n• Observation: Weights are not equally important\n• Keeping only 1% of salient weight channels in FP16 can greatly \nimprove perplexity (43.2 → 13.0)\n• Salient weights are determined by activation distribution, not weight.\n• But the mixed-precision format is not hardware-efficient.\nAWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration [Lin et al., MLSys 2024]\n75\n"
+  },
+  {
+    "page": 76,
+    "text": "AWQ\n• Protecting salient weights by per-channel scaling\n• Multiplying the salient channels with 𝑠> 1 reduces its quantization \nerror\nAWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration [Lin et al., MLSys 2024]\n76\n𝑠= 𝑠𝑋\n𝛼=\n1\n𝑁෍𝑋\n𝛼\n0 ≤𝛼≤1\nFind per-layer optimal 𝛼\nChannel group-wise Quantization\n"
+  },
+  {
+    "page": 77,
+    "text": "AWQ\n• Better perplexity than GPTQ (w/ and w/o reordering) on LLaMA \n& Llama-2 models.\n• Reconstruction process of GPTQ leads to an over-fitting issue to the \ncalibration set and may not preserve the generalist abilities of LLMs.\nAWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration [Lin et al., MLSys 2024]\n77\n"
+  },
+  {
+    "page": 78,
+    "text": "QLoRA = LoRA+Quant\n• LoRA with quantized base model weights\n• NormalFloat (NF4)\n• Double quantization (apply quantization on scaling factors) to further \nreduce base model size\n• Paged Optimizers with CPU offloading\nQLoRA: Efficient Finetuning of Quantized LLMs [Dettmers et al., NeurIPS 2023]\n78\n"
+  },
+  {
+    "page": 79,
+    "text": "Double Quantization\n• Quantize the quantization constants\n• Bits per parameter: \n32\n64 = 0.5 bits ➔\n8\n64 +\n32\n64⋅256 = 0.127 bits\n• Reduce the memory footprint of quantization constants.\n• Compute in BF16\n(NF4)\n(FP32)\n(FP8)\n(FP32)\n(FP32)\nblock size: 64\nblock size: 64 ⋅256\nDouble Quantization\nDouble quantized weights\nAdapter weights\n79\nQLoRA: Efficient Finetuning of Quantized LLMs [Dettmers et al., NeurIPS 2023]\n"
+  },
+  {
+    "page": 80,
+    "text": "Llama.cpp Quantization\n계열\n형식\n기법\nLegacy\nblock quant\nQ4_0, Q5_0, Q8_0 (symmetric, only scale)\nQ4_1, Q5_1 (asymmetric, scale+min)\n32-weight block 마다scale/min (FP16)\nK-quant\nQ2_K_S, Q2_K, \nQ3_K_S, Q3_K_M, Q3_K_L \nQ4_K_S, Q4_K_M, \nQ5_K_S, Q5_K_M, Q6_K\nMixed Precision\nDouble Quant (6bit scale/min)\n(superblock = 8 blocks = 256 weights)\nIQ / I-quant\nIQ1_S, IQ1_M\nIQ2_XXS, IQ2_XS, IQ2_S, IQ2_M\nIQ3_XXS, IQ3_XS, IQ3_S, IQ3_M\nIQ4_XS, IQ4_NL (non-linear)\nimportance-aware (GPTQ)\nimatrix 𝐼𝑖≈𝐸𝑥𝑖\n2\nStructured codebook/VQ \n(XXS < XS < S < M)\nTernary\n𝑤 {−1,0, +1}\nTQ1_0 (base-3 packing, 메모리,복잡)\nTQ2_0 (2-bit scalar packing)\n[−1,+1,0,−1,+1]→[0,2,1,0,2]\n0 × 34 + 2 × 33 + 1 × 32 + 0 × 31 + 2 × 30 =\n65 (8𝑏으로표현) \nFP4\nMXFP4, NVFP4\nFP4 + shared scale\nultra-low-bit\nQ1_0, Q2_0\n단순1/2-bit block quant\n80\n"
+  }
+]

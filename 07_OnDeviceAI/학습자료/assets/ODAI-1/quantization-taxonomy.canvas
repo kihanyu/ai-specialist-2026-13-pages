@@ -1,0 +1,180 @@
+{
+  "nodes": [
+    {
+      "id": "root",
+      "type": "text",
+      "x": 780,
+      "y": 100,
+      "width": 400,
+      "height": 160,
+      "text": "Quantization 양자화\n\n실수 → 유한한 대표값\n\n배치 / 부호화 단위 구분",
+      "color": "4"
+    },
+    {
+      "id": "linear",
+      "type": "text",
+      "x": 40,
+      "y": 370,
+      "width": 630,
+      "height": 170,
+      "text": "Linear / Uniform — 선형·균일 스칼라\n\n공유 scale 안에서 대표값 간격이 일정\n\n복원: r ~ S(q - Z)",
+      "color": "4"
+    },
+    {
+      "id": "nonlinear",
+      "type": "text",
+      "x": 720,
+      "y": 370,
+      "width": 630,
+      "height": 170,
+      "text": "Nonlinear / Non-uniform — 비균일 스칼라\n\n대표값 위치에 따라 간격이 달라짐\n\n이 자료에서는 비균일이라는 의미로 사용",
+      "color": "4"
+    },
+    {
+      "id": "vqaxis",
+      "type": "text",
+      "x": 1400,
+      "y": 370,
+      "width": 480,
+      "height": 170,
+      "text": "Vector Quantization — 별도 분류축\n\n분류 기준: 여러 원소의 공동 부호화\n\n스칼라 간격 분류의 하위집합 아님",
+      "color": "4"
+    },
+    {
+      "id": "sym",
+      "type": "text",
+      "x": 40,
+      "y": 700,
+      "width": 300,
+      "height": 260,
+      "text": "대칭 선형\n\nZero point Z = 0\n\nINT8 / INT4 등\n\nq = round(r / S)\n\n최종 코드 범위로 clip",
+      "color": "4"
+    },
+    {
+      "id": "asym",
+      "type": "text",
+      "x": 370,
+      "y": 700,
+      "width": 300,
+      "height": 260,
+      "text": "비대칭 선형\n\n범위에 맞게 Z 선택\n\nZ는 0일 수도 있음\n\nq = round(r / S) + Z\n\n최종 코드 범위로 clip",
+      "color": "4"
+    },
+    {
+      "id": "log",
+      "type": "text",
+      "x": 720,
+      "y": 700,
+      "width": 300,
+      "height": 260,
+      "text": "로그 · 거듭제곱\n\nLog quantization\n\nINQ: 0 또는 ±2^k\n\nINQ는 점진 양자화와\n\n재학습을 함께 사용",
+      "color": "4"
+    },
+    {
+      "id": "scalar",
+      "type": "text",
+      "x": 1050,
+      "y": 700,
+      "width": 300,
+      "height": 260,
+      "text": "기타 비균일 스칼라\n\nNF4 / learned codebook\n\nBinary-code: 강의의 예\n\nFP4(E2M1), MX/NV\n\n원소 대표값 간격 비균일",
+      "color": "4"
+    },
+    {
+      "id": "vector",
+      "type": "text",
+      "x": 1400,
+      "y": 700,
+      "width": 480,
+      "height": 260,
+      "text": "벡터 양자화의 강의 예\n\nQuIP#: E8 격자 기반 codebook\n\nAQLM: 여러 codebook 벡터의 합\n\n여러 원소를 벡터로 묶어 공동 부호화\n\n1차원 간격 기준을 그대로 적용하지 않음",
+      "color": "4"
+    },
+    {
+      "id": "axis",
+      "type": "text",
+      "x": 40,
+      "y": 1060,
+      "width": 850,
+      "height": 190,
+      "text": "별도 설계축 — 위 가지와 조합 가능\n\nPTQ / QAT: 변환·학습 방식; static / dynamic: 결정 시점\n\nper-tensor / channel / group / token: scale 공유 단위\n\nWeight / Activation / KV: 양자화 대상",
+      "color": "4"
+    },
+    {
+      "id": "methods",
+      "type": "text",
+      "x": 940,
+      "y": 1060,
+      "width": 940,
+      "height": 190,
+      "text": "오차 제어·전처리 기법 — 독립적인 대표값 분류가 아님\n\nRTN·AdaRound·BRECQ·OBQ·GPTQ: 반올림·재구성·오차 보상\n\nSmoothQuant·AWQ: scaling; QuaRot·SpinQuant: 회전\n\n블록 선형 형식 예: Q4_0 / Q4_1 / K-quant (구체 정의 확인)",
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "linear",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e1",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "nonlinear",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e2",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "vqaxis",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e3",
+      "fromNode": "linear",
+      "fromSide": "bottom",
+      "toNode": "sym",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e4",
+      "fromNode": "linear",
+      "fromSide": "bottom",
+      "toNode": "asym",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e5",
+      "fromNode": "nonlinear",
+      "fromSide": "bottom",
+      "toNode": "log",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e6",
+      "fromNode": "nonlinear",
+      "fromSide": "bottom",
+      "toNode": "scalar",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e7",
+      "fromNode": "vqaxis",
+      "fromSide": "bottom",
+      "toNode": "vector",
+      "toSide": "top",
+      "toEnd": "arrow"
+    }
+  ]
+}

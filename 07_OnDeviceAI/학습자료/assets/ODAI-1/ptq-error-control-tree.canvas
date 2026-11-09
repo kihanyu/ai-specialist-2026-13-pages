@@ -1,0 +1,134 @@
+{
+  "nodes": [
+    {
+      "id": "root",
+      "type": "text",
+      "x": 620,
+      "y": 100,
+      "width": 500,
+      "height": 150,
+      "text": "PTQ 오차를 줄이는 세 가지 관점\n\n양자화 설정과 보정 수단을 조합\n\n원인 확인 후 필요한 수단 선택",
+      "color": "4"
+    },
+    {
+      "id": "range",
+      "type": "text",
+      "x": 40,
+      "y": 370,
+      "width": 500,
+      "height": 150,
+      "text": "1. 대표 입력과 범위를 조정\n\n값이 잘리거나 한 코드에 뭉치는가?\n\n관련: 4.5절",
+      "color": "4"
+    },
+    {
+      "id": "round",
+      "type": "text",
+      "x": 620,
+      "y": 370,
+      "width": 500,
+      "height": 150,
+      "text": "2. 반올림·출력 오차를 조정\n\n가중치 오차가 출력에 크게 전파되는가?\n\n관련: 4.6절",
+      "color": "4"
+    },
+    {
+      "id": "scale",
+      "type": "text",
+      "x": 1200,
+      "y": 370,
+      "width": 500,
+      "height": 150,
+      "text": "3. 공유 단위와 분포를 조정\n\n서로 다른 채널 범위를 함께 쓰는가?\n\n관련: 4.7–4.8절",
+      "color": "4"
+    },
+    {
+      "id": "r",
+      "type": "text",
+      "x": 40,
+      "y": 650,
+      "width": 500,
+      "height": 240,
+      "text": "Calibration: 대표 입력·통계 수집\n\n범위 선택: min/max·percentile·MSE\n\nClipping: 극단값과 보통 값의 오차 절충\n\nStatic / dynamic: 범위 결정 시점\n\nDynamic이 항상 더 정확한 것은 아님",
+      "color": "4"
+    },
+    {
+      "id": "q",
+      "type": "text",
+      "x": 620,
+      "y": 650,
+      "width": 500,
+      "height": 240,
+      "text": "RTN: 각 값의 최근접 반올림\n\nAdaRound: 반올림 방향 최적화\n\nBRECQ: 여러 연산의 block 재구성\n\nOBQ: 2차 정보와 남은 가중치 보상\n\n각 기법의 비용과 목적함수는 다름",
+      "color": "4"
+    },
+    {
+      "id": "g",
+      "type": "text",
+      "x": 1200,
+      "y": 650,
+      "width": 500,
+      "height": 240,
+      "text": "Per-channel / group: scale 공유 범위\n\nWeight equalization: 채널 범위 균등화\n\nBias correction: 평균적인 출력 이동 보정\n\nGranularity와 static/dynamic은 별도 축\n\nReLU equalization은 양의 동차성 활용",
+      "color": "4"
+    },
+    {
+      "id": "note",
+      "type": "text",
+      "x": 40,
+      "y": 990,
+      "width": 1660,
+      "height": 150,
+      "text": "읽는 법: 관점별 도구 지도다. 세 가지는 배타적인 알고리즘 분류나 고정된 처리 순서가 아니며 서로 조합할 수 있다.\n\nNF4·INQ·codebook·QuIP#·AQLM의 표현 분류는 3장 상단 지도와 이 장 4.2–4.4절에서 별도로 확인한다.\n\n목표 미달 시 QAT를 검토하되, calibration에서의 오차와 별도 평가·실제 장치에서의 품질·성능을 구별한다.",
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "range",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e1",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "round",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e2",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "scale",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e3",
+      "fromNode": "range",
+      "fromSide": "bottom",
+      "toNode": "r",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e4",
+      "fromNode": "round",
+      "fromSide": "bottom",
+      "toNode": "q",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e5",
+      "fromNode": "scale",
+      "fromSide": "bottom",
+      "toNode": "g",
+      "toSide": "top",
+      "toEnd": "arrow"
+    }
+  ]
+}

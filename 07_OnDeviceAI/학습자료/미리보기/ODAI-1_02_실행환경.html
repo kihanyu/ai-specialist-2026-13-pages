@@ -2,18 +2,18 @@
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>온디바이스 AI 실행 환경 | On-device AI 교안</title><link rel="stylesheet" href="textbook.css">
 <script>if(window.self!==window.top)document.documentElement.classList.add('embedded');window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$']] },options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-</head><body><a class="skip" href="#content">본문으로 건너뛰기</a><div class="document-shell"><aside class="document-toc"><details open><summary>이 문서의 목차</summary><nav aria-label="문서 내부 목차"><a class="level-2" href="#실행-구성요소-가지치기-지도">실행 구성요소 가지치기 지도</a><a class="level-2" href="#학습-목표와-선수-개념">학습 목표와 선수 개념</a><a class="level-2" href="#21-모델프레임워크하드웨어의-세-축--p16">2.1 모델·프레임워크·하드웨어의 세 축 — p.16</a><a class="level-2" href="#22-모델-압축-지도--p17">2.2 모델 압축 지도 — p.17</a><a class="level-2" href="#23-small-llm-모델-이름보다-예산과-과제--p18">2.3 Small LLM: 모델 이름보다 예산과 과제 — p.18</a><a class="level-2" href="#24-llamacpp-gguf-ggml의-관계--p19">2.4 llama.cpp, GGUF, GGML의 관계 — p.19</a><a class="level-2" href="#25-llamacpp-실행-흐름과-측정--p20">2.5 llama.cpp 실행 흐름과 측정 — p.20</a><a class="level-2" href="#26-executorch와-aotbackend-delegation--p21">2.6 ExecuTorch와 AOT·Backend Delegation — p.21</a><a class="level-2" href="#27-npu-연산기와-메모리의-협력--p22">2.7 NPU: 연산기와 메모리의 협력 — p.22</a><a class="level-2" href="#28-hailo-개발-환경과-실행-환경-분리--p23">2.8 Hailo: 개발 환경과 실행 환경 분리 — p.23</a><a class="level-2" href="#29-배포-판단을-위한-교육용-점검표">2.9 배포 판단을 위한 교육용 점검표</a><a class="level-2" href="#장-요약과-흔한-오해">장 요약과 흔한 오해</a><a class="level-2" href="#복습-질문과-해설">복습 질문과 해설</a><a class="level-2" href="#다음-장으로">다음 장으로</a></nav></details></aside><main class="document-main" id="content"><nav class="document-nav" aria-label="상위 이동"><a href="../../../index.html" target="_top">전체 과정</a><a href="index.html#ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html" target="_top">On-device AI 강의 목차</a><a href="../../ODAI-1/ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.md" target="_blank" rel="noopener">Markdown 원문</a></nav><h1 id="2장-온디바이스-ai-실행-환경">2장. 온디바이스 AI 실행 환경</h1>
+</head><body><a class="skip" href="#content">본문으로 건너뛰기</a><div class="document-shell"><aside class="document-toc"><details open><summary>이 문서의 목차</summary><nav aria-label="문서 내부 목차"><a class="level-2" href="#실행-구성요소-가지치기-지도">실행 구성요소 가지치기 지도</a><a class="level-2" href="#학습-목표와-선수-개념">학습 목표와 선수 개념</a><a class="level-2" href="#21-모델프레임워크하드웨어의-세-축--p16">2.1 모델·프레임워크·하드웨어의 세 축 — p.16</a><a class="level-2" href="#22-모델-압축-지도--p17">2.2 모델 압축 지도 — p.17</a><a class="level-2" href="#23-small-llm-모델-이름보다-예산과-과제--p18">2.3 Small LLM: 모델 이름보다 예산과 과제 — p.18</a><a class="level-2" href="#24-llamacpp-gguf-ggml의-관계--p19">2.4 llama.cpp, GGUF, GGML의 관계 — p.19</a><a class="level-2" href="#25-llamacpp-실행-흐름과-측정--p20">2.5 llama.cpp 실행 흐름과 측정 — p.20</a><a class="level-2" href="#26-executorch와-aotbackend-delegation--p21">2.6 ExecuTorch와 AOT·Backend Delegation — p.21</a><a class="level-2" href="#27-npu-연산기와-메모리의-협력--p22">2.7 NPU: 연산기와 메모리의 협력 — p.22</a><a class="level-2" href="#28-hailo-개발-환경과-실행-환경-분리--p23">2.8 Hailo: 개발 환경과 실행 환경 분리 — p.23</a><a class="level-2" href="#29-배포-판단을-위한-교육용-점검표">2.9 배포 판단을 위한 교육용 점검표</a><a class="level-2" href="#장-요약과-흔한-오해">장 요약과 흔한 오해</a><a class="level-2" href="#복습-질문과-해설">복습 질문과 해설</a><a class="level-2" href="#다음-장으로">다음 장으로</a></nav></details></aside><main class="document-main" id="content"><nav class="document-nav" aria-label="상위 이동"><a href="../../../index.html" target="_top">전체 과정</a><a href="index.html#ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html" target="_top">On-device AI 강의 목차</a><a href="../ODAI-1/ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.md" target="_blank" rel="noopener">Markdown 원문</a></nav><h1 id="2장-온디바이스-ai-실행-환경">2장. 온디바이스 AI 실행 환경</h1>
 <h2 id="실행-구성요소-가지치기-지도">실행 구성요소 가지치기 지도</h2>
-<p><img alt="실행 구성요소 가지치기 지도" src="../../assets/ODAI-1/deployment-components-tree.png"/></p>
-<p><a href="../../assets/ODAI-1/deployment-components-tree.canvas" rel="noopener" target="_blank">편집 가능한 Canvas</a> · <a href="../../assets/ODAI-1/deployment-components-tree.svg" rel="noopener" target="_blank">확대용 SVG</a></p>
+<p><img alt="실행 구성요소 가지치기 지도" src="../assets/ODAI-1/deployment-components-tree.png"/></p>
+<p><a href="../assets/ODAI-1/deployment-components-tree.canvas" rel="noopener" target="_blank">편집 가능한 Canvas</a> · <a href="../assets/ODAI-1/deployment-components-tree.svg" rel="noopener" target="_blank">확대용 SVG</a></p>
 <p>모델·실행 소프트웨어·하드웨어는 함께 맞춰야 하는 구성요소다. 아래 그림은 각 요소의 역할과 대표 예를 묶어 보여준다. 화살표는 실행 순서나 소프트웨어가 하드웨어를 포함한다는 뜻이 아니다. 상세 배포 순서는 본문의 흐름 설명을 따른다.
 원본 범위: <strong>PDF p.16–23</strong>. 앞 장에서 계산한 가중치·KV·연산·메모리 예산을 실제 장치 배포에 연결한다. <strong>원문 요지</strong>, <strong>교육용 보충</strong>, <strong>정정·주의</strong>를 구분하여 읽는다. 모델 목록과 지원 하드웨어 목록은 원본 강의의 예시이며, 현재 모든 버전의 호환성 보장표가 아니다.</p>
 <h2 id="학습-목표와-선수-개념">학습 목표와 선수 개념</h2>
 <p>모델, 프레임워크, 가속기가 맡는 역할을 구분하고, llama.cpp와 ExecuTorch가 모델을 장치에서 실행하는 방법을 설명한다. NPU의 이론 연산량과 앱의 실제 지연시간이 다른 이유를 설명하고, 변환→검증→프로파일링의 배포 절차를 세울 수 있어야 한다.</p>
 <p>선수 개념은 1장의 parameter·activation·latency·bandwidth다. **Operator(연산자, op)**는 convolution·행렬곱·ReLU 같은 계산 단위, **kernel(커널)**은 특정 장치에서 그 연산을 수행하는 구현 코드다. **Runtime(실행기)**는 모델의 연산을 순서대로 실행하고 메모리·장치 호출을 관리하는 소프트웨어다. **Backend(백엔드)**는 CPU·GPU·NPU 등의 실행 경로를 제공하는 구성 요소다.</p>
 <h2 id="21-모델프레임워크하드웨어의-세-축--p16">2.1 모델·프레임워크·하드웨어의 세 축 — p.16</h2>
-<p><img alt="PDF p.16 온디바이스 AI를 가능하게 하는 세 축 Crop" src="../../assets/ODAI-1/p016-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p016-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="PDF p.16 온디바이스 AI를 가능하게 하는 세 축 Crop" src="../assets/ODAI-1/p016-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p016-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>이미지 읽기:</strong> 위쪽 모델, 가운데 프레임워크, 아래 가속기의 세 층을 본다. 어느 한 층만 선택해서 끝나는 문제가 아니라 세 층의 호환성을 맞추는 문제다.</p>
 <p><strong>원문 요지:</strong> Efficient AI models, Edge AI frameworks, Hardware accelerators가 함께 온디바이스 AI를 가능하게 한다.</p>
 <table>
@@ -46,8 +46,8 @@
 <p>원본은 llama.cpp, ExecuTorch, MLC-LLM, LiteRT, ONNX Runtime, MLX, OpenVINO GenAI를 프레임워크 예시로 든다. 이름만으로 실행 대상을 결정하지 말고, 실제 모델 구조·장치·빌드·정밀도 경로를 함께 확인한다.</p>
 <p><strong>교육용 사례:</strong> 4-bit 가중치를 가진 모델이 4 GB 안에 들어가더라도, NPU가 그 블록 형식이나 연산을 지원하지 않으면 CPU 경로로 실행될 수 있다. “메모리에 들어간다”와 “가속기를 활용한다”는 별개의 조건이다.</p>
 <h2 id="22-모델-압축-지도--p17">2.2 모델 압축 지도 — p.17</h2>
-<p><img alt="PDF p.17 모델 압축 기법 지도 Crop" src="../../assets/ODAI-1/p017-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p017-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="PDF p.17 모델 압축 기법 지도 Crop" src="../assets/ODAI-1/p017-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p017-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>이미지 읽기:</strong> 같은 모델 경량화라도 값의 정밀도를 줄이는지, 연결을 없애는지, 구조를 바꾸는지, 다른 모델에서 학습하는지 구분한다.</p>
 <table>
 <thead>
@@ -95,8 +95,8 @@
 <p>이 PDF의 후반은 양자화에 집중한다. pruning과 KD는 강의 계획상 다음 Part에서 상세 학습할 주제이므로 이 표에서는 위치와 정의만 확보한다.</p>
 <p>**Dense kernel(조밀 커널)**은 일반적인 조밀 행렬 형태로 계산하는 구현이다. 가중치에 0이 많아도 그 위치를 건너뛰는 희소 전용 경로가 없으면 연산 시간이 비례해서 줄지 않는다.</p>
 <h2 id="23-small-llm-모델-이름보다-예산과-과제--p18">2.3 Small LLM: 모델 이름보다 예산과 과제 — p.18</h2>
-<p><img alt="PDF p.18 소형 LLM 예시 Crop" src="../../assets/ODAI-1/p018-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p018-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="PDF p.18 소형 LLM 예시 Crop" src="../assets/ODAI-1/p018-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p018-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>이미지 읽기:</strong> 제공자별 모델 계열과 파라미터 규모를 본다. 원문의 특정 버전·크기는 강의 시점의 사례 목록이며 최신성·완전성을 보장하는 카탈로그가 아니다.</p>
 <p>**Small LLM / SLM(소형 언어 모델)**은 자원 제약을 고려해 상대적으로 작게 설계한 언어 모델이다. “small”을 나누는 단일한 절대 파라미터 기준은 없으며 목표 장치와 과제에 따라 판단한다. 원본은 Gemini Nano, Gemma, Llama, MobileLLM, Phi, Ministral, Minitron, Qwen 등의 계열을 예시로 든다. 이 설명자료는 원본 표기의 제품 버전·파라미터 수를 새로 인증하지 않는다.</p>
 <p><strong>교육용 보충:</strong> 모델 크기에는 전체 파라미터 수, 특정 입력에서 활성화되는 파라미터 수, embedding을 포함하는지 등이 섞일 수 있다. 실제 저장량은 배포 파일에 들어가는 모든 가중치와 부가 정보를 기준으로 계산한다. **Embedding table(임베딩 테이블)**은 토큰 ID별 벡터를 저장하므로 어휘 수가 크면 상당한 저장량을 차지한다.</p>
@@ -143,8 +143,8 @@
 </table>
 <p>처음에는 같은 과제에서 비교 가능한 작은 기준 모델을 정하고, 품질·지연·메모리를 측정한 뒤 양자화를 적용하는 순서가 학습에 적합하다. 특정 모델 구매나 채택을 권하는 목록은 아니다.</p>
 <h2 id="24-llamacpp-gguf-ggml의-관계--p19">2.4 llama.cpp, GGUF, GGML의 관계 — p.19</h2>
-<p><img alt="PDF p.19 llama.cpp 개요 Crop" src="../../assets/ODAI-1/p019-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p019-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="PDF p.19 llama.cpp 개요 Crop" src="../assets/ODAI-1/p019-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p019-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>이미지 읽기:</strong> C/C++ 구현, 저비트 표현, CPU+GPU 혼합 실행이라는 세 가지 역할을 본다. C++로 작성됐다는 사실 자체가 모든 모델·장치에서 높은 성능을 보장하는 것은 아니다.</p>
 <p><strong>llama.cpp</strong>는 C/C++ 중심의 LLM 추론 프로젝트다. 학습 프레임워크의 모델을 장치가 읽는 형식으로 준비하고 CPU 또는 지원 backend에서 실행한다. 프로젝트의 현재 구조와 지원 범위는 <a href="https://github.com/ggml-org/llama.cpp" rel="noopener" target="_blank">llama.cpp 공식 저장소</a>를 기준으로 확인한다.</p>
 <table>
@@ -181,8 +181,8 @@
 <p><strong>정정·주의:</strong> p.19의 “GGUF and GGML: tensor library”는 두 역할을 혼합한 표현이다. GGUF는 추론 모델의 텐서와 메타데이터를 담는 <strong>파일 형식</strong>으로 구별해야 한다. 이 구분은 <a href="https://github.com/ggml-org/ggml/blob/master/docs/gguf.md" rel="noopener" target="_blank">GGUF 공식 명세</a>에 근거한다.</p>
 <p>**CPU+GPU hybrid inference(혼합 추론)**는 모델의 일부를 CPU·시스템 메모리에, 일부를 GPU 경로에 배치하는 실행 방식이다. <strong>Offload</strong>는 이 배치와 이동을 조정하는 행위를 가리킬 수 있다. 가속기에 올리는 양이 늘면 항상 빨라지는 것이 아니라 전송·메모리·연산 균형을 측정해야 한다.</p>
 <h2 id="25-llamacpp-실행-흐름과-측정--p20">2.5 llama.cpp 실행 흐름과 측정 — p.20</h2>
-<p><img alt="PDF p.20 llama.cpp 구조와 실행 화면 Crop" src="../../assets/ODAI-1/p020-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p020-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="PDF p.20 llama.cpp 구조와 실행 화면 Crop" src="../assets/ODAI-1/p020-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p020-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>이미지 읽기:</strong> 왼쪽 구조도는 입력·모델 실행·backend의 연결을 보고, 오른쪽 화면은 실제 로드와 실행 결과를 확인하는 예로 읽는다. 화면의 명령·모델·경로를 현재 버전에서 그대로 실행 가능한 실습 스크립트로 취급하지 않는다.</p>
 <p><strong>교육용 실행 절차:</strong> 원본 모델의 구조와 tokenizer를 확인하고, 실행기가 지원하는 모델 파일을 준비한다. 필요하면 지원 형식으로 변환·양자화한다. 이어 CPU/GPU 경로·문맥 크기·batch 등을 설정해 로드하고, prefill·decode를 수행하며 품질·속도·메모리를 측정한다. 변환 성공은 정확도 보존이나 최적 성능의 증거가 아니므로 기준 출력과 비교한다.</p>
 <p>**Tokenizer(토크나이저)**는 텍스트를 토큰 ID로 바꾸고 다시 텍스트로 복원하는 구성 요소다. **Chat template(대화 템플릿)**은 역할·구분 토큰 등 모델이 기대하는 대화 입력 형식이다. 같은 가중치라도 tokenizer·template이 맞지 않으면 출력 품질이 나빠질 수 있다. **Context length(문맥 길이)**는 처리·보관할 토큰 범위이며 메모리와 연관된다.</p>
@@ -218,8 +218,8 @@
 </table>
 <p>이 장은 개념 중심 설명이다. 원본 화면의 명령을 검증하지 않은 상태에서 복사 가능한 최신 설치 명령으로 제시하지 않는다.</p>
 <h2 id="26-executorch와-aotbackend-delegation--p21">2.6 ExecuTorch와 AOT·Backend Delegation — p.21</h2>
-<p><img alt="PDF p.21 ExecuTorch export와 runtime Crop" src="../../assets/ODAI-1/p021-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p021-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="PDF p.21 ExecuTorch export와 runtime Crop" src="../assets/ODAI-1/p021-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p021-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>이미지 읽기:</strong> 개발 PC에서 준비하는 export·변환 경로와 장치에서 실행하는 runtime 경로를 분리한다. backend로 보내는 부분과 공통 실행 경로가 어디에서 나뉘는지 본다.</p>
 <p><strong>ExecuTorch</strong>는 PyTorch 모델을 edge 장치에 배포·추론하기 위한 실행 체계다. **AOT(Ahead-of-Time compilation, 사전 컴파일)**는 실행 전에 모델의 연산 그래프를 분석·변환하여 장치용 실행 계획을 준비하는 방식이다. **Export(내보내기)**는 모델 계산을 명시적인 그래프로 캡처하는 과정이며, **IR(Intermediate Representation, 중간 표현)**은 변환·최적화에 쓰는 모델 표현이다. **Lowering(하향 변환)**은 그래프를 더 구체적인 장치·실행 수준으로 변환하는 과정이다.</p>
 <p>**Backend delegation(백엔드 위임)**은 실행 그래프의 지원 부분을 특정 가속기용 컴파일러·실행 경로에 맡기는 방식이다. 원본의 EXIR은 ExecuTorch의 export 중간 표현을 가리킨다. 세부 IR 명칭·API는 버전별 문서와 맞춰야 한다.</p>
@@ -262,8 +262,8 @@
 </table>
 <p><strong>정정·주의:</strong> 목록에 장치 제조사가 있다고 모든 모델의 모든 연산이 해당 NPU로 가는 것은 아니다. unsupported op(미지원 연산)가 남거나 그래프 분할로 장치 간 복사가 늘면 실제 속도가 달라진다. **Fallback(대체 실행 경로)**은 가속 경로가 처리하지 못하는 연산을 다른 backend 등으로 실행하는 처리다. 가능한 fallback의 종류는 실행기·빌드마다 다르므로 자동 CPU 실행을 항상 보장한다고 쓰지 않는다.</p>
 <h2 id="27-npu-연산기와-메모리의-협력--p22">2.7 NPU: 연산기와 메모리의 협력 — p.22</h2>
-<p><img alt="PDF p.22 PLENA NPU 구조 예시 Crop" src="../../assets/ODAI-1/p022-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p022-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="PDF p.22 PLENA NPU 구조 예시 Crop" src="../assets/ODAI-1/p022-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p022-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>이미지 읽기:</strong> p.22의 PLENA 구조도에서 matrix unit, vector/scalar unit, SRAM, 외부 메모리 controller를 나누어 본다. 선의 색과 범례로 제어 흐름과 데이터 흐름을 구분한다. 이 그림은 특정 설계 예시이며 모든 상용 NPU의 표준 블록도가 아니다.</p>
 <table>
 <thead>
@@ -314,8 +314,8 @@
 <p><strong>교육용 보충:</strong> 행렬 연산기가 빨라도 데이터가 늦게 도착하면 기다려야 한다. LayerNorm·softmax처럼 행렬곱 이외의 연산, quant/dequant(양자화/복원), 메모리 복사도 전체 시간에 포함된다. **TOPS(Tera Operations Per Second)**는 초당 10^12 operations라는 이론 연산 성능 단위다. 자료형·희소성·MAC 산정·지속 전력 조건이 다를 수 있으므로 TOPS 수치만으로 앱 지연시간을 비교하지 않는다.</p>
 <p><strong>원문 범위 주의:</strong> 그림의 inverse Hadamard transform과 quantizer/dequantizer는 이 설계가 변환과 저정밀 저장을 결합함을 보여준다. 이것이 일반 NPU의 필수 기능이라는 뜻은 아니다. 회전·Hadamard를 통한 양자화 개선은 6장에서 연결한다.</p>
 <h2 id="28-hailo-개발-환경과-실행-환경-분리--p23">2.8 Hailo: 개발 환경과 실행 환경 분리 — p.23</h2>
-<p><img alt="PDF p.23 Hailo software stack Crop" src="../../assets/ODAI-1/p023-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p023-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="PDF p.23 Hailo software stack Crop" src="../assets/ODAI-1/p023-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p023-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>이미지 읽기:</strong> 왼쪽 Model Build Environment는 모델을 준비하는 경로, 오른쪽 Runtime Environment는 앱이 장치에서 실행되는 경로다. parser→optimizer→resource allocator→compiler와 application→runtime→driver→firmware의 책임 차이를 본다.</p>
 <p><strong>원문 요지:</strong> Hailo 예시는 모델을 가속기에 맞는 형태로 만드는 개발 소프트웨어와, 장치에서 모델을 실행하는 runtime·driver·firmware의 층을 보여준다. 그림에 표시된 플러그인·인터페이스의 실제 지원 여부는 해당 제품·소프트웨어 버전 문서에서 확인해야 한다.</p>
 <table>
@@ -388,7 +388,7 @@
 <p><strong>범례 주의:</strong> p.23의 흰 점선 테두리는 원본 범례에서 <code>Future support (for Hailo-10H)</code>로 표시한 부분이다. 원본 제작 시점의 향후 지원 표시이므로 현재 제공 기능으로 단정하지 않는다.</p>
 <h2 id="29-배포-판단을-위한-교육용-점검표">2.9 배포 판단을 위한 교육용 점검표</h2>
 <p>아래는 원본의 모델–프레임워크–하드웨어 구성을 실제 학습 과제로 연결한 보충 양식이다. 통합 문서의 Canvas에서는 이 준비·실행 흐름을 시각적으로 따라갈 수 있다.</p>
-<p><a href="../../assets/ODAI-1/learning-flow.canvas" rel="noopener" target="_blank">전체 학습 흐름 Canvas</a> · <a href="../../assets/ODAI-1/learning-flow.svg" rel="noopener" target="_blank">SVG 미리보기</a></p>
+<p><a href="../assets/ODAI-1/learning-flow.canvas" rel="noopener" target="_blank">전체 학습 흐름 Canvas</a> · <a href="../assets/ODAI-1/learning-flow.svg" rel="noopener" target="_blank">SVG 미리보기</a></p>
 <ul>
 <li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>과제와 품질 기준을 정하고 대표 입력을 준비했다.</li>
 <li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>모델 전체 저장량과 최대 문맥·batch에서의 실행 메모리를 계산했다.</li>

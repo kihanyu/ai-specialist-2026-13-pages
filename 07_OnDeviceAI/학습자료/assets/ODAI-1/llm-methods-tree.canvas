@@ -1,0 +1,152 @@
+{
+  "nodes": [
+    {
+      "id": "root",
+      "type": "text",
+      "x": 760,
+      "y": 100,
+      "width": 500,
+      "height": 150,
+      "text": "고급 LLM 기법의 개념 지도\n\n기법의 주된 수단과 목적을 구분\n\n비트·대상·커널 선택은 함께 검토",
+      "color": "4"
+    },
+    {
+      "id": "inference",
+      "type": "text",
+      "x": 310,
+      "y": 370,
+      "width": 1000,
+      "height": 150,
+      "text": "추론 양자화 — 아래는 주된 오차 제어 수단별 묶음\n\n가중치·활성값·KV 중 실제 대상과 비트 수는 기법별로 다름\n\nLLM.int8 / SmoothQuant / 회전 / GPTQ / AWQ",
+      "color": "4"
+    },
+    {
+      "id": "training",
+      "type": "text",
+      "x": 1530,
+      "y": 370,
+      "width": 500,
+      "height": 150,
+      "text": "업무 미세조정 — 학습 메모리 절약\n\n추론 가속 기법과 목적을 구별\n\nQLoRA",
+      "color": "4"
+    },
+    {
+      "id": "split",
+      "type": "text",
+      "x": 40,
+      "y": 670,
+      "width": 340,
+      "height": 250,
+      "text": "고정밀 경로로 분리\n\nLLM.int8()\n\n일반 feature: INT8 경로\n\noutlier: 고정밀 경로\n\n관련: 6.3절",
+      "color": "4"
+    },
+    {
+      "id": "scaling",
+      "type": "text",
+      "x": 410,
+      "y": 670,
+      "width": 340,
+      "height": 250,
+      "text": "Scaling으로 오차 완화\n\nSmoothQuant: W/A 난도 이전\n\nAWQ: 중요 weight 채널 보호\n\n같은 상쇄식, 다른 목표\n\n관련: 6.4, 6.7절",
+      "color": "4"
+    },
+    {
+      "id": "rotation",
+      "type": "text",
+      "x": 780,
+      "y": 670,
+      "width": 340,
+      "height": 250,
+      "text": "회전으로 outlier 분산\n\nQuaRot: 회전 변환 활용\n\nSpinQuant: 회전 행렬 학습\n\n구조에 맞춰 삽입·상쇄\n\n관련: 6.5절",
+      "color": "4"
+    },
+    {
+      "id": "reconstruct",
+      "type": "text",
+      "x": 1150,
+      "y": 670,
+      "width": 340,
+      "height": 250,
+      "text": "재구성과 오차 보상\n\nGPTQ\n\n국소 출력 재구성 목적\n\n근사 2차 정보로 보정\n\n관련: 6.6절",
+      "color": "4"
+    },
+    {
+      "id": "qlora",
+      "type": "text",
+      "x": 1530,
+      "y": 670,
+      "width": 500,
+      "height": 250,
+      "text": "QLoRA: 고정한 저비트 base + LoRA 학습\n\nNF4: 기반 가중치의 대표 저장 표현\n\nDouble quant: scale 상수 추가 양자화\n\nPaged optimizer: 메모리 급증 관리\n\n저장 dtype·계산 dtype·학습 대상 구분\n\n관련: 6.8절",
+      "color": "4"
+    },
+    {
+      "id": "note",
+      "type": "text",
+      "x": 40,
+      "y": 1030,
+      "width": 1990,
+      "height": 150,
+      "text": "읽는 법: 주된 설명 수단을 기준으로 묶은 학습 지도이며 서로 배타적인 분류나 성능 순위가 아니다. 기법을 조합할 수도 있다.\n\nW/A/KV는 대상 텐서의 축, W4A16 등의 표기는 정밀도 축이다. 위 알고리즘 이름만으로 모든 실행 조건이 정해지지는 않는다.\n\nllama.cpp의 Q4·K·IQ·TQ·FP4는 저장·실행 형식의 분류이며 이 알고리즘들과 별도 축이다. 6.9절에서 확인한다.",
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "inference",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e1",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "training",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e2",
+      "fromNode": "inference",
+      "fromSide": "bottom",
+      "toNode": "split",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e3",
+      "fromNode": "inference",
+      "fromSide": "bottom",
+      "toNode": "scaling",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e4",
+      "fromNode": "inference",
+      "fromSide": "bottom",
+      "toNode": "rotation",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e5",
+      "fromNode": "inference",
+      "fromSide": "bottom",
+      "toNode": "reconstruct",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e6",
+      "fromNode": "training",
+      "fromSide": "bottom",
+      "toNode": "qlora",
+      "toSide": "top",
+      "toEnd": "arrow"
+    }
+  ]
+}

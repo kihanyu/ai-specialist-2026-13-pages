@@ -1,0 +1,106 @@
+{
+  "nodes": [
+    {
+      "id": "p1",
+      "type": "text",
+      "x": 40,
+      "y": 110,
+      "width": 320,
+      "height": 160,
+      "text": "Prefill: 입력 토큰들\n\n프롬프트를 함께 처리\n\n여러 토큰의 병렬 연산",
+      "color": "4"
+    },
+    {
+      "id": "p2",
+      "type": "text",
+      "x": 440,
+      "y": 110,
+      "width": 320,
+      "height": 160,
+      "text": "GEMM + Attention\n\nQ·K·V 계산\n\ncausal mask 적용",
+      "color": "4"
+    },
+    {
+      "id": "p3",
+      "type": "text",
+      "x": 840,
+      "y": 110,
+      "width": 320,
+      "height": 160,
+      "text": "KV cache 생성\n\n레이어별 K·V 보관\n\n첫 출력 토큰 선택",
+      "color": "4"
+    },
+    {
+      "id": "d1",
+      "type": "text",
+      "x": 840,
+      "y": 440,
+      "width": 320,
+      "height": 160,
+      "text": "Decode: 새 토큰 1개\n\n직전 출력 토큰 입력\n\n순차 생성 단계",
+      "color": "4"
+    },
+    {
+      "id": "d2",
+      "type": "text",
+      "x": 440,
+      "y": 440,
+      "width": 320,
+      "height": 160,
+      "text": "가중치 읽기 + GEMV\n\n새 Q·K·V 계산\n\nKV cache 읽기·추가",
+      "color": "4"
+    },
+    {
+      "id": "d3",
+      "type": "text",
+      "x": 40,
+      "y": 440,
+      "width": 320,
+      "height": 160,
+      "text": "Attention + 다음 토큰\n\n과거 K·V 활용\n\n종료까지 Decode 반복",
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "fromNode": "p1",
+      "fromSide": "right",
+      "toNode": "p2",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e1",
+      "fromNode": "p2",
+      "fromSide": "right",
+      "toNode": "p3",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e2",
+      "fromNode": "p3",
+      "fromSide": "bottom",
+      "toNode": "d1",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e3",
+      "fromNode": "d1",
+      "fromSide": "left",
+      "toNode": "d2",
+      "toSide": "right",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e4",
+      "fromNode": "d2",
+      "fromSide": "left",
+      "toNode": "d3",
+      "toSide": "right",
+      "toEnd": "arrow"
+    }
+  ]
+}

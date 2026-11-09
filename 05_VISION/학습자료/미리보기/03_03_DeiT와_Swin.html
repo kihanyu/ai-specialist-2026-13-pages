@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DeiT와 Swin | Vision 교안</title><link rel="stylesheet" href="textbook.css">
+<script>if(window.self!==window.top)document.documentElement.classList.add('embedded');window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['$$','$$']] },options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body><a class="skip" href="#content">본문으로 건너뛰기</a><div class="document-shell"><aside class="document-toc"><details open><summary>이 문서의 목차</summary><nav aria-label="문서 내부 목차"><a class="level-2" href="#1-어떤-병목을-바꾸는가">1. 어떤 병목을 바꾸는가</a><a class="level-2" href="#2-교사의-예측을-학습-신호로-쓰는-deit">2. 교사의 예측을 학습 신호로 쓰는 DeiT</a><a class="level-3" href="#overview">Overview</a><a class="level-3" href="#architecture--loss">Architecture &amp; Loss</a><a class="level-3" href="#deit-experiments">DeiT Experiments</a><a class="level-3" href="#deit-summary">DeiT Summary</a><a class="level-2" href="#3-지역-계산과-윈도우-간-전달을-결합하는-swin">3. 지역 계산과 윈도우 간 전달을 결합하는 Swin</a><a class="level-3" href="#어떤-문제를-해결하려-했을까">어떤 문제를 해결하려 했을까?</a><a class="level-3" href="#patch-merging은-어떻게-할까">Patch Merging은 어떻게 할까?</a><a class="level-3" href="#swin의-window와-shift">Swin의 Window와 Shift</a><a class="level-3" href="#swin-architecture">Swin Architecture</a><a class="level-3" href="#complexity">Complexity</a><a class="level-3" href="#experiments">Experiments</a><a class="level-3" href="#summary">Summary</a><a class="level-2" href="#4-파라미터연산량처리량을-따로-읽기--심화">4. 파라미터·연산량·처리량을 따로 읽기 — 심화</a><a class="level-3" href="#1-vit-깊이보다-폭이-커질-때도-빠르게-증가한다">1. ViT: 깊이보다 폭이 커질 때도 빠르게 증가한다</a><a class="level-3" href="#2-deit-비슷한-크기의-학생을-더-잘-학습시키기">2. DeiT: 비슷한 크기의 학생을 더 잘 학습시키기</a><a class="level-3" href="#3-swin-채널과-stage별-깊이가-모델-크기를-결정한다">3. Swin: 채널과 Stage별 깊이가 모델 크기를 결정한다</a><a class="level-3" href="#4-파라미터가-비슷해도-계산량은-다르다">4. 파라미터가 비슷해도 계산량은 다르다</a><a class="level-2" href="#5-작은-계산으로-연결하고-확인하기">5. 작은 계산으로 연결하고 확인하기</a></nav></details></aside><main class="document-main" id="content"><nav class="document-nav" aria-label="상위 이동"><a href="../../../index.html" target="_top">전체 과정</a><a href="index.html#03_03_DeiT%EC%99%80_Swin.html" target="_top">Vision 강의 목차</a><a href="../03_03_DeiT%EC%99%80_Swin.md" target="_blank" rel="noopener">Markdown 원문</a></nav><h1 id="deit와-swin-데이터-효율과-계산-효율">DeiT와 Swin: 데이터 효율과 계산 효율</h1>
+<p>ViT를 실용적으로 만드는 두 질문을 나눠 봅니다. <strong>DeiT는 같은 데이터에서 더 좋은 학습 신호를 얻고, Swin은 한 번에 비교할 토큰 범위와 특징 해상도를 바꿉니다.</strong> 두 방법은 서로 다른 설계 축을 다룹니다.</p>
+<p><strong>목표:</strong> 정답·교사 예측·두 Head의 손실을 구별하고, Window·Shift·Mask·Patch Merging의 역할과 계산량을 연결하며, 파라미터 수와 실행 비용을 분리해 설명합니다.</p>
+<p>선수지식은 <a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT</a>의 QKV, CLS, 패치와 잔차 연결입니다. <a href="03_01_Attention_Note.html">학습 지도</a>에서 전체 순서를 확인할 수 있습니다.</p>
+<p><strong>핵심 경로:</strong> <a href="#directions">문제 지도</a> → <a href="#deit">DeiT의 두 학습 목표</a> → <a href="#swin-architecture">Swin의 연결 범위</a> → <a href="#check">손계산과 확인</a>.
+<strong>심화:</strong> 두 모델의 Experiments와 <a href="#parameters">파라미터 수</a>는 평가 조건을 비교할 때 읽습니다. 기본 학습 중에는 실험의 모든 수치를 외우지 않아도 됩니다.</p>
+<p>원문: <a href="../../%EA%B5%90%EC%95%88/03_00_Attention.pdf#page=23" rel="noopener" target="_blank">교안 23~37쪽</a>. 추가 손계산·문제는 교육용 보충입니다. 표의 논문 성능은 재현 실험 결과가 아니라 원문 보고값입니다.</p>
+<p><a id="directions"></a></p>
+<h2 id="1-어떤-병목을-바꾸는가">1. 어떤 병목을 바꾸는가</h2>
+<p>ViT 이후의 연구는 <strong>데이터·계산 비용을 줄이거나, 라벨 의존도를 낮추고 활용 범위를 넓히는 방향</strong>으로 발전했습니다. 여기서는 DeiT·Swin·CLIP·DINO를 비교한 뒤, 이 문서의 학습 흐름과 직접 이어지는 DeiT와 Swin을 자세히 살펴봅니다. 네 방법은 각각 학습 전략, 모델 구조, 학습 데이터와 목표 등 서로 다른 부분을 개선합니다.</p>
+<table>
+<thead>
+<tr>
+<th>방법</th>
+<th>해결하려던 문제</th>
+<th>핵심 방법</th>
+<th>쉽게 기억하기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DeiT</strong></td>
+<td>초기 ViT가 좋은 성능을 내려면 대규모 외부 데이터와 학습 자원을 많이 요구</td>
+<td>데이터 증강·규제 등 학습 방법을 개선하고, 증류 버전에서는 교사 모델의 예측을 배우는 Distillation token 사용</td>
+<td><strong>더 적은 데이터로 잘 학습하기</strong></td>
+</tr>
+<tr>
+<td><strong>Swin Transformer</strong></td>
+<td>전역 Attention의 계산 부담과, 검출·분할에 필요한 여러 해상도 특징의 부족</td>
+<td>작은 Window 안에서 Attention을 계산하고, Window 위치를 이동해 영역 간 정보를 연결. Patch merging으로 계층적 특징 생성</td>
+<td><strong>작은 창으로 효율적으로 보고, 여러 크기의 특징 만들기</strong></td>
+</tr>
+<tr>
+<td><strong>CLIP</strong></td>
+<td>고정된 클래스 라벨로 학습한 모델은 새로운 개념·작업에 추가 라벨과 학습이 필요</td>
+<td>이미지·텍스트 쌍을 대조 학습해, 맞는 이미지와 설명의 표현을 가깝게 정렬</td>
+<td><strong>이미지와 언어를 연결해 새 분류 기준에도 활용하기</strong></td>
+</tr>
+<tr>
+<td><strong>DINO</strong></td>
+<td>사람이 붙인 정답 라벨 없이도 유용한 시각 특징을 학습하고 싶음</td>
+<td>같은 이미지의 다른 뷰에서 Student가 Teacher의 출력을 맞추는 자기증류. Teacher는 Student 가중치의 이동평균으로 갱신</td>
+<td><strong>라벨 없이 이미지 자체에서 특징 배우기</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>CLIP은 이미지 Encoder와 텍스트 Encoder를 함께 학습하는 방법</strong>이며, 이미지 Encoder로 ViT뿐 아니라 ResNet도 사용할 수 있습니다. 분류할 때 “고양이 사진”, “강아지 사진” 같은 설명과 이미지의 유사도를 비교하면 해당 과제의 별도 학습 없이 사용하는 Zero-shot 분류가 가능합니다.</p>
+<p><strong>여기서 DINO는 원래의 자기지도 시각 표현 학습 방법</strong>을 뜻합니다. 이후의 DINOv2나 이름이 같은 객체 검출 모델 DINO와는 구분합니다. 라벨 없이 특징을 배우는 것이지, 학습 후 클래스 이름까지 자동으로 붙여 주는 것은 아닙니다.</p>
+<p>원 논문: <a href="https://arxiv.org/abs/2012.12877">DeiT</a>, <a href="https://arxiv.org/abs/2103.14030">Swin</a>, <a href="https://arxiv.org/abs/2103.00020">CLIP</a>, <a href="https://arxiv.org/abs/2104.14294">DINO</a></p>
+<p><img alt="ViT 이후 연구를 데이터 효율·계층·장치·언어·자기지도·CNN 재설계로 분류한 지도" src="../assets/orca-paste-1793778558871-e5694521-559a-499a-a33c-5342990c918a.png"/></p>
+<hr/>
+<p>교안 24쪽은 이 밖에 LV-ViT(데이터 효율), EfficientFormer·MobileViT(장치·메모리 효율), ALIGN(이미지·언어 정렬), ConvNeXt(CNN 구조 재설계)를 연구 방향의 예로 듭니다. 이 장은 그 지도를 보존하되 구조 상세는 교안이 전개하는 DeiT·Swin에 집중합니다. 연도나 이름을 발전 순위로 외우기보다 데이터·계산·감독 신호 중 어느 축을 바꾸는지 구별하세요.</p>
+<p><a id="deit"></a></p>
+<h2 id="2-교사의-예측을-학습-신호로-쓰는-deit">2. 교사의 예측을 학습 신호로 쓰는 DeiT</h2>
+<hr/>
+<h3 id="overview">Overview</h3>
+<p>먼저 학습 전략의 관점에서 ViT를 개선한 DeiT를 살펴보겠습니다. 앞서 원 ViT의 실험에서 확인한 대규모 사전학습 의존을 완화하는 것이 출발점입니다.</p>
+<p><strong>DeiT(Data-efficient Image Transformers)는 대규모 외부 데이터 없이도 ViT를 효과적으로 학습하도록 만든 학습 방법과 모델 계열</strong>입니다. 원 ViT의 대규모 사전학습 의존을 줄여, ImageNet-1K만으로 경쟁력 있는 성능을 내는 것이 목표였습니다. 원 ViT도 ImageNet-1K로 학습할 수는 있지만, 원 논문의 조건에서는 큰 데이터로 사전학습했을 때 강점이 뚜렷했습니다.</p>
+<p>교안 26쪽의 화학 증류 장치는 이름을 설명하는 비유입니다. 지식 증류는 모델의 가중치를 물리적으로 추출하거나 그대로 복사하는 연산이 아니라, 교사의 출력으로 학생의 손실 목표를 만드는 학습입니다.</p>
+<h4 id="어떻게-데이터-효율을-높일까">어떻게 데이터 효율을 높일까?</h4>
+<table>
+<thead>
+<tr>
+<th>방법</th>
+<th>하는 일</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>학습 전략 개선</td>
+<td>데이터 증강, Mixup·CutMix, 규제, 최적화 등의 조합을 조정</td>
+<td>같은 데이터로 더 잘 학습</td>
+</tr>
+<tr>
+<td>지식 증류 — 증류 버전</td>
+<td>교사 모델의 예측을 학생 Transformer에 전달</td>
+<td>정답 라벨 외에 교사가 배운 판단도 활용</td>
+</tr>
+<tr>
+<td>Distillation token</td>
+<td>CLS와 별도로 교사의 예측을 배우는 토큰 추가</td>
+<td>Attention을 통해 교사 신호가 패치 표현 학습에 반영</td>
+</tr>
+</tbody>
+</table>
+<p><strong>DeiT의 개선이 전부 지식 증류 때문인 것은 아닙니다.</strong> 증류 없는 DeiT도 개선된 학습 전략을 사용하며, 증류를 추가한 모델은 성능을 더 높입니다. CNN 교사를 사용하면 CNN이 배운 시각적 판단을 학생 ViT에 전달할 수 있지만, 학생의 기본 구조 자체가 CNN으로 바뀌는 것은 아닙니다.</p>
+<hr/>
+<h4 id="cls와-distillation-token의-차이">CLS와 Distillation token의 차이</h4>
+<table>
+<thead>
+<tr>
+<th>토큰</th>
+<th>학습에서 맞추는 대상</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLS</td>
+<td>데이터의 정답 클래스</td>
+<td>일반적인 분류 예측</td>
+</tr>
+<tr>
+<td>Distillation token</td>
+<td>교사 모델의 예측</td>
+<td>교사의 판단을 배우는 별도 분류 예측</td>
+</tr>
+</tbody>
+</table>
+<p>증류 버전의 입력은 <strong><code>CLS + 패치 N개 + Distillation token</code>으로 총 N+2개 토큰</strong>입니다. 토큰 모두가 Encoder에서 상호작용하고, 최종 CLS와 증류 토큰에는 각각 분류 Head를 연결합니다. 원 논문에서는 교사가 고른 클래스 자체를 목표로 사용하는 Hard distillation이 효과적이었습니다. 추론할 때는 두 Head의 예측 확률을 평균해 사용할 수 있으며 교사 모델은 필요하지 않습니다.</p>
+<hr/>
+<h4 id="그림-학습-전략과-증류의-효과">그림: 학습 전략과 증류의 효과</h4>
+<p><img alt="ImageNet-1K만으로 학습한 모델의 처리량과 Top-1 정확도 비교" src="../assets/orca-paste-1793778713588-26c5bc04-c71a-4804-b344-22cf8b299489.png"/></p>
+<table>
+<thead>
+<tr>
+<th>그래프 표시</th>
+<th>읽는 방법</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>가로축 images/s</td>
+<td>초당 처리 이미지 수. 오른쪽일수록 빠름. 학습에 사용한 이미지 수가 아님</td>
+</tr>
+<tr>
+<td>세로축 Top-1 accuracy</td>
+<td>가장 높은 점수의 클래스가 정답인 비율. 위쪽일수록 좋음</td>
+</tr>
+<tr>
+<td>ViT — 파란 점</td>
+<td>비교 대상인 기본 ViT 결과</td>
+</tr>
+<tr>
+<td>Ours — 빨간 계열</td>
+<td>DeiT 학습 전략을 적용한 결과</td>
+</tr>
+<tr>
+<td>증류 표시가 붙은 Ours</td>
+<td>Transformer용 지식 증류까지 적용한 결과</td>
+</tr>
+</tbody>
+</table>
+<p>그림의 <strong>Learning strategy 화살표는 학습 방법 개선</strong>, <strong>Distillation 화살표는 교사 지식 추가 전달</strong>에 따른 정확도 향상을 강조합니다. 특히 DeiT-B와 ViT-B는 기본 모델 구조가 같아, 차이가 단순한 모델 크기 증가 때문은 아님을 보여줍니다.</p>
+<p>가장 위의 <strong>384</strong> 표시는 입력 해상도 384×384 조건입니다. 해상도가 높아지면 토큰 수와 계산량이 늘 수 있으므로, 서로 다른 해상도의 점을 같은 계산 조건으로 해석하면 안 됩니다. 처리량은 원 그림의 V100 GPU 측정 조건에 해당하며 다른 기기에서 그대로 보장되지 않습니다.</p>
+<p><strong>“외부 데이터 없음”은 원 DeiT 실험에서 추가 데이터셋 없이 학습했다는 뜻이며, 정답 라벨 없이 학습했다는 뜻은 아닙니다.</strong> ImageNet 라벨과, 증류 버전에서는 교사 예측을 함께 활용합니다. 라벨 없는 자기지도 학습인 DINO와 구별해야 합니다.</p>
+<p>출처: <a href="https://arxiv.org/abs/2012.12877">DeiT 원 논문 — Training data-efficient image transformers &amp; distillation through attention</a></p>
+<hr/>
+<h3 id="architecture--loss">Architecture &amp; Loss</h3>
+<p>학습 전략의 효과를 확인했으므로, 이제 증류 버전에서 교사의 판단이 학생에게 전달되는 경로를 살펴보겠습니다. 구조에서는 두 토큰과 Head를, 손실에서는 각각의 학습 목표를 구분하는 것이 핵심입니다.</p>
+<h4 id="1-구조-정답과-교사를-함께-배우는-학생-모델">1. 구조: 정답과 교사를 함께 배우는 학생 모델</h4>
+<p><img alt="정답 라벨을 배우는 CLS Head와 고정된 교사 예측을 배우는 Distillation Head" src="../assets/orca-paste-1793778916704-39afbfef-c779-4a62-b26e-a023b02f479e.png"/></p>
+<p><strong>학생 Transformer는 실제 정답과 교사의 판단을 두 경로로 학습합니다.</strong> 같은 이미지가 학생과 교사에 입력되며, 학생만 역전파로 갱신하고 사전학습한 교사는 고정합니다.</p>
+<table>
+<thead>
+<tr>
+<th>구성</th>
+<th>학습 대상</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLS token → Class Head</td>
+<td>실제 정답 라벨 y</td>
+<td>정답을 맞히는 분류 능력 학습</td>
+</tr>
+<tr>
+<td>Distillation token → Distillation Head</td>
+<td>교사의 예측</td>
+<td>교사가 배운 판단을 전달받음</td>
+</tr>
+<tr>
+<td>Teacher model</td>
+<td>학생의 증류 손실로 갱신하지 않음</td>
+<td>학생이 따라 배울 목표 제공</td>
+</tr>
+</tbody>
+</table>
+<p>입력은 <strong>패치 N개 + CLS + Distillation token = N+2개 토큰</strong>입니다. 두 특수 토큰은 같은 Encoder 안에서 패치들과 상호작용하되, 마지막에 서로 다른 Head로 점수를 만듭니다. 두 토큰의 최종 값이 반드시 같아지는 것은 아닙니다.</p>
+<p>교사는 CNN이나 Transformer일 수 있습니다. 원 DeiT 연구는 특히 <strong>RegNet 계열의 강한 CNN 교사</strong>를 활용했습니다. RegNet과 EfficientNet은 서로 다른 모델 계열입니다.</p>
+<hr/>
+<h4 id="2-손실-soft-distillation과-hard-distillation">2. 손실: Soft distillation과 Hard distillation</h4>
+<p><img alt="교사 확률분포를 사용하는 Soft distillation과 교사 최상위 클래스를 사용하는 Hard distillation 손실" src="../assets/orca-paste-1793778905704-72a18635-bf42-4a14-a15c-ec1642d55498.png"/></p>
+<p>아래는 두 Head를 가진 증류 토큰 모델에서 <strong>정답 라벨로 계산한 분류 손실과 교사 예측으로 계산한 증류 손실을 결합하는 방식</strong>입니다. 두 Head를 구분하기 위해 학생 점수를 z_cls와 z_dist, 교사 점수를 z_t로 표기합니다. 뒤의 실험 표에는 교사의 목표만 사용하는 일반 증류 비교도 포함되므로, 그 설정과 구분해서 읽어야 합니다.</p>
+<table>
+<thead>
+<tr>
+<th>방식</th>
+<th>교사가 제공하는 목표</th>
+<th>학생이 맞추는 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Soft distillation</td>
+<td>전체 클래스의 확률분포</td>
+<td>예: 고양이 0.7, 강아지 0.2, 토끼 0.1의 상대적 관계</td>
+</tr>
+<tr>
+<td>Hard distillation</td>
+<td>가장 높은 점수의 클래스 하나</td>
+<td>위 예시에서는 정수 라벨 ‘고양이’</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h5 id="soft-distillation">Soft distillation</h5>
+<p>온도 τ로 부드럽게 만든 교사·학생 분포를 비교합니다. 여기서는 KL의 첫 인자를 목표 분포로 정의합니다.</p>
+<div class="math">$$
+p_t^{(\tau)} = \operatorname{softmax}(z_t/\tau), \qquad
+p_s^{(\tau)} = \operatorname{softmax}(z_{\mathrm{dist}}/\tau)
+$$</div>
+<div class="math">$$
+\mathcal{L}_{\mathrm{soft}}
+= (1-\lambda)\operatorname{CE}(z_{\mathrm{cls}},y)
++ \lambda\tau^2 D_{\mathrm{KL}}\left(p_t^{(\tau)}\;\Vert\;p_s^{(\tau)}\right)
+$$</div>
+<ul>
+<li><strong>λ</strong>: 정답 손실과 증류 손실의 비중입니다.</li>
+<li><strong>τ(Temperature)</strong>: 클수록 분포가 부드러워져 정답 외 클래스의 상대적 정보도 전달하기 쉽습니다.</li>
+<li><strong>τ²</strong>: 온도 사용에 따른 증류 기울기 규모 변화를 보정하는 계수입니다.</li>
+<li><strong>KL</strong>: 교사와 학생 분포의 차이를 측정합니다. 방향에 따라 값이 달라지므로 목표·예측의 정의와 구현의 인자 순서를 확인해야 합니다.</li>
+</ul>
+<hr/>
+<h5 id="hard-distillation">Hard distillation</h5>
+<p>교사의 최고 점수 클래스를 정수 라벨 y_t로 사용합니다.</p>
+<div class="math">$$
+y_t = \operatorname*{argmax}_c z_{t,c}
+$$</div>
+<div class="math">$$
+\mathcal{L}_{\mathrm{hard}}
+= \frac{1}{2}\operatorname{CE}(z_{\mathrm{cls}},y)
++ \frac{1}{2}\operatorname{CE}(z_{\mathrm{dist}},y_t)
+$$</div>
+<p>첫 항은 <strong>CLS Head가 실제 정답을 맞히도록</strong>, 둘째 항은 <strong>Distillation Head가 교사의 선택을 맞히도록</strong> 합니다. 교사가 틀릴 수도 있으므로 y와 y_t가 항상 같은 것은 아닙니다. 원 DeiT 실험에서는 Hard distillation이 효과적이었습니다.</p>
+<hr/>
+<h5 id="그림의-hard-prediction-표기를-해석할-때-주의">그림의 ‘Hard Prediction’ 표기를 해석할 때 주의</h5>
+<p>학생의 예측을 먼저 argmax로 바꿔 손실에 넣는다는 뜻으로 읽으면 안 됩니다. <strong>학생은 미분 가능한 logits로 손실을 계산</strong>하고, Hard distillation에서는 교사의 예측에만 argmax를 적용해 목표 라벨을 만듭니다. PyTorch의 <code>CrossEntropyLoss</code>는 위 식의 CE에 logits와 정수 라벨을 전달하는 방식으로 사용할 수 있습니다.</p>
+<hr/>
+<h4 id="학습과-추론">학습과 추론</h4>
+<pre><code class="language-text">학습: 같은 이미지 → 학생의 두 Head / 고정된 교사
+      → 정답 분류 손실 + 교사 증류 손실
+      → 학생 Encoder·두 토큰·두 Head 등을 갱신
+
+추론: 이미지 → 학생의 두 Head → 예측 확률 평균 → 클래스 선택
+      교사는 필요 없음
+</code></pre>
+<p><strong>두 Head가 있어도 최종적으로 서로 다른 정답 두 개를 요구하는 것이 아닙니다.</strong> 같은 클래스 집합을 예측하되 학습 목표의 출처가 다르며, 추론에서 예측을 결합할 수 있습니다.</p>
+<p>출처: <a href="https://arxiv.org/abs/2012.12877">DeiT 원 논문</a></p>
+<hr/>
+<h3 id="deit-experiments">DeiT Experiments</h3>
+<p>구조와 손실을 이해했다면, 이제 교사의 종류와 증류 방식이 실제 결과에 어떤 차이를 만드는지 확인할 수 있습니다.</p>
+<p>두 표는 <strong>어떤 교사를 쓰는지, 어떤 증류 목표와 출력 Head를 쓰는지</strong>에 따라 학생 DeiT의 성능이 어떻게 달라지는지 비교합니다. 수치는 ImageNet **Top-1 정확도(%)**이며, 높을수록 좋습니다. Ti·S·B는 Tiny·Small·Base 모델, 224·384는 입력 이미지 한 변의 픽셀 수입니다.</p>
+<hr/>
+<h4 id="1-교사-모델에-따른-학생-성능">1. 교사 모델에 따른 학생 성능</h4>
+<table>
+<thead>
+<tr>
+<th>교사 모델</th>
+<th>교사 정확도 (%)</th>
+<th>학생 DeiT-B 증류 모델 — 사전학습, 224 (%)</th>
+<th>학생 — 384 해상도 파인튜닝 후 (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeiT-B</td>
+<td>81.8</td>
+<td>81.9</td>
+<td>83.1</td>
+</tr>
+<tr>
+<td>RegNetY-4GF</td>
+<td>80.0</td>
+<td>82.7</td>
+<td>83.6</td>
+</tr>
+<tr>
+<td>RegNetY-8GF</td>
+<td>81.7</td>
+<td>82.7</td>
+<td>83.8</td>
+</tr>
+<tr>
+<td>RegNetY-12GF</td>
+<td>82.4</td>
+<td>83.1</td>
+<td>84.1</td>
+</tr>
+<tr>
+<td>RegNetY-16GF</td>
+<td>82.9</td>
+<td>83.1</td>
+<td>84.2</td>
+</tr>
+</tbody>
+</table>
+<h5 id="결과-해석">결과 해석</h5>
+<p>이 표에서는 <strong>교사의 정확도만으로 학생 성능이 결정되지는 않는다</strong>는 점이 드러납니다. RegNetY-4GF 교사의 정확도는 80.0%로 DeiT-B 교사의 81.8%보다 낮지만, 학생은 각각 82.7%와 81.9%를 기록했습니다. 이 조건에서는 CNN 교사가 학생에게 더 유용한 학습 신호를 제공한 것입니다.</p>
+<p>이는 CNN의 지역성 같은 구조적 가정(inductive bias)에서 얻은 시각적 판단을 ViT에 전달하는 것이 도움이 된다는 해석을 뒷받침합니다. 다만 이 결과를 모든 CNN 교사와 Transformer 교사의 우열로 일반화할 수는 없습니다. 학생은 교사의 판단을 참고하면서도 자신의 구조와 학습 과정을 통해 학습하므로, 교사보다 높은 정확도를 얻을 수도 있습니다.</p>
+<p>오른쪽 열은 384 해상도로 파인튜닝한 별도의 조건입니다. 높은 해상도로 세부 정보를 더 활용할 수 있지만 계산량도 늘어나므로, 같은 비용에서 정확도만 높아진 것으로 해석해서는 안 됩니다. 다음 표에서는 교사보다 <strong>증류 목표와 출력의 사용 방식</strong>에 초점을 맞춥니다.</p>
+<hr/>
+<h4 id="2-증류-방식과-출력-head-비교">2. 증류 방식과 출력 Head 비교</h4>
+<table>
+<thead>
+<tr>
+<th>방법</th>
+<th>정답 라벨 사용</th>
+<th>교사 목표</th>
+<th>Ti 224 (%)</th>
+<th>S 224 (%)</th>
+<th>B 224 (%)</th>
+<th>B → 384 (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeiT — 증류 없음</td>
+<td>✓</td>
+<td>없음</td>
+<td>72.2</td>
+<td>79.8</td>
+<td>81.8</td>
+<td>83.1</td>
+</tr>
+<tr>
+<td>DeiT — 일반적인 Soft 증류</td>
+<td>✗</td>
+<td>Soft 분포</td>
+<td>72.2</td>
+<td>79.8</td>
+<td>81.8</td>
+<td>83.2</td>
+</tr>
+<tr>
+<td>DeiT — Hard 증류</td>
+<td>✗</td>
+<td>Hard 라벨</td>
+<td>74.3</td>
+<td>80.9</td>
+<td>83.0</td>
+<td>84.0</td>
+</tr>
+<tr>
+<td>증류 토큰 모델 — CLS 출력만 사용</td>
+<td>✓</td>
+<td>Hard 라벨</td>
+<td>73.9</td>
+<td>80.9</td>
+<td>83.0</td>
+<td>84.2</td>
+</tr>
+<tr>
+<td>증류 토큰 모델 — Distillation 출력만 사용</td>
+<td>✓</td>
+<td>Hard 라벨</td>
+<td>74.6</td>
+<td>81.1</td>
+<td>83.1</td>
+<td>84.4</td>
+</tr>
+<tr>
+<td>증류 토큰 모델 — 두 출력 결합</td>
+<td>✓</td>
+<td>Hard 라벨</td>
+<td>74.5</td>
+<td>81.2</td>
+<td>83.4</td>
+<td>84.5</td>
+</tr>
+</tbody>
+</table>
+<p>원 표는 <strong>300 epochs 사전학습</strong> 조건을 제시합니다. ‘정답 라벨 사용’은 해당 행의 <strong>학생 학습 목표</strong>에 관한 표시이며, 교사가 라벨 없이 학습됐다는 뜻은 아닙니다. 마지막 세 행은 같은 증류 토큰 학습 방식에서 평가에 사용할 출력을 달리한 비교이고, 마지막 행은 두 분류기의 예측을 결합하는 Late fusion입니다.</p>
+<h5 id="결과-해석-1">결과 해석</h5>
+<p>먼저 B 224에서 증류 없음과 Soft 증류는 모두 81.8%, Hard 증류는 83.0%입니다. <strong>이 조건에서는 Hard 증류가 더 효과적</strong>이었으며, 교사의 전체 확률분포를 배우는 것이 언제나 더 좋은 것은 아님을 보여줍니다.</p>
+<p>다음으로 증류 토큰 모델의 마지막 세 행은 CLS가 실제 정답을, Distillation token이 교사의 Hard 라벨을 학습한 결과입니다. 두 목표를 별도로 배우는 방식이므로, 토큰 하나를 추가한 효과만으로 해석해서는 안 됩니다. B 224에서는 CLS 출력 83.0%, 증류 출력 83.1%, 두 출력 결합 83.4%로 <strong>두 Head의 상호 보완 가능성</strong>이 나타났습니다. 다만 Ti 224에서는 증류 출력만 사용한 74.6%가 결합한 74.5%보다 조금 높아, 결합이 언제나 최고인 것은 아닙니다.</p>
+<p>개선량은 퍼센트포인트로 읽습니다. B 224의 81.8% → 83.4%는 +1.6%p, B 384의 83.1% → 84.5%는 +1.4%p입니다. 두 표는 비교 목적과 설정이 다르므로 비슷한 이름의 수치를 무조건 같은 실험으로 취급해서는 안 됩니다. 반복 실험의 분산도 제시되지 않았으므로 0.1%p 정도의 차이를 확정적인 우열로 과장하지 않는 것이 좋습니다.</p>
+<p>결국 DeiT의 성능을 이해하려면 <strong>교사의 정확도와 함께, 어떤 목표로 지식을 전달하고 두 예측을 어떻게 활용하는지</strong>를 살펴봐야 합니다.</p>
+<p>출처: <a href="https://arxiv.org/abs/2012.12877">DeiT 원 논문 — 표 2·3</a></p>
+<hr/>
+<h3 id="deit-summary">DeiT Summary</h3>
+<p>지금까지 살펴본 학습 전략, 두 토큰의 역할, 실험 결과를 연결하면 DeiT의 기여를 다음과 같이 정리할 수 있습니다.</p>
+<h4 id="key-contributions--핵심-기여">Key contributions — 핵심 기여</h4>
+<table>
+<thead>
+<tr>
+<th>Contribution</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Knowledge Distillation</td>
+<td>CNN 교사가 학습한 시각적 판단을 학생 Transformer에 전달합니다.</td>
+</tr>
+<tr>
+<td>Distillation Token</td>
+<td>교사의 예측을 배우는 별도 토큰을 두고 Attention으로 패치와 상호작용합니다.</td>
+</tr>
+<tr>
+<td>Pure Transformer Architecture</td>
+<td>학생은 기본 ViT의 Transformer 구조를 유지합니다.</td>
+</tr>
+<tr>
+<td>Optimized Training Recipe</td>
+<td>데이터 증강·규제·최적화 전략을 조합해 같은 데이터를 더 잘 활용합니다.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>DeiT는 수억 장 규모의 외부 데이터 없이도, 학습 방법을 개선하면 Transformer를 효과적으로 학습할 수 있음을 보여줬습니다.</strong> 여기서 데이터 효율적이라는 말은 극소량의 데이터만으로 충분하다는 뜻이 아니라, ImageNet-1K 규모에서도 경쟁력 있는 결과를 얻었다는 의미입니다.</p>
+<h4 id="쉽게-정리하면">쉽게 정리하면</h4>
+<ul>
+<li><strong>지식 증류:</strong> CNN 교사의 예측을 활용해 교사가 학습한 시각적 판단을 학생 Transformer에 전달합니다.</li>
+<li><strong>증류 토큰:</strong> CLS는 실제 정답을, 별도 Distillation token은 교사의 예측을 배우도록 합니다. 추론에서는 두 Head의 예측을 결합할 수 있습니다.</li>
+<li><strong>Transformer 구조 유지:</strong> 학생은 CNN 특징 추출기를 붙인 하이브리드 구조가 아니라, 기본 ViT 구조를 유지합니다. CNN 교사를 쓴다고 학생 자체가 CNN이 되는 것은 아닙니다.</li>
+<li><strong>학습 전략 개선:</strong> 강한 데이터 증강·규제·최적화 전략을 함께 사용합니다. 증류 없는 DeiT도 이 학습 전략의 효과를 얻습니다.</li>
+</ul>
+<p><strong>핵심은 모델을 무조건 크게 만드는 대신, 같은 데이터를 더 잘 활용하는 학습 전략과 교사 지식 전달로 ViT의 실용성을 높였다는 점</strong>입니다. DINO와 달리 정답 라벨을 사용하는 지도학습이며, 원 실험의 ‘외부 데이터 없음’과 ‘라벨 없음’은 구분해야 합니다.</p>
+<hr/>
+<p><a id="swin"></a></p>
+<h2 id="3-지역-계산과-윈도우-간-전달을-결합하는-swin">3. 지역 계산과 윈도우 간 전달을 결합하는 Swin</h2>
+<p>DeiT가 같은 데이터로 더 잘 학습하는 방법에 초점을 맞췄다면, Swin은 Attention의 계산 범위와 특징의 해상도를 바꿉니다. 특히 고해상도 이미지를 처리하고 검출·분할에 필요한 여러 크기의 특징을 만드는 문제로 이어집니다.</p>
+<p><strong>Swin Transformer는 작은 윈도우 안에서 Attention을 계산하고, 단계별로 공간 크기를 줄이는 계층형 Vision Transformer</strong>입니다. Swin은 Shifted Window에서 온 이름입니다.</p>
+<h3 id="어떤-문제를-해결하려-했을까">어떤 문제를 해결하려 했을까?</h3>
+<table>
+<thead>
+<tr>
+<th>기본 ViT의 부담</th>
+<th>Swin의 방법</th>
+<th>효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>모든 토큰 쌍의 Attention은 토큰 수의 제곱에 비례</td>
+<td>Window 안에서만 Attention 계산</td>
+<td>고해상도 입력의 계산 부담 완화</td>
+</tr>
+<tr>
+<td>기본 구조는 여러 층에서 같은 토큰 격자를 유지</td>
+<td>Patch Merging으로 격자를 줄이고 채널을 늘림</td>
+<td>여러 해상도의 특징 맵 생성</td>
+</tr>
+<tr>
+<td>작은 물체부터 큰 물체까지 다뤄야 하는 검출·분할</td>
+<td>계층별 특징을 해당 작업의 Head에 제공</td>
+<td>분류 외 작업에도 쓸 수 있는 Backbone 구성</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="계층적으로 공간 해상도가 달라지는 Swin과 같은 격자를 유지하는 기본 ViT 비교" src="../assets/orca-paste-1793779720962-03fb3ae9-d735-448c-b4c3-83be07f98da4.png"/></p>
+<p>그림 왼쪽 Swin은 <strong>세밀한 격자 → 중간 격자 → 거친 격자</strong>로 진행하며, 각 단계의 특징을 검출·분할에 활용할 수 있습니다. 4×·8×·16×는 입력 대비 공간 축소 배율입니다. 오른쪽의 기본 ViT는 같은 패치 격자를 유지하며 깊어지는 모습을 보여줍니다. 이 비교는 계층적 특징을 만드는 구조의 차이를 나타내며, ViT도 별도의 구성을 통해 검출·분할에 사용할 수 있습니다.</p>
+<h3 id="patch-merging은-어떻게-할까">Patch Merging은 어떻게 할까?</h3>
+<p>인접한 <strong>2×2 토큰을 특징 방향으로 이어 붙인 뒤 선형 변환</strong>합니다. 기본 구성의 크기 변화는 <code>H×W×C → (H/2)×(W/2)×4C → (H/2)×(W/2)×2C</code>입니다. 즉, 공간 토큰 수는 1/4로 줄이고 채널은 2배로 늘립니다. 여기서 H·W는 현재 토큰 격자의 높이와 너비를 뜻합니다.</p>
+<p>기본 Swin은 이 과정을 거친 최종 특징을 전역 평균해 분류에 사용합니다. 검출·분할에서는 여러 단계의 특징을 해당 작업의 Head와 연결합니다. 원 ViT의 CLS를 선택하는 방식과 최종 특징을 모으는 방식에도 차이가 있습니다.</p>
+<hr/>
+<h3 id="swin의-window와-shift">Swin의 Window와 Shift</h3>
+<p>계층적 특징을 만드는 방법을 확인했으므로, 이번에는 각 단계 안에서 Attention을 어떻게 효율적으로 계산하면서 윈도우 사이의 정보를 연결하는지 살펴보겠습니다.</p>
+<p><strong>윈도우 안에서만 계산하면 효율적이지만, 같은 경계를 계속 쓰면 다른 윈도우와 정보가 단절됩니다.</strong> Swin은 연속한 블록에서 윈도우 경계를 이동해 이 문제를 완화합니다.</p>
+<table>
+<thead>
+<tr>
+<th>연산</th>
+<th>계산 방식</th>
+<th>효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>W-MSA</td>
+<td>겹치지 않는 일반 윈도우 안에서 Self-Attention</td>
+<td>효율적인 지역 정보 조합</td>
+</tr>
+<tr>
+<td>SW-MSA</td>
+<td>윈도우 경계를 대략 반 윈도우만큼 이동한 뒤 내부에서 Self-Attention</td>
+<td>이전 윈도우의 경계를 넘어 정보 교환</td>
+</tr>
+</tbody>
+</table>
+<p>원 표의 <code>Window size / 2</code>는 토큰 단위에서 정수로 처리합니다. 예를 들어 7×7 토큰 윈도우이면 보통 각 축으로 3칸 이동합니다. <strong>윈도우 크기는 원본 이미지 픽셀 수가 아니라 현재 특징 격자의 토큰 수 기준</strong>입니다.</p>
+<p><img alt="고정 윈도우 내부 계산과 경계를 이동해 이전 윈도우 사이를 연결하는 Attention" src="../assets/orca-paste-1793779791439-04d3a7ec-51c4-4fa2-b6ac-a538b049f124.png"/></p>
+<h4 id="그림-읽는-방법">그림 읽는 방법</h4>
+<ul>
+<li><strong>왼쪽:</strong> 떨어진 윈도우 사이를 직접 연결하지 않고 각 윈도우 안에서 계산합니다.</li>
+<li><strong>가운데 Layer ℓ:</strong> 빨간 경계가 일반 윈도우이며, 작은 칸 하나가 패치 토큰입니다.</li>
+<li><strong>오른쪽 Layer ℓ+1:</strong> 경계를 이동하면 원래 다른 윈도우에 있던 토큰들이 같은 새 윈도우에 들어가 서로 참고할 수 있습니다.</li>
+</ul>
+<p><strong>원본 이미지나 물체를 실제로 움직이는 것이 아니라, Attention을 함께 계산할 토큰 묶음을 바꾸는 것</strong>입니다. W-MSA와 SW-MSA를 번갈아 쌓으면 여러 블록에 걸쳐 더 넓은 영역의 정보가 전달됩니다. 한 층에서 모든 토큰 쌍을 직접 비교하는 전역 Attention과는 다릅니다.</p>
+<h4 id="계산량과-경계-처리">계산량과 경계 처리</h4>
+<p>토큰이 T개이고 윈도우가 M×M이면, 전역 Attention의 점수 수는 T²개인 반면 윈도우 방식은 대략 <strong>(T/M²) × M⁴ = TM²개</strong>입니다. 따라서 윈도우 크기를 고정하면 이 관계 계산 비용은 토큰 수 T에 선형으로 증가합니다. 모델 전체의 계산량과 실제 실행 시간은 다른 연산과 구현에도 영향을 받습니다.</p>
+<p>효율적인 구현에서는 특징 맵을 순환 이동한 뒤 윈도우로 나누고, <strong>이동으로 반대편 가장자리가 인위적으로 붙은 부분은 Attention Mask로 차단</strong>합니다. 필요한 경우 크기를 맞추는 Padding도 처리합니다.</p>
+<p><strong>기억하기: Window는 계산 범위를 줄이고, Shift는 윈도우 사이를 연결하며, Patch Merging은 계층적 해상도를 만듭니다.</strong></p>
+<p>출처: <a href="https://arxiv.org/abs/2103.14030">Swin Transformer 원 논문</a></p>
+<hr/>
+<h3 id="swin-architecture">Swin Architecture</h3>
+<p>지금까지 Window, Shift, Patch Merging을 각각 살펴봤다면, 이번에는 이 연산들이 실제 네트워크에서 어떻게 연결되는지 확인하겠습니다. Swin은 <strong>같은 Stage 안에서는 크기를 유지하며 블록을 반복하고, Stage 사이에서는 Patch Merging으로 공간 크기와 채널 수를 바꿉니다.</strong> 먼저 연속한 두 블록을 살펴본 뒤 전체 Stage 구조로 확장합니다.</p>
+<hr/>
+<h4 id="1-연속한-두-블록-w-msa--sw-msa">1. 연속한 두 블록: W-MSA → SW-MSA</h4>
+<p><img alt="일반 윈도우와 이동 윈도우 블록의 잔차 연결 및 순환 이동·마스크 처리" src="../assets/orca-paste-1793780088943-e7ae6688-92b1-4b70-8fe6-b75294ee8355.png"/></p>
+<p>첫 그림의 점선 상자 하나가 Swin 블록 하나이며, 두 블록을 아래에서 위로 읽습니다.</p>
+<table>
+<thead>
+<tr>
+<th>블록</th>
+<th>흐름</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>첫 블록</td>
+<td>LN → W-MSA → 잔차 덧셈 → LN → MLP → 잔차 덧셈</td>
+<td>일반 윈도우 안에서 정보 조합</td>
+</tr>
+<tr>
+<td>다음 블록</td>
+<td>LN → SW-MSA → 잔차 덧셈 → LN → MLP → 잔차 덧셈</td>
+<td>이동한 윈도우 안에서 이전 경계를 넘는 정보 조합</td>
+</tr>
+</tbody>
+</table>
+<p>이 그림은 <strong>원 Swin의 Pre-LN 구조</strong>입니다. 지름길로 원래 표현을 전달하고, Attention·MLP 결과를 더해 학습을 돕습니다. W-MSA에서 SW-MSA로 바뀌어도 토큰 격자 크기와 채널 수는 유지됩니다.</p>
+<p>윈도우가 7×7이면 <strong>한 윈도우의 토큰은 49개</strong>입니다. 도식의 작은 칸 수는 구조를 단순화한 그림일 수 있으므로, 수치 예제의 M=7과 구별합니다.</p>
+<p>각 토큰은 현재 Stage의 채널 수만큼 특징을 가지며, Head 하나의 Attention 점수 행렬은 <code>49×49</code>입니다. Shift는 각 축으로 3토큰을 이동하는 방식입니다.</p>
+<p>오른쪽 아래는 SW-MSA를 효율적으로 구현하는 과정입니다.</p>
+<ol>
+<li><strong>Cyclic shift:</strong> 특징 격자를 순환 이동해 이동 윈도우를 일정한 크기로 묶습니다.</li>
+<li><strong>Masked Attention:</strong><ol>
+<li>순환 이동 때문에 인위적으로 붙은 영역끼리는 Attention을 차단합니다.</li>
+<li>새 이동 윈도우 안에서 정상적으로 연결되는 토큰은 서로 참고합니다.</li>
+<li>차단할 점수에는 음의 무한대를 더해 Softmax 가중치가 0이 되게 합니다. 단순히 0보다 작은 점수는 여전히 양의 가중치를 가집니다. 공식 구현의 -100 같은 큰 음수는 이를 수치적으로 근사합니다.</li>
+</ol>
+</li>
+<li><strong>Reverse cyclic shift:</strong> 계산 결과를 원래 격자 위치로 되돌립니다.</li>
+</ol>
+<p><strong>정정 근거:</strong> <a href="https://github.com/microsoft/Swin-Transformer/blob/main/models/swin_transformer.py">Swin 공식 구현의 attention mask</a>.</p>
+<p>이미지 내용을 바꾸는 데이터 증강이 아니라, <strong>같이 Attention을 계산할 토큰의 묶음을 효율적으로 바꾸는 구현</strong>입니다.</p>
+<hr/>
+<h4 id="2-전체-구조-4개의-stage와-patch-merging">2. 전체 구조: 4개의 Stage와 Patch Merging</h4>
+<p><img alt="4×4 패치 입력에서 네 Stage를 거치며 해상도를 줄이고 채널을 늘리는 Swin-T 구조" src="../assets/orca-paste-1793780106651-2a3876d5-5bfb-47b2-be3d-9cd16e66e2d4.png"/></p>
+<p>두 블록의 연결을 전체 모델로 확장하면 아래의 네 Stage 구조가 됩니다. 아래 표의 H·W는 원본 이미지 크기, C는 첫 Stage의 임베딩 채널 수입니다. 앞서 Patch Merging의 일반식을 설명할 때 H·W를 현재 토큰 격자 크기로 썼던 것과 표기의 기준이 다릅니다. 그림의 블록 수 <code>[2, 2, 6, 2]</code>는 <strong>Swin-T</strong> 구성에 해당하며, 다른 Swin 변형은 블록 수·채널·Head 수 등이 달라질 수 있습니다.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>연산</th>
+<th>출력 크기 — 높이 × 너비 × 채널</th>
+<th>224×224 입력, C=96 예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력</td>
+<td>RGB 이미지</td>
+<td>H × W × 3</td>
+<td>224 × 224 × 3</td>
+</tr>
+<tr>
+<td>Patch Partition</td>
+<td>4×4 패치별 Flatten</td>
+<td>H/4 × W/4 × 48</td>
+<td><strong>56 × 56</strong> × 48</td>
+</tr>
+<tr>
+<td>Linear Embedding</td>
+<td>패치당 48개 값을 <strong>C차원으로 변환</strong></td>
+<td>H/4 × W/4 × C</td>
+<td>56 × 56 × 96</td>
+</tr>
+<tr>
+<td>Stage 1</td>
+<td>Swin 블록 ×2</td>
+<td>H/4 × W/4 × C</td>
+<td><strong>56 × 56</strong> × 96</td>
+</tr>
+<tr>
+<td>Stage 2</td>
+<td>Patch Merging → 블록 ×2</td>
+<td>H/8 × W/8 × 2C</td>
+<td>28 × 28 × 192</td>
+</tr>
+<tr>
+<td>Stage 3</td>
+<td>Patch Merging → 블록 ×6</td>
+<td>H/16 × W/16 × 4C</td>
+<td>14 × 14 × 384</td>
+</tr>
+<tr>
+<td>Stage 4</td>
+<td>Patch Merging → 블록 ×2</td>
+<td>H/32 × W/32 × 8C</td>
+<td>7 × 7 × 768</td>
+</tr>
+</tbody>
+</table>
+<p>처음의 48은 <code>4×4×3</code>으로 계산한 패치 하나의 픽셀·채널 값 개수입니다. 이 값을 C차원으로 임베딩한 뒤 Stage 1을 시작하고, Stage가 바뀔 때마다 토큰 격자는 줄어들고 특징 채널은 늘어납니다. 그 변환을 담당하는 Patch Merging을 수치로 확인해 보겠습니다.</p>
+<hr/>
+<h4 id="3-patch-merging에서-어떤-변화가-일어날까">3. Patch Merging에서 어떤 변화가 일어날까?</h4>
+<p>그림 위쪽은 인접한 2×2 토큰을 한 묶음으로 만드는 과정입니다.</p>
+<pre><code class="language-text">2×2의 각 토큰이 C차원
+→ 특징 방향으로 Concat해 4C차원
+→ LayerNorm과 Linear로 2C차원으로 변환
+</code></pre>
+<p>Stage 1에서 Stage 2로 넘어가는 예시는 <code>56×56×96 → 28×28×384 → 28×28×192</code>입니다. 인접 토큰의 특징을 이어 붙인 뒤 학습 가능한 변환으로 조합하므로 단순한 평균 Pooling과 계산 방식이 다릅니다. 이렇게 얻은 여러 해상도의 특징을 작업에 맞는 Head와 연결합니다.</p>
+<hr/>
+<h4 id="4-분류검출분할에-연결하기">4. 분류·검출·분할에 연결하기</h4>
+<p>분류에서는 보통 최종 Stage의 특징을 정규화하고 공간 방향으로 평균한 뒤 분류 Head에 전달합니다. 위 예시에서는 <code>7×7×768 → 768 → 클래스별 logits</code>이며, CLS 토큰은 사용하지 않습니다.</p>
+<p>검출·분할에서는 여러 Stage의 특징을 활용해 작은 물체의 위치와 큰 물체의 문맥을 함께 다루기 쉬워집니다. 이것이 앞 항목에서 설명한 계층 구조의 이점입니다.</p>
+<p><strong>블록에서는 Window와 Shift를 번갈아 사용해 정보를 전달하고, Stage 사이에서는 Patch Merging으로 더 넓은 범위를 다루는 계층을 만듭니다.</strong></p>
+<p>처음의 CNN과 연결해 보면, Swin은 지역 단위의 계산과 계층적 특징이라는 장점을 Attention 구조에 반영한 모델로 이해할 수 있습니다. 이 문서에서 살펴본 흐름은 <strong>Attention의 가중합 → Transformer의 문맥 표현 → ViT의 이미지 토큰 처리 → DeiT의 학습 전략 개선 → Swin의 계산 범위와 계층 구조 개선</strong>으로 이어집니다. 각 모델을 비교할 때는 관계를 계산하는 방식, 학습 목표, 데이터와 계산 조건을 함께 살펴보면 됩니다.</p>
+<hr/>
+<h3 id="complexity">Complexity</h3>
+<p>ViT와 Swin의 계산량 차이는 <strong>한 토큰이 몇 개의 토큰을 참고하는가</strong>에서 시작합니다. 전역 Attention은 모든 토큰 쌍을 비교하고, Window Attention은 같은 윈도우 안의 토큰만 비교합니다.</p>
+<p><img alt="전역 Attention과 Window Attention의 계산 복잡도 비교" src="../assets/orca-paste-1793836313943-db93965a-abba-4082-92b0-da2cf05bf42e.png"/></p>
+<h4 id="1-식의-기호와-계산-범위">1. 식의 기호와 계산 범위</h4>
+<p>이 절에서 H·W는 <strong>현재 특징 격자의 높이와 너비</strong>, N=HW는 토큰 수, C는 채널 수, M은 윈도우 한 변의 토큰 수입니다. 원본 이미지의 픽셀 크기와 구분해야 합니다. 아래 식은 Q·K·V 및 출력 Linear와 두 Attention 행렬 곱의 주요 연산량이며, MLP·정규화·Softmax 등은 생략합니다. CLS 토큰과 경계 Padding도 생략한 비교입니다.</p>
+<table>
+<thead>
+<tr>
+<th>Attention 방식</th>
+<th>주요 연산량</th>
+<th>토큰 수 N에 따른 증가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>전역 MSA — ViT</td>
+<td><span class="math">\(4NC^2 + 2N^2C\)</span></td>
+<td>C를 고정하면 이차 증가</td>
+</tr>
+<tr>
+<td>Window MSA — Swin</td>
+<td><span class="math">\(4NC^2 + 2NM^2C\)</span></td>
+<td>C와 M을 고정하면 선형 증가</td>
+</tr>
+</tbody>
+</table>
+<p>공통 항 <strong>4NC²</strong>는 Q·K·V를 만드는 세 Linear와 결과를 조합하는 출력 Linear에서 나옵니다. 차이를 만드는 항은 <strong>관련도 QKᵀ와 가중합 AV</strong>입니다. 전역 방식은 N×N 관계를 계산하지만, 윈도우 방식은 윈도우 하나당 M²×M² 관계를 N/M²개 윈도우에서 계산합니다.</p>
+<div class="math">$$
+\frac{N}{M^2}\times 2(M^2)^2C = 2NM^2C
+$$</div>
+<p><img alt="N×C Query와 C×N Key 전치 행렬의 곱으로 N×N 관계를 계산하는 과정" src="../assets/orca-paste-1793836327121-963c182c-a317-4df9-a213-1b078543eb67.png"/></p>
+<h4 id="2-토큰-수가-늘어나면-어떤-차이가-날까">2. 토큰 수가 늘어나면 어떤 차이가 날까?</h4>
+<p>같은 특징 격자가 56×56이면 N=3,136입니다. 7×7 윈도우에서는 토큰마다 49개 토큰을 참고하므로, Head 하나의 관련도 점수 수는 전역 방식의 <strong>3,136²=9,834,496개</strong>에서 윈도우 방식의 <strong>3,136×49=153,664개</strong>로 줄어듭니다. 관계 계산 부분만 비교하면 64배 차이입니다. Q·K·V 변환과 MLP는 그대로 필요하므로 전체 모델이 64배 빨라진다는 뜻은 아닙니다.</p>
+<p>패치 크기를 유지하고 이미지의 가로·세로를 각각 2배로 늘리면 토큰 수는 4배가 됩니다. 이때 전역 Attention의 <strong>N² 항은 16배</strong>, 고정 윈도우 Attention의 <strong>NM² 항은 4배</strong>가 됩니다. 따라서 ‘Swin은 이미지 크기에 선형’이라는 말의 기준은 이미지 한 변의 길이가 아니라 <strong>픽셀 수 또는 그에 비례하는 토큰 수</strong>입니다.</p>
+<h4 id="3-patch-merging과-실제-속도까지-연결하기">3. Patch Merging과 실제 속도까지 연결하기</h4>
+<p>Patch Merging으로 N이 1/4, C가 2배가 되면 NC² 항은 그대로이고, 고정 M에서 NM²C 항은 절반이 됩니다. 토큰 수가 줄어도 채널이 늘어나므로 모든 계산이 1/4이 되지는 않습니다. Stage별 블록 수도 전체 비용에 영향을 줍니다.</p>
+<p><strong>계산량(FLOPs), 중간 활성값 메모리, 실행 시간은 구분해야 합니다.</strong> 일반적인 구현에서 저장하는 Attention 점수의 크기도 전역 방식은 Head당 N², 윈도우 방식은 NM²에 비례합니다. 다만 메모리 효율적인 Attention 구현은 전체 점수 행렬 저장을 피할 수 있으며, 실제 속도는 GPU·배치 크기·메모리 이동·Shift와 Padding 구현에도 좌우됩니다.</p>
+<p>출처: <a href="https://arxiv.org/html/2103.14030v2#S3.SS2">Swin 원 논문 §3.2 — Window Attention의 복잡도</a></p>
+<hr/>
+<h3 id="experiments">Experiments</h3>
+<p>이번에는 <strong>ViT-L/16과 Swin-L이 같은 입력 해상도에서 어떤 정확도와 실행 비용을 보이는지</strong> 비교합니다. 아래 그림의 오른쪽 (b), <strong>ImageNet-22K 사전학습 모델</strong>에 있는 두 행을 기준으로 읽습니다. 두 모델 모두 384×384 입력으로 ImageNet-1K 분류 성능을 평가한 결과입니다.</p>
+<p><img alt="오른쪽 ImageNet-22K 사전학습 표의 ViT-L/16과 Swin-L 비교" src="../assets/orca-paste-1793836347958-04b79100-4195-484e-b2ba-f6b482aea616.png"/></p>
+<h4 id="1-같은-평가-조건에서-결과-비교">1. 같은 평가 조건에서 결과 비교</h4>
+<table>
+<thead>
+<tr>
+<th>비교 항목</th>
+<th>ViT-L/16</th>
+<th>Swin-L</th>
+<th>Swin-L의 차이</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>사전학습 데이터</td>
+<td>ImageNet-22K</td>
+<td>ImageNet-22K</td>
+<td>같은 데이터셋 범주</td>
+</tr>
+<tr>
+<td>평가 입력</td>
+<td>384×384</td>
+<td>384×384</td>
+<td>같은 해상도</td>
+</tr>
+<tr>
+<td>파라미터 수</td>
+<td>307M</td>
+<td>197M</td>
+<td>110M 감소, 약 35.8% 적음</td>
+</tr>
+<tr>
+<td>FLOPs</td>
+<td>190.7G</td>
+<td>103.9G</td>
+<td>86.8G 감소, 약 45.5% 적음</td>
+</tr>
+<tr>
+<td>Throughput — images/s</td>
+<td>27.3</td>
+<td>42.1</td>
+<td>약 1.54배, 약 54.2% 높음</td>
+</tr>
+<tr>
+<td>ImageNet-1K Top-1 정확도</td>
+<td>85.2%</td>
+<td>87.3%</td>
+<td>+2.1%p</td>
+</tr>
+</tbody>
+</table>
+<p>수치는 <strong>첨부 그림 및 Swin 원 논문 v2의 표 1</strong> 기준입니다. M은 백만 개의 파라미터, G는 표의 집계 기준에 따른 십억 단위 연산량입니다. Throughput은 논문에서 V100 GPU로 측정한 초당 처리 이미지 수이며, 높을수록 같은 시간에 더 많은 이미지를 처리합니다.</p>
+<h4 id="2-정확도-더-작은-모델이-더-높은-성능을-보인다">2. 정확도: 더 작은 모델이 더 높은 성능을 보인다</h4>
+<p>ViT-L/16은 307M 파라미터로 85.2%, Swin-L은 197M 파라미터로 87.3%의 Top-1 정확도를 기록합니다. <strong>Swin-L은 파라미터가 약 36% 적으면서 정확도는 2.1%p 높습니다.</strong> 이 비교에서는 파라미터를 더 많이 가진 모델이 반드시 더 정확하지 않다는 점을 확인할 수 있습니다.</p>
+<p>오분류율로 바꾸면 ViT-L/16은 14.8%, Swin-L은 12.7%입니다. 오분류율의 상대 감소는 약 14.2%이지만, 정확도 차이를 표현할 때는 <strong>+2.1%p</strong>로 적어야 합니다. ‘정확도가 14.2% 높다’는 의미는 아닙니다.</p>
+<h4 id="3-계산량과-처리량-이론적-절감이-실제-속도에서도-나타난다">3. 계산량과 처리량: 이론적 절감이 실제 속도에서도 나타난다</h4>
+<p>Swin-L의 FLOPs는 103.9G로 ViT-L/16의 190.7G보다 약 45.5% 적습니다. 이 값은 해당 해상도에서 <strong>이미지 한 장을 처리하는 연산량</strong>이며, 모델이 저장하는 가중치 개수인 파라미터 수와는 다른 지표입니다.</p>
+<p>실제 처리량도 27.3→42.1 images/s로 약 1.54배 높습니다. 따라서 이 측정 조건에서는 Swin-L이 더 적은 연산으로 더 많은 이미지를 처리합니다. 다만 연산량 비율인 190.7/103.9≈1.84가 그대로 속도 비율이 되지는 않습니다. 메모리 접근, 연산 종류, 윈도우 분할과 Shift 구현 등이 실행 시간에 영향을 주기 때문입니다. 또한 처리량은 배치 처리 성능이므로 이 수치만으로 이미지 한 장의 응답 지연 시간을 단정할 수는 없습니다.</p>
+<h4 id="4-구조와-연결해-결과-해석하기">4. 구조와 연결해 결과 해석하기</h4>
+<p>ViT-L/16은 16×16 패치를 사용하고, Encoder에서 같은 토큰 격자를 유지하며 전역 Attention을 계산합니다. Swin-L은 작은 패치에서 시작해 <strong>윈도우 내부 Attention으로 관계 계산을 제한하고, Shift로 윈도우 사이를 연결하며, Patch Merging으로 단계별 토큰 수를 줄입니다.</strong> 이 구조는 고해상도 입력의 계산 부담을 관리하면서 여러 크기의 특징을 표현하는 데 도움이 됩니다.</p>
+<p>다만 위 결과는 <strong>모델 전체의 비교</strong>입니다. 두 모델은 폭·깊이·패치 크기·위치 정보와 학습 설정 등이 다릅니다. 따라서 정확도 향상 전체가 Shift 하나 때문이거나, 파라미터 감소 전체가 Window Attention 때문이라고 해석할 수는 없습니다. 특히 Window Attention의 주된 절감 대상은 토큰 사이의 관계 계산이며, QKV·MLP 가중치 수는 주로 채널 폭과 블록 수에 의해 결정됩니다.</p>
+<p>이 표가 보여주는 결론은 <strong>ImageNet-22K 사전학습과 384 입력의 해당 분류 실험에서, Swin-L이 ViT-L/16보다 적은 파라미터와 연산량으로 더 높은 정확도와 처리량을 달성했다</strong>는 것입니다. 검출·분할 성능이나 다른 하드웨어에서의 속도는 해당 작업과 환경에서 별도로 비교해야 합니다.</p>
+<p>출처: <a href="https://arxiv.org/html/2103.14030v2#S4.SS1">Swin 원 논문 v2 — 표 1 및 ImageNet 분류 실험 조건</a></p>
+<hr/>
+<h3 id="summary">Summary</h3>
+<p>ViT와 Swin은 모두 <strong>이미지를 토큰으로 바꾸고 Attention으로 토큰의 정보를 조합</strong>합니다. 차이는 토큰 격자를 유지하는 방식과, 한 블록에서 정보를 주고받는 범위에 있습니다.</p>
+<h4 id="1-swin의-구성-요소를-역할별로-정리하기">1. Swin의 구성 요소를 역할별로 정리하기</h4>
+<p><img alt="계층적 표현, Window Attention, Patch Merging, Cyclic Shift와 Mask의 역할" src="../assets/orca-paste-1793836372298-f0504811-d251-4f83-a94a-497b99d16894.png"/></p>
+<table>
+<thead>
+<tr>
+<th>구성</th>
+<th>하는 일</th>
+<th>얻는 이점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>W-MSA</td>
+<td>작은 윈도우 안에서 Attention 계산</td>
+<td>토큰 수 증가에 따른 관계 계산 부담 완화</td>
+</tr>
+<tr>
+<td>SW-MSA</td>
+<td>다음 블록에서 윈도우 경계를 이동</td>
+<td>이전에 다른 윈도우에 있던 토큰 사이에 정보 전달</td>
+</tr>
+<tr>
+<td>Cyclic Shift + Mask</td>
+<td>이동 윈도우를 효율적으로 묶고 잘못 연결된 가장자리를 차단</td>
+<td>이동 윈도우 계산을 배치로 처리</td>
+</tr>
+<tr>
+<td>Patch Merging</td>
+<td>인접 2×2 토큰을 합쳐 격자를 줄이고 채널 확대</td>
+<td>여러 해상도의 계층적 특징 생성</td>
+</tr>
+</tbody>
+</table>
+<p>그림의 ‘global context’는 <strong>여러 블록을 거치며 더 넓은 문맥을 반영한다</strong>는 의미로 읽어야 합니다. Shift 한 번으로 모든 토큰 사이에 전역 Attention을 계산하는 것은 아닙니다. 계층 구조는 Patch Merging에서, 윈도우 사이 연결은 Shift에서 나옵니다.</p>
+<h4 id="2-vit와-swin을-같은-기준으로-비교하기">2. ViT와 Swin을 같은 기준으로 비교하기</h4>
+<p><img alt="기본 ViT와 Swin Transformer의 구조 및 Attention 범위 비교" src="../assets/orca-paste-1793836392474-834d2fc6-bd4a-443c-9d33-3cc1ed96559c.png"/></p>
+<table>
+<thead>
+<tr>
+<th>비교 기준</th>
+<th>기본 ViT</th>
+<th>Swin Transformer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>시작 토큰</td>
+<td>예: 16×16 픽셀 패치</td>
+<td>기본 구성은 4×4 픽셀 패치</td>
+</tr>
+<tr>
+<td>공간 구조</td>
+<td>블록을 지나도 같은 토큰 격자 유지</td>
+<td>Stage 사이 Patch Merging으로 격자 축소</td>
+</tr>
+<tr>
+<td>정보 교환</td>
+<td>한 Attention 층에서 모든 토큰을 직접 비교</td>
+<td>윈도우 내부 계산과 Shift를 반복하며 범위 확대</td>
+</tr>
+<tr>
+<td>특징 차원</td>
+<td>보통 전체 Encoder에서 같은 차원 유지</td>
+<td>Stage가 바뀔 때 채널 증가</td>
+</tr>
+<tr>
+<td>위치 정보</td>
+<td>학습 가능한 절대 위치 임베딩</td>
+<td>기본 Swin은 윈도우 내 상대 위치 바이어스</td>
+</tr>
+<tr>
+<td>분류 출력</td>
+<td>최종 CLS 표현 사용</td>
+<td>최종 공간 특징의 전역 평균 사용</td>
+</tr>
+<tr>
+<td>해상도 증가 부담</td>
+<td>전역 관계 계산이 토큰 수의 제곱에 비례</td>
+<td>고정 윈도우에서 토큰 수에 선형 비례</td>
+</tr>
+<tr>
+<td>검출·분할 연결</td>
+<td>여러 크기의 특징이 필요하면 별도 구성 가능</td>
+<td>여러 Stage의 특징을 바로 활용하기 편리</td>
+</tr>
+</tbody>
+</table>
+<p>표는 원래의 대표 구성을 비교합니다. <strong>ViT도 검출·분할에 사용할 수 있고, Swin도 분류에 사용할 수 있습니다.</strong> 그림의 ‘Best suited for’는 적용 가능 여부를 나누는 경계가 아니라, 기본 구조가 제공하는 특징의 차이로 이해하면 됩니다.</p>
+<h4 id="3-vit--deit--swin의-흐름">3. ViT → DeiT → Swin의 흐름</h4>
+<ul>
+<li><strong>ViT:</strong> 이미지 패치 시퀀스를 표준 Transformer Encoder에 넣어 이미지 분류를 수행합니다.</li>
+<li><strong>DeiT:</strong> 기본 ViT를 바탕으로 학습 전략과 지식 증류를 개선해 ImageNet-1K 규모의 데이터를 효과적으로 활용합니다.</li>
+<li><strong>Swin:</strong> Attention의 범위와 특징 격자를 바꾸어 고해상도 입력과 여러 크기의 물체를 다루기 편한 Backbone을 만듭니다.</li>
+</ul>
+<p>모델을 고를 때는 <strong>학습 데이터와 사전학습 가중치, 입력 해상도, 필요한 특징 해상도, 정확도·메모리·실행 시간</strong>을 함께 비교해야 합니다. 파라미터 수가 같아도 계산 방식이 다르면 실제 사용 비용은 달라집니다.</p>
+<p>출처: <a href="https://arxiv.org/html/2010.11929v2#S3">ViT 원 논문 — 구조와 학습 설정</a>, <a href="https://arxiv.org/html/2103.14030v2#S3">Swin 원 논문 — 전체 구조</a></p>
+<hr/>
+<p><a id="parameters"></a></p>
+<h2 id="4-파라미터연산량처리량을-따로-읽기--심화">4. 파라미터·연산량·처리량을 따로 읽기 — 심화</h2>
+<p>파라미터 수는 <strong>학습으로 갱신하는 가중치와 바이어스의 개수</strong>입니다. 입력에 따라 계산되는 Q·K·V, Attention 점수, 특징 맵의 원소 수와 다릅니다. M은 백만 개를 뜻하므로 86M은 약 8,600만 개입니다.</p>
+<p><img alt="ViT, DeiT, Swin의 모델 규모와 파라미터 수 비교" src="../assets/orca-paste-1793836422053-1561bc2c-3d11-43f3-8f6e-deaccdaeb029.png"/></p>
+<h3 id="1-vit-깊이보다-폭이-커질-때도-빠르게-증가한다">1. ViT: 깊이보다 폭이 커질 때도 빠르게 증가한다</h3>
+<table>
+<thead>
+<tr>
+<th>모델</th>
+<th>Hidden dimension D</th>
+<th>Head 수</th>
+<th>블록 수 L</th>
+<th>대략적인 파라미터 수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ViT-Ti/16</td>
+<td>192</td>
+<td>3</td>
+<td>12</td>
+<td>5.7M</td>
+</tr>
+<tr>
+<td>ViT-S/16</td>
+<td>384</td>
+<td>6</td>
+<td>12</td>
+<td>22M</td>
+</tr>
+<tr>
+<td>ViT-B/16</td>
+<td>768</td>
+<td>12</td>
+<td>12</td>
+<td>86M</td>
+</tr>
+<tr>
+<td>ViT-L/16</td>
+<td>1,024</td>
+<td>16</td>
+<td>24</td>
+<td>307M</td>
+</tr>
+<tr>
+<td>ViT-H/14</td>
+<td>1,280</td>
+<td>16</td>
+<td>32</td>
+<td>632M</td>
+</tr>
+</tbody>
+</table>
+<p>위는 그림의 반올림 값입니다. Tiny·Small은 후속 구현에서 널리 쓰이는 규모이며 원 ViT 논문의 대표 규모는 Base·Large·Huge입니다. 실제 개수는 분류 클래스 수, Head 구성과 입력 해상도에 따른 위치 임베딩 크기 등에 따라 조금 달라집니다.</p>
+<p>MLP의 중간 차원이 4D라면 블록 하나의 주요 가중치 수는 다음과 같습니다. 바이어스와 LayerNorm은 작은 항으로 생략합니다.</p>
+<div class="math">$$
+\underbrace{3D^2+D^2}_{\text{QKV 및 출력 Linear}}
++\underbrace{D(4D)+(4D)D}_{\text{MLP}}
+=12D^2
+$$</div>
+<p>따라서 Encoder의 주요 파라미터 수는 <strong>약 12LD²</strong>입니다. 같은 12블록인 Small에서 Base로 D가 384→768, 즉 2배가 되면 주요 가중치는 약 4배가 됩니다. Base→Large는 차원과 블록 수가 함께 증가합니다.</p>
+<p><strong>Head 수가 2배라고 파라미터가 반드시 2배가 되지는 않습니다.</strong> 전체 D를 고정한 채 Head 수를 늘리면 Head당 차원이 줄어들기 때문입니다. 주요 QKV 가중치의 합계 크기는 그대로입니다.</p>
+<h3 id="2-deit-비슷한-크기의-학생을-더-잘-학습시키기">2. DeiT: 비슷한 크기의 학생을 더 잘 학습시키기</h3>
+<table>
+<thead>
+<tr>
+<th>모델 — 224 입력 기준 공개 표</th>
+<th>파라미터 수</th>
+<th>비교 의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeiT-Tiny</td>
+<td>약 5M</td>
+<td>작은 차원의 ViT 계열 학생</td>
+</tr>
+<tr>
+<td>DeiT-Small</td>
+<td>약 22M</td>
+<td>ViT-S 규모</td>
+</tr>
+<tr>
+<td>DeiT-Base</td>
+<td>약 86M</td>
+<td>ViT-B 규모</td>
+</tr>
+<tr>
+<td>DeiT-Base distilled</td>
+<td>약 87M</td>
+<td>별도 증류 토큰과 분류 Head 추가</td>
+</tr>
+</tbody>
+</table>
+<p>그림의 ViT-Tiny 5.7M과 DeiT-Tiny 5M은 정밀도가 다른 요약 값이므로 그 차이를 구조적인 압축 효과로 해석하면 안 됩니다. 증류 모델에서는 토큰·위치 임베딩과 추가 분류 Head가 늘어나지만 Encoder의 기본 폭과 깊이는 유지됩니다.</p>
+<p>DeiT-B 증류 모델은 약 1M 증가만으로 두 학습 목표를 활용합니다. <strong>교사 CNN의 파라미터는 학생의 추론 파라미터 수에 합산하지 않습니다.</strong> 다만 학습 시에는 교사 예측을 만드는 계산과 메모리 비용이 추가되므로, 학생 모델 크기가 비슷해도 전체 학습 비용은 같지 않습니다.</p>
+<h3 id="3-swin-채널과-stage별-깊이가-모델-크기를-결정한다">3. Swin: 채널과 Stage별 깊이가 모델 크기를 결정한다</h3>
+<p>| 모델     | 첫 Stage 채널 C | Stage별 블록 수     | 대략적인 파라미터 수 |
+| ------ | ------------ | --------------- | ----------- |
+| Swin-T | 96           |</p>
+<div class="math">$$
+2, 2, 6, 2
+$$</div>
+<p>| 28M         |
+| Swin-S | 96           |</p>
+<div class="math">$$
+2, 2, 18, 2
+$$</div>
+<p>| 50M         |
+| Swin-B | 128          |</p>
+<div class="math">$$
+2, 2, 18, 2
+$$</div>
+<p>| 88M         |
+| Swin-L | 192          |</p>
+<div class="math">$$
+2, 2, 18, 2
+$$</div>
+<p>| 197M        |</p>
+<p>수치는 그림 및 공식 Swin-V1 공개 모델 표 기준이며, 앞 실험 그림의 Swin-T는 29M으로 표기되어 있습니다. 기본 채널은 Stage마다 C→2C→4C→8C가 됩니다. T→S는 주로 세 번째 Stage의 깊이를 늘리고, S→B→L은 같은 깊이에서 채널 폭을 늘립니다. 채널 수의 제곱에 비례하는 Linear·MLP 가중치가 많아 폭 증가가 파라미터 수에 크게 반영됩니다.</p>
+<p>Window Attention에서도 QKV와 출력 Linear의 가중치는 여러 윈도우에 공유됩니다. <strong>윈도우 수가 늘어난다고 윈도우마다 새 파라미터를 만드는 것은 아닙니다.</strong> Shift와 Mask 자체도 학습 가중치를 추가하지 않습니다. 반면 상대 위치 바이어스와 Patch Merging의 선형 변환에는 학습 파라미터가 있습니다.</p>
+<h3 id="4-파라미터가-비슷해도-계산량은-다르다">4. 파라미터가 비슷해도 계산량은 다르다</h3>
+<p>ViT-B·DeiT-B·Swin-B는 모두 약 86~88M이지만, 토큰 수와 Attention 범위가 달라 FLOPs와 활성값 메모리는 다릅니다. 해상도를 높이면 Linear 가중치를 그대로 재사용해도 계산할 토큰과 관계의 수가 증가합니다. ViT의 절대 위치 임베딩처럼 크기가 달라질 수 있는 일부 파라미터는 전체의 작은 부분입니다.</p>
+<p>또한 <strong>Tiny·Small·Base는 각 계열 내부의 이름</strong>이므로 서로 같은 크기를 보장하지 않습니다. DeiT-Tiny 약 5M과 Swin-T 약 28M을 이름만 보고 같은 규모로 비교하면 안 됩니다.</p>
+<p>예를 들어 86M개 가중치를 FP32로 저장하면 가중치 자체만 약 344MB입니다. 학습에는 그래디언트·옵티마이저 상태·활성값 등이 더 필요합니다. 따라서 파라미터 수는 저장 공간을 가늠하는 기준이며, GPU 메모리나 실행 시간을 단독으로 결정하는 값은 아닙니다.</p>
+<p>출처: <a href="https://arxiv.org/html/2010.11929v2#S4.SS1">ViT 원 논문 — 모델 규모</a>, <a href="https://github.com/facebookresearch/deit/blob/main/README_deit.md#model-zoo">DeiT 공식 모델별 파라미터 수</a>, <a href="https://github.com/microsoft/Swin-Transformer#main-results-on-imagenet-with-pretrained-models">Swin 공식 모델별 파라미터 수</a></p>
+<hr/>
+<p><a id="check"></a></p>
+<h2 id="5-작은-계산으로-연결하고-확인하기">5. 작은 계산으로 연결하고 확인하기</h2>
+<p><strong>DeiT 교육용 계산:</strong> 세 클래스 중 정답은 0, 교사가 고른 클래스는 1이라고 합시다. CLS Head 확률이 <code>[0.6,0.3,0.1]</code>, 증류 Head 확률이 <code>[0.2,0.7,0.1]</code>이면 Hard loss는 <code>(-ln 0.6-ln 0.7)/2≈0.433750</code>입니다. 교사와 정답이 달라도 각 Head는 자기 목표를 받습니다. 이는 이미 구한 확률로 손계산하는 예이며 실제 손실 API에는 logits를 넘깁니다. 교사는 고정하고 학생을 갱신합니다.</p>
+<p><strong>Swin 교육용 연결:</strong> 4×4 토큰 격자를 2×2 윈도우 네 개로 나누면 첫 블록에서 <code>(행 1,열 1)</code>과 <code>(행 1,열 2)</code>는 서로 다른 창에 있습니다(인덱스 0부터). 경계를 1칸 이동한 다음 블록에서는 내부의 행 1~2·열 1~2가 한 창이 되어 이 두 토큰이 연결됩니다. 순환 이동으로 맨 왼쪽과 맨 오른쪽이 붙는 인공 연결은 Mask가 막습니다. <strong>이전 창 사이의 실제 내부 경계는 연결하고, 이미지 바깥을 감아 붙인 경계는 차단</strong>한다는 차이가 핵심입니다.</p>
+<ol>
+<li>위 DeiT 예제에서 교사 argmax 대신 학생 argmax를 손실 입력으로 넣어도 될까요?</li>
+<li>4×4 토큰과 2×2 창에서 Head당 점수 수는 전역·윈도우 각각 몇 개인가요? Shift 자체로 토큰 수가 줄어드나요?</li>
+<li>56×56×96에서 Patch Merging의 중간·최종 shape는? 단순 평균과 무엇이 다른가요?</li>
+<li>ViT-B와 Swin-B의 파라미터 수가 비슷하면 처리량도 같다고 할 수 있나요?</li>
+</ol>
+<details>
+<summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>안 됩니다. 교사 argmax는 목표 라벨을 만들지만 학생 logits는 미분 가능한 손실에 연결되어야 합니다. <code>argmax</code>만 남기면 필요한 확률과 기울기 경로를 잃습니다. <a href="#deit">DeiT</a>의 Architecture &amp; Loss로 돌아가세요.</li>
+<li>T=16이므로 전역은 16²=256개입니다. 창은 4개, 창당 4²=16개이므로 64개입니다. Shift는 묶음을 바꿀 뿐 16개 토큰을 유지합니다. <a href="#swin-architecture">Swin</a>의 Window와 Shift를 확인하세요.</li>
+<li>2×2 이웃 네 개를 이어 붙여 <code>28×28×384</code>, 정규화·Linear 뒤 <code>28×28×192</code>입니다. 학습된 가중치로 특징을 조합하며 원소별 평균이 아닙니다. <a href="#swin-architecture">Swin</a>의 Patch Merging으로 돌아가세요.</li>
+<li>아닙니다. 가중치를 같은 횟수로 사용하는 것이 아니며 토큰 수·관계 계산 범위·구현과 하드웨어도 다릅니다. <a href="#parameters">비용 비교</a>와 Complexity의 4NC²+2NM²C를 대조하세요.</li>
+</ol>
+</details>
+<p>다음 <a href="03_04_CLIP%EA%B3%BC_DINO.html">CLIP과 DINO</a>에서는 구조를 유지하면서 학습 목표의 출처를 바꿉니다. 특히 고정된 DeiT 교사와 EMA로 바뀌는 DINO 교사를 비교하세요.</p>
+<nav class="page-turn" aria-label="앞뒤 학습 문서"><a href="03_02_Attention과_ViT.html">← Attention과 ViT</a><a href="03_04_CLIP과_DINO.html">CLIP과 DINO →</a></nav><p class="source-note">기준 본문은 기존 Markdown입니다. 수식·도표는 온라인 렌더러를 사용하며, 원문과 도표 원문으로도 확인할 수 있습니다.</p></main></div>
+<script>if(window.self!==window.top||matchMedia('(max-width:800px)').matches)document.querySelector('.document-toc details').open=false;</script>
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';mermaid.initialize({startOnLoad:true,securityLevel:'strict',theme:'neutral'});</script>
+</body></html>

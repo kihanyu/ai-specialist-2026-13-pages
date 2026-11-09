@@ -2,57 +2,27 @@
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CNN: 합성곱과 특징 학습 | Vision 교안</title><link rel="stylesheet" href="textbook.css">
 <script>if(window.self!==window.top)document.documentElement.classList.add('embedded');window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['$$','$$']] },options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-</head><body><a class="skip" href="#content">본문으로 건너뛰기</a><div class="document-shell"><aside class="document-toc"><details open><summary>이 문서의 목차</summary><nav aria-label="문서 내부 목차"><a class="level-2" href="#1-convolution--합성곱의-기초">1. Convolution — 합성곱의 기초</a><a class="level-3" href="#완전연결-신경망에서-cnn으로">완전연결 신경망에서 CNN으로</a><a class="level-3" href="#합성곱의-설정과-학습-파라미터">합성곱의 설정과 학습 파라미터</a><a class="level-3" href="#합성곱의-구조적-장점">합성곱의 구조적 장점</a><a class="level-3" href="#padding--stride--pooling">Padding / Stride / Pooling</a><a class="level-3" href="#cnn-architecture">CNN Architecture</a><a class="level-2" href="#2-수용영역과-합성곱-변형">2. 수용영역과 합성곱 변형</a><a class="level-3" href="#receptive-field">Receptive field</a><a class="level-3" href="#11-convolution-위치를-유지하며-채널-조합하기">1×1 Convolution: 위치를 유지하며 채널 조합하기</a><a class="level-3" href="#group-convolution-채널을-나누어-계산하기">Group Convolution: 채널을 나누어 계산하기</a><a class="level-3" href="#depthwise-separable-convolution-공간-처리와-채널-조합을-분리하기">Depthwise Separable Convolution: 공간 처리와 채널 조합을 분리하기</a><a class="level-3" href="#추가-합성곱-기법-수업-범위-안내">추가 합성곱 기법: 수업 범위 안내</a><a class="level-2" href="#3-cnn은-무엇을-학습할까">3. CNN은 무엇을 학습할까?</a><a class="level-3" href="#학습한-특징을-얼굴-검출에-활용하기">학습한 특징을 얼굴 검출에 활용하기</a><a class="level-2" href="#4-cnn-모델의-발전--vggnet">4. CNN 모델의 발전 — VGGNet</a><a class="level-3" href="#cnn-models">CNN Models</a><a class="level-3" href="#vggnet">VGGNet</a><a class="level-2" href="#5-resnet--degradation과-잔차-학습">5. ResNet — Degradation과 잔차 학습</a><a class="level-3" href="#resnet은-어떻게-도움을-줄까">ResNet은 어떻게 도움을 줄까?</a><a class="level-3" href="#항등변환을-학습하기-어려운-이유">항등변환을 학습하기 어려운 이유</a><a class="level-3" href="#skip-connection-잔차-학습의-의미">Skip Connection: 잔차 학습의 의미</a><a class="level-3" href="#resnet의-성과-깊은-모델을-실제로-학습하기">ResNet의 성과: 깊은 모델을 실제로 학습하기</a><a class="level-3" href="#잔차-경로는-어떤-출력을-학습할까">잔차 경로는 어떤 출력을 학습할까?</a><a class="level-3" href="#resnet이-역전파를-돕는-원리">ResNet이 역전파를 돕는 원리</a><a class="level-2" href="#6-사람의-시각계와-cnn-비교">6. 사람의 시각계와 CNN 비교</a><a class="level-3" href="#그림의-뇌-영역과-cnn-층의-대응">그림의 뇌 영역과 CNN 층의 대응</a><a class="level-3" href="#사람의-시각과의-유사성">사람의 시각과의 유사성</a><a class="level-3" href="#판다-이미지가-보여주는-인식의-한계">판다 이미지가 보여주는 인식의 한계</a></nav></details></aside><main class="document-main" id="content"><nav class="document-nav" aria-label="상위 이동"><a href="../../../index.html" target="_top">전체 과정</a><a href="index.html#02_02_CNN_Note.html" target="_top">Vision 강의 목차</a><a href="../../02_02_CNN_Note.md" target="_blank" rel="noopener">Markdown 원문</a></nav><h1 id="cnn">CNN</h1>
+</head><body><a class="skip" href="#content">본문으로 건너뛰기</a><div class="document-shell"><aside class="document-toc"><details open><summary>이 문서의 목차</summary><nav aria-label="문서 내부 목차"><a class="level-2" href="#1-convolution--합성곱의-기초">1. Convolution — 합성곱의 기초</a><a class="level-3" href="#완전연결-신경망에서-cnn으로">완전연결 신경망에서 CNN으로</a><a class="level-3" href="#손으로-계산하는-필터-한-번-고정-필터와-학습-필터">손으로 계산하는 필터 한 번: 고정 필터와 학습 필터</a><a class="level-3" href="#합성곱의-설정과-학습-파라미터">합성곱의 설정과 학습 파라미터</a><a class="level-3" href="#출력-크기-파라미터-연산량은-서로-다른-수입니다">출력 크기, 파라미터, 연산량은 서로 다른 수입니다</a><a class="level-3" href="#합성곱의-구조적-장점">합성곱의 구조적 장점</a><a class="level-3" href="#padding--stride--pooling">Padding / Stride / Pooling</a><a class="level-3" href="#cnn-architecture">CNN Architecture</a><a class="level-2" href="#2-수용영역과-합성곱-변형">2. 수용영역과 합성곱 변형</a><a class="level-3" href="#receptive-field">Receptive field</a><a class="level-3" href="#수용영역을-층별로-누적하는-방법">수용영역을 층별로 누적하는 방법</a><a class="level-3" href="#11-convolution-위치를-유지하며-채널-조합하기">1×1 Convolution: 위치를 유지하며 채널 조합하기</a><a class="level-3" href="#group-convolution-채널을-나누어-계산하기">Group Convolution: 채널을 나누어 계산하기</a><a class="level-3" href="#depthwise-separable-convolution-공간-처리와-채널-조합을-분리하기">Depthwise Separable Convolution: 공간 처리와 채널 조합을 분리하기</a><a class="level-3" href="#심화-해상도와-샘플링-위치를-바꾸는-합성곱">심화: 해상도와 샘플링 위치를 바꾸는 합성곱</a><a class="level-2" href="#3-cnn은-무엇을-학습할까">3. CNN은 무엇을 학습할까?</a><a class="level-3" href="#학습한-특징을-얼굴-검출에-활용하기">학습한 특징을 얼굴 검출에 활용하기</a><a class="level-2" href="#4-cnn-모델의-발전--vggnet">4. CNN 모델의 발전 — VGGNet</a><a class="level-3" href="#cnn-models">CNN Models</a><a class="level-3" href="#vggnet">VGGNet</a><a class="level-2" href="#5-사람의-시각계와-cnn-비교">5. 사람의 시각계와 CNN 비교</a><a class="level-3" href="#그림의-뇌-영역과-cnn-층의-대응">그림의 뇌 영역과 CNN 층의 대응</a><a class="level-3" href="#사람의-시각과의-유사성">사람의 시각과의 유사성</a><a class="level-3" href="#판다-이미지가-보여주는-인식의-한계">판다 이미지가 보여주는 인식의 한계</a><a class="level-2" href="#6-직접-계산하고-확인하기">6. 직접 계산하고 확인하기</a></nav></details></aside><main class="document-main" id="content"><nav class="document-nav" aria-label="상위 이동"><a href="../../../index.html" target="_top">전체 과정</a><a href="index.html#02_02_CNN_Note.html" target="_top">Vision 강의 목차</a><a href="../02_02_CNN_Note.md" target="_blank" rel="noopener">Markdown 원문</a></nav><h1 id="cnn">CNN</h1>
 <p>앞 문서에서는 완전연결 신경망이 비선형 함수를 통해 복잡한 입력과 출력의 관계를 학습하는 과정을 살펴봤습니다. 이를 이미지에 적용할 때는 픽셀의 값뿐 아니라 이웃 관계와 공간 구조도 함께 활용해야 합니다. **CNN(Convolutional Neural Network, 합성곱 신경망)**은 작은 영역을 처리하는 필터를 이미지 여러 위치에서 공유하여 이러한 구조를 효율적으로 학습합니다. CNN도 DNN의 한 종류이며, 여기서는 완전연결 신경망과 비교하면서 설명합니다.</p>
 <p>먼저 합성곱의 원리를 살펴보고, 필터와 특징 맵의 크기를 결정하는 방법을 익힙니다. 이어서 계산을 줄이는 합성곱 변형과 대표적인 CNN 구조를 통해, 특징 추출에서 깊은 모델의 학습까지 연결해 보겠습니다.</p>
-<p><strong>목차</strong></p>
+<p><strong>학습 목표:</strong> 합성곱의 출력 차원·가중치 수·수용영역을 계산하고, 경량 합성곱의 제약과 깊은 모델이 필요한 이유를 설명합니다.</p>
+<p><strong>선수지식:</strong> 가중합, ReLU, 역전파의 역할은 <a href="02_01_DNN_Note.html">DNN 노트</a>에서 복습합니다. 본문 그림은 H×W×C 표기도 사용하며, 실습 텐서는 N×C×H×W입니다. N은 배치 수입니다.</p>
+<p><strong>읽는 순서:</strong> 핵심은 1절의 연산 → 2절의 수용영역 → 3절의 특징 → 4절의 VGG → 6절의 계산 확인입니다. 2절의 합성곱 변형과 5절의 시각계 비교는 보충·심화입니다. 다음은 <a href="02_03_CNN_ResNet_18Layer.html">ResNet의 잔차 원리와 구현</a>입니다.</p>
 <ul>
-<li><a href="#1-convolution--%ED%95%A9%EC%84%B1%EA%B3%B1%EC%9D%98-%EA%B8%B0%EC%B4%88">1. Convolution — 합성곱의 기초</a><ul>
-<li><a href="#%EC%99%84%EC%A0%84%EC%97%B0%EA%B2%B0-%EC%8B%A0%EA%B2%BD%EB%A7%9D%EC%97%90%EC%84%9C-cnn%EC%9C%BC%EB%A1%9C">완전연결 신경망에서 CNN으로</a></li>
-<li><a href="#%ED%95%A9%EC%84%B1%EA%B3%B1%EC%9D%98-%EC%84%A4%EC%A0%95%EA%B3%BC-%ED%95%99%EC%8A%B5-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0">합성곱의 설정과 학습 파라미터</a></li>
-<li><a href="#%ED%95%A9%EC%84%B1%EA%B3%B1%EC%9D%98-%EA%B5%AC%EC%A1%B0%EC%A0%81-%EC%9E%A5%EC%A0%90">합성곱의 구조적 장점</a></li>
-<li><a href="#padding--stride--pooling">Padding / Stride / Pooling</a></li>
-<li><a href="#cnn-architecture">CNN Architecture</a></li>
+<li><a href="#cnn-convolution">1. 합성곱 연산과 차원</a></li>
+<li><a href="#2-수용영역과-합성곱-변형">2. 수용영역과 합성곱 변형</a></li>
+<li><a href="#cnn-features">3. 학습되는 특징</a></li>
+<li><a href="#cnn-vgg">4. VGG와 깊은 특징 추출</a></li>
+<li><a href="#cnn-human">5. 사람의 시각과 비교</a></li>
+<li><a href="#6-직접-계산하고-확인하기">6. 직접 계산하고 확인하기</a></li>
 </ul>
-</li>
-<li><a href="#2-%EC%88%98%EC%9A%A9%EC%98%81%EC%97%AD%EA%B3%BC-%ED%95%A9%EC%84%B1%EA%B3%B1-%EB%B3%80%ED%98%95">2. 수용영역과 합성곱 변형</a><ul>
-<li><a href="#receptive-field">Receptive field</a></li>
-<li><a href="#11-convolution-%EC%9C%84%EC%B9%98%EB%A5%BC-%EC%9C%A0%EC%A7%80%ED%95%98%EB%A9%B0-%EC%B1%84%EB%84%90-%EC%A1%B0%ED%95%A9%ED%95%98%EA%B8%B0">1×1 Convolution: 위치를 유지하며 채널 조합하기</a></li>
-<li><a href="#group-convolution-%EC%B1%84%EB%84%90%EC%9D%84-%EB%82%98%EB%88%84%EC%96%B4-%EA%B3%84%EC%82%B0%ED%95%98%EA%B8%B0">Group Convolution: 채널을 나누어 계산하기</a></li>
-<li><a href="#depthwise-separable-convolution-%EA%B3%B5%EA%B0%84-%EC%B2%98%EB%A6%AC%EC%99%80-%EC%B1%84%EB%84%90-%EC%A1%B0%ED%95%A9%EC%9D%84-%EB%B6%84%EB%A6%AC%ED%95%98%EA%B8%B0">Depthwise Separable Convolution: 공간 처리와 채널 조합을 분리하기</a></li>
-<li><a href="#%EC%B6%94%EA%B0%80-%ED%95%A9%EC%84%B1%EA%B3%B1-%EA%B8%B0%EB%B2%95-%EC%88%98%EC%97%85-%EB%B2%94%EC%9C%84-%EC%95%88%EB%82%B4">추가 합성곱 기법: 수업 범위 안내</a></li>
-</ul>
-</li>
-<li><a href="#3-cnn%EC%9D%80-%EB%AC%B4%EC%97%87%EC%9D%84-%ED%95%99%EC%8A%B5%ED%95%A0%EA%B9%8C">3. CNN은 무엇을 학습할까?</a><ul>
-<li><a href="#%ED%95%99%EC%8A%B5%ED%95%9C-%ED%8A%B9%EC%A7%95%EC%9D%84-%EC%96%BC%EA%B5%B4-%EA%B2%80%EC%B6%9C%EC%97%90-%ED%99%9C%EC%9A%A9%ED%95%98%EA%B8%B0">학습한 특징을 얼굴 검출에 활용하기</a></li>
-</ul>
-</li>
-<li><a href="#4-cnn-%EB%AA%A8%EB%8D%B8%EC%9D%98-%EB%B0%9C%EC%A0%84--vggnet">4. CNN 모델의 발전 — VGGNet</a><ul>
-<li><a href="#cnn-models">CNN Models</a></li>
-<li><a href="#vggnet">VGGNet</a></li>
-</ul>
-</li>
-<li><a href="#5-resnet--degradation%EA%B3%BC-%EC%9E%94%EC%B0%A8-%ED%95%99%EC%8A%B5">5. ResNet — Degradation과 잔차 학습</a><ul>
-<li><a href="#resnet%EC%9D%80-%EC%96%B4%EB%96%BB%EA%B2%8C-%EB%8F%84%EC%9B%80%EC%9D%84-%EC%A4%84%EA%B9%8C">ResNet은 어떻게 도움을 줄까?</a></li>
-<li><a href="#%ED%95%AD%EB%93%B1%EB%B3%80%ED%99%98%EC%9D%84-%ED%95%99%EC%8A%B5%ED%95%98%EA%B8%B0-%EC%96%B4%EB%A0%A4%EC%9A%B4-%EC%9D%B4%EC%9C%A0">항등변환을 학습하기 어려운 이유</a></li>
-<li><a href="#skip-connection-%EC%9E%94%EC%B0%A8-%ED%95%99%EC%8A%B5%EC%9D%98-%EC%9D%98%EB%AF%B8">Skip Connection: 잔차 학습의 의미</a></li>
-<li><a href="#resnet%EC%9D%98-%EC%84%B1%EA%B3%BC-%EA%B9%8A%EC%9D%80-%EB%AA%A8%EB%8D%B8%EC%9D%84-%EC%8B%A4%EC%A0%9C%EB%A1%9C-%ED%95%99%EC%8A%B5%ED%95%98%EA%B8%B0">ResNet의 성과: 깊은 모델을 실제로 학습하기</a></li>
-<li><a href="#%EC%9E%94%EC%B0%A8-%EA%B2%BD%EB%A1%9C%EB%8A%94-%EC%96%B4%EB%96%A4-%EC%B6%9C%EB%A0%A5%EC%9D%84-%ED%95%99%EC%8A%B5%ED%95%A0%EA%B9%8C">잔차 경로는 어떤 출력을 학습할까?</a></li>
-<li><a href="#resnet%EC%9D%B4-%EC%97%AD%EC%A0%84%ED%8C%8C%EB%A5%BC-%EB%8F%95%EB%8A%94-%EC%9B%90%EB%A6%AC">ResNet이 역전파를 돕는 원리</a></li>
-</ul>
-</li>
-<li><a href="#6-%EC%82%AC%EB%9E%8C%EC%9D%98-%EC%8B%9C%EA%B0%81%EA%B3%84%EC%99%80-cnn-%EB%B9%84%EA%B5%90">6. 사람의 시각계와 CNN 비교</a><ul>
-<li><a href="#%EA%B7%B8%EB%A6%BC%EC%9D%98-%EB%87%8C-%EC%98%81%EC%97%AD%EA%B3%BC-cnn-%EC%B8%B5%EC%9D%98-%EB%8C%80%EC%9D%91">그림의 뇌 영역과 CNN 층의 대응</a></li>
-<li><a href="#%EC%82%AC%EB%9E%8C%EC%9D%98-%EC%8B%9C%EA%B0%81%EA%B3%BC%EC%9D%98-%EC%9C%A0%EC%82%AC%EC%84%B1">사람의 시각과의 유사성</a></li>
-<li><a href="#%ED%8C%90%EB%8B%A4-%EC%9D%B4%EB%AF%B8%EC%A7%80%EA%B0%80-%EB%B3%B4%EC%97%AC%EC%A3%BC%EB%8A%94-%EC%9D%B8%EC%8B%9D%EC%9D%98-%ED%95%9C%EA%B3%84">판다 이미지가 보여주는 인식의 한계</a></li>
-</ul>
-</li>
-</ul>
+<p>원문은 <a href="../../%EA%B5%90%EC%95%88/02_00_DNN_CNN.pdf" rel="noopener" target="_blank">DNN·CNN 교안</a>의 실제 PDF 14~36, 43쪽입니다. 37~42쪽은 ResNet 노트에서 다룹니다. 작은 계산, 실행 절차, 질문은 <strong>교육용 보충</strong>이며 원문의 속도·불변성·규제 설명을 한정한 부분은 해당 위치에 정정 이유를 적었습니다.</p>
 <hr/>
+<p><a id="cnn-convolution"></a></p>
 <h2 id="1-convolution--합성곱의-기초">1. Convolution — 합성곱의 기초</h2>
 <p>합성곱을 이해하려면 **Convolution(합성곱), Cross-correlation(상호상관), Autocorrelation(자기상관)**을 구분하면 도움이 됩니다. 합성곱은 수학적으로 필터를 뒤집어 적용하고, 상호상관은 뒤집지 않고 적용합니다. CNN에서 관례적으로 합성곱이라 부르는 연산은 보통 상호상관 방식으로 구현됩니다. <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">PyTorch의 Conv2d 설명</a>에서도 이 정의를 확인할 수 있습니다. 자기상관은 하나의 신호를 이동시킨 자기 자신과 비교하여 반복성 등을 살펴봅니다.</p>
 <p>아래에서는 세 연산의 활용을 직소 퍼즐에 빗대어 살펴봅니다. 이는 역할을 이해하기 위한 예시이며, 세 연산을 차례로 실행하면 퍼즐이 자동으로 풀린다는 뜻은 아닙니다.</p>
-<p><img alt="" src="../../assets/orca-paste-1793759315651-37f947cf-a64a-4f3f-a118-cdfeeb54aec3.png"/></p>
+<p><img alt="섞인 자동차 조각으로 보는 국소 패턴과 전체 구조" src="../assets/orca-paste-1793759315651-37f947cf-a64a-4f3f-a118-cdfeeb54aec3.png"/></p>
 <p>사진을 조각내 무작위로 섞은 뒤 복원하는 것은 <strong>직소 퍼즐을 맞추는 문제</strong>와 비슷합니다. 세 연산은 복원 과정에서 다음 역할을 할 수 있습니다.</p>
 <table>
 <thead>
@@ -131,8 +101,18 @@
 </ol>
 <p>예를 들어 나뭇가지가 조각의 왼쪽에 있든 오른쪽에 있든, <strong>같은 필터로 가지의 특징을 찾을 수 있습니다.</strong> 이것이 가중치 공유의 장점입니다.</p>
 <p>다만 <strong>CNN만 사용한다고 원래 사진이 자동으로 복원되지는 않습니다.</strong> CNN이 추출한 특징을 이용해 조각 간 연결 점수를 구하고, 전체 배치를 결정하는 모델이나 탐색 과정이 필요합니다. 또한 일반적인 CNN은 조각 회전을 자동으로 해결하지 않으므로 회전도 별도로 고려해야 합니다.</p>
+<h3 id="손으로-계산하는-필터-한-번-고정-필터와-학습-필터">손으로 계산하는 필터 한 번: 고정 필터와 학습 필터</h3>
+<p>교안 17쪽의 Sobel·Prewitt·Scharr·Roberts는 사람이 정한 경계 검출 필터의 예입니다. 다음은 계산을 단순화한 교육용 필터이며, 특정 Sobel 필터를 재현한 것은 아닙니다.</p>
+<pre><code class="language-text">입력의 작은 영역 X      필터 W
+1 2 3                  1 0 -1
+4 5 6                  1 0 -1
+7 8 9                  1 0 -1
+</code></pre>
+<p>CNN 방식인 상호상관의 출력은 위치끼리 곱한 뒤 모두 더합니다. 편향 0이면 <code>(1-3)+(4-6)+(7-9)=-6</code>입니다. 필터를 오른쪽 한 칸 옮기면 새로운 3×3 영역으로 같은 계산을 합니다. RGB라면 각 채널에서 계산한 세 합을 더해 <strong>출력 채널 하나의 값</strong>을 만듭니다. 음수도 의미 있는 반응이며, 뒤에 ReLU를 붙이면 이 예의 출력은 0입니다.</p>
+<p>고정 필터는 모든 이미지에 같은 수치를 적용합니다. CNN은 초기 필터에서 시작해 정답과 손실에 따라 수치를 바꿉니다. 모든 필터가 사람이 이름 붙일 수 있는 경계 검출기로 수렴하는 것은 아닙니다.</p>
+<p>교안 15쪽의 섞인 자동차 조각은 국소 통계와 전체 의미가 다를 수 있음을 환기합니다. 앞의 퍼즐 복원 이야기는 <strong>교육용 비유</strong>이지 교안에 제시된 복원 알고리즘이 아닙니다. 분류를 잘했다는 사실만으로 물체의 의미를 사람처럼 이해한다고 결론 내릴 수 없습니다.</p>
 <h3 id="합성곱의-설정과-학습-파라미터">합성곱의 설정과 학습 파라미터</h3>
-<p><img alt="" src="../../assets/orca-paste-1793759587355-8110aade-359d-4a89-9973-f90e339c81b0.png"/></p>
+<p><img alt="다채널 입력에 두 합성곱 필터를 적용하는 예" src="../assets/orca-paste-1793759587355-8110aade-359d-4a89-9973-f90e339c81b0.png"/></p>
 <p>이제 작은 필터가 실제로 어떤 크기의 출력을 만드는지 살펴보겠습니다. 합성곱에서는 <strong>설계자가 정하는 하이퍼파라미터</strong>, <strong>설정에 따라 계산되는 크기</strong>, <strong>학습으로 갱신되는 파라미터</strong>를 구분해야 합니다.</p>
 <h4 id="1-설계자가-정하는-값">1. 설계자가 정하는 값</h4>
 <table>
@@ -228,6 +208,17 @@ $$</div>
 <p>즉, 필터 가중치는 총 54개입니다.</p>
 <p>일반적으로 필터마다 편향을 하나씩 사용한다면 <strong>편향 2개를 더해 총 56개</strong>가 학습됩니다. 그림에는 편향이 표시되어 있지 않습니다.</p>
 <p>즉, <strong>필터의 ‘틀’은 내가 정하고, 필터 안의 ‘숫자’는 모델이 학습하며, 출력 크기는 설정에 따라 계산됩니다.</strong></p>
+<h3 id="출력-크기-파라미터-연산량은-서로-다른-수입니다">출력 크기, 파라미터, 연산량은 서로 다른 수입니다</h3>
+<p><strong>교육용 보충.</strong> 높이·너비 각각에 다음 식을 적용합니다. K는 커널 크기, S는 stride, P는 양쪽 각각의 padding, D는 dilation(커널 표본 간격)입니다.</p>
+<pre><code class="language-text">유효 커널 폭 K_eff = D × (K - 1) + 1
+출력 폭 = floor((입력 폭 + 2P - K_eff) / S) + 1
+가중치 수 = C_out × (C_in / G) × K_h × K_w
+편향 사용 시 총 파라미터 = 가중치 수 + C_out
+</code></pre>
+<p>G는 그룹 수이며 일반 합성곱에서는 1입니다. 유효 커널이 패딩된 입력보다 크면 정상적인 양수 출력 크기가 나오지 않으므로 설정을 바꿔야 합니다. 비정사각형 입력에는 높이와 너비를 따로 계산합니다.</p>
+<p><code>N×3×32×32 → Conv(3→16, K=3, S=2, P=1, D=1)</code>이면 한 변은 <code>floor((32+2-3)/2)+1=16</code>, 출력은 <code>N×16×16×16</code>입니다. 가중치는 <code>16×3×3×3=432</code>, 편향까지 448개입니다. N이나 입력 공간 크기가 바뀌어도 이 파라미터 수는 같습니다. 반면 곱셈·누적 쌍(MAC)은 한 이미지당 <code>16×16×16×27=110,592</code>번으로 공간 크기에 비례합니다. 편향과 활성화 연산은 이 MAC 계산에서 제외했습니다.</p>
+<p>교안 19쪽의 100×100 흑백 입력을 FC 1,000개에 연결하면 가중치만 <code>10,000×1,000=10,000,000</code>개, 편향까지는 10,001,000개입니다. CNN의 작은 공유 필터는 이 부담을 줄이지만 <strong>과적합을 없애지는 않습니다.</strong> 데이터 수, 모델 규모, 증강, 정규화와 검증 결과도 함께 봐야 합니다.</p>
+<p>출력 공식·그룹 조건 확인: <a href="https://docs.pytorch.org/docs/2.15/generated/torch.nn.Conv2d.html">PyTorch 2.15 Conv2d</a>. 공식 문서 확인일 2026-11-09이며 로컬 설치 버전을 뜻하지 않습니다.</p>
 <h3 id="합성곱의-구조적-장점">합성곱의 구조적 장점</h3>
 <p>앞의 계산에서 보았듯이, 필터는 작은 영역을 보면서 같은 가중치를 여러 위치에서 사용합니다. 이 구조가 CNN에 주는 장점을 정리하면 다음과 같습니다.</p>
 <table>
@@ -320,7 +311,7 @@ Average Pooling → 평균값 3.5
 <p><strong>Padding은 테두리 추가, Stride는 이동 간격, Pooling은 영역 요약</strong>으로 기억하면 됩니다. Pooling 자체에는 일반적으로 학습하는 가중치가 없습니다.</p>
 <h3 id="cnn-architecture">CNN Architecture</h3>
 <p>합성곱과 크기 조절 연산을 연결하면 하나의 CNN이 됩니다. 아래 그림은 특징 추출부 뒤에 완전연결 분류부를 붙인 대표적인 구성을 보여줍니다.</p>
-<p><img alt="" src="../../assets/orca-paste-1793759865514-4b07e73b-64df-45e8-a346-7469126bbf7b.png"/></p>
+<p><img alt="합성곱과 풀링 뒤 분류부를 연결한 CNN" src="../assets/orca-paste-1793759865514-4b07e73b-64df-45e8-a346-7469126bbf7b.png"/></p>
 <table>
 <thead>
 <tr>
@@ -413,10 +404,11 @@ Average Pooling → 평균값 3.5
 </tr>
 </tbody>
 </table>
+<p><a id="cnn-receptive"></a></p>
 <h2 id="2-수용영역과-합성곱-변형">2. 수용영역과 합성곱 변형</h2>
 <h3 id="receptive-field">Receptive field</h3>
 <p>층을 쌓으면 뒤쪽 특징은 원본 이미지의 더 넓은 영역을 바탕으로 계산됩니다. **수용 영역(Receptive field)**은 특정 출력값에 영향을 줄 수 있는 입력 영역을 뜻합니다. 이를 통해 작은 필터를 여러 번 쌓는 이유를 이해할 수 있습니다.</p>
-<p><img alt="" src="../../assets/orca-paste-1793760603594-fbcb5762-af11-49c1-a947-758f9f0fd4fd.png"/></p>
+<p><img alt="3×3 두 층과 5×5 한 층의 수용영역 비교" src="../assets/orca-paste-1793760603594-fbcb5762-af11-49c1-a947-758f9f0fd4fd.png"/></p>
 <table>
 <thead>
 <tr>
@@ -450,9 +442,53 @@ Average Pooling → 평균값 3.5
 <li><strong>단순한 특징을 조합해 복잡한 특징을 만듭니다.</strong> 첫 층에서 작은 선·경계를 찾고, 다음 층에서 이를 조합해 모서리·모양을 찾는 식입니다.</li>
 </ol>
 <p>다만 <strong>가중치가 적다고 계산량도 항상 적은 것은 아닙니다.</strong> 이 작은 예에서는 중간 <code>3×3</code> 출력도 계산해야 합니다. 또한 중간에 활성화 함수가 없다면 두 합성곱을 쌓는 것만으로 비선형 표현력이 늘어나지는 않습니다.</p>
+<h3 id="수용영역을-층별로-누적하는-방법">수용영역을 층별로 누적하는 방법</h3>
+<p><strong>교육용 보충.</strong> 출력 칸 사이의 간격까지 함께 추적해야 stride가 있는 층을 계산할 수 있습니다. r은 원본 입력 기준 수용영역 한 변, j는 인접 출력 두 칸 사이의 원본 좌표 간격입니다. 입력에서는 <code>r=1, j=1</code>입니다.</p>
+<pre><code class="language-text">r_new = r_old + (K_eff - 1) × j_old
+j_new = j_old × S
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>연산</th>
+<th>계산</th>
+<th style="text-align:right">r</th>
+<th style="text-align:right">j</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력</td>
+<td>한 픽셀에서 시작</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td>3×3 Conv, S=1</td>
+<td>1+2×1</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td>2×2 Pool, S=2</td>
+<td>3+1×1</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td>3×3 Conv, S=1</td>
+<td>4+2×2</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right">2</td>
+</tr>
+</tbody>
+</table>
+<p>마지막 특징 한 칸은 원본의 최대 8×8 범위에 의존합니다. 마지막 두 칸의 중심 간격은 2픽셀입니다. Padding은 경계 근처 실제 이미지와 겹치는 범위를 바꾸지만 이 이론적 폭의 누적식은 바꾸지 않습니다. 이 값은 가능한 의존 범위이며, 모든 픽셀이 동일한 강도로 기여한다는 뜻은 아닙니다. 학습된 가중치·비선형성에 따른 <strong>실제 영향의 분포</strong>와 구별합니다.</p>
+<p>**Dilated convolution(팽창 합성곱)**은 필터 값 사이의 샘플링 간격을 넓힙니다. K=3, D=2이면 <code>K_eff=2×(3-1)+1=5</code>이므로 3×3의 9개 가중치로 5×5 범위의 띄엄띄엄한 9개 위치를 봅니다. S=1, P=2이면 공간 크기를 유지합니다. 5×5의 모든 픽셀을 보는 일반 필터와 같지 않으며, 여러 층에서 빈틈 있는 샘플링이 문제가 될 수도 있습니다.</p>
+<p>교안 22쪽의 두 3×3 대 한 5×5 비교는 채널·출력 크기·구현 조건을 고정해야 합니다. 표의 ‘항상 더 빠름’으로 일반화하지 않습니다. 같은 C채널을 유지하면 가중치는 18C² 대 25C²지만 중간 활성화 저장 비용도 생깁니다.</p>
 <h3 id="11-convolution-위치를-유지하며-채널-조합하기">1×1 Convolution: 위치를 유지하며 채널 조합하기</h3>
 <p>지금까지 공간적으로 더 넓은 영역을 보는 방법을 살펴봤다면, 이번에는 같은 위치의 채널들을 조합하는 방법을 살펴보겠습니다.</p>
-<p><img alt="1×1 합성곱으로 입력 채널 C개를 출력 채널 K개로 변환하는 구조" src="../../assets/orca-paste-1793765169291-7b5ec91e-30a1-4eef-b13f-00bc6dbcd45f.png"/></p>
+<p><img alt="1×1 합성곱으로 입력 채널 C개를 출력 채널 K개로 변환하는 구조" src="../assets/orca-paste-1793765169291-7b5ec91e-30a1-4eef-b13f-00bc6dbcd45f.png"/></p>
 <p><strong>1×1 합성곱은 같은 위치에 있는 여러 채널의 값을 가중합하여 새로운 특징을 만드는 연산</strong>입니다.</p>
 <p>그림의 길쭉한 필터는 가로·세로가 각각 1이고, 입력 채널 전체를 관통하는 깊이 C를 가집니다.</p>
 <table>
@@ -486,7 +522,7 @@ Average Pooling → 평균값 3.5
 </tr>
 </tbody>
 </table>
-<p>위 표는 <strong>Stride 1, Padding 0</strong>인 경우입니다. 각 필터를 모든 위치에 같은 가중치로 적용하면 특징 맵 하나가 만들어지고, 필터 K개를 사용하면 출력 채널도 K개가 됩니다.</p>
+<p>위 표는 <strong>Stride 1, Padding 0</strong>인 경우입니다. 교안 23쪽의 ‘FC 대체’는 위치마다 같은 채널 변환을 적용한다는 맥락입니다. H=W=1인 특징에서는 1×1 Conv가 채널 벡터의 FC와 같은 가중합을 수행합니다. H,W가 클 때 1×1 Conv 하나가 전체 H×W×C를 펼친 FC와 같지는 않습니다. 각 필터를 모든 위치에 같은 가중치로 적용하면 특징 맵 하나가 만들어지고, 필터 K개를 사용하면 출력 채널도 K개가 됩니다.</p>
 <p>예를 들어 한 위치의 채널 값이 <code>[2, 3, 1]</code>, 필터 가중치가 <code>[1, 0, -1]</code>이라면, 편향을 제외한 출력은 다음과 같습니다.</p>
 <div class="math">$$
 2 \times 1 + 3 \times 0 + 1 \times (-1) = 1
@@ -500,7 +536,7 @@ $$</div>
 <p><strong>3×3 합성곱은 주변 위치와 채널을 함께 보고, 1×1 합성곱은 현재 위치의 채널들을 조합합니다.</strong> 따라서 1×1 합성곱 자체는 공간 수용 영역을 넓히지 않습니다. 학습 파라미터 수는 가중치 C × K개이며, 편향을 사용하면 K개가 추가됩니다.</p>
 <h3 id="group-convolution-채널을-나누어-계산하기">Group Convolution: 채널을 나누어 계산하기</h3>
 <p>1×1 합성곱을 포함한 일반 합성곱은 각 출력 채널을 만들 때 모든 입력 채널을 사용합니다. 계산 비용을 더 줄이려면 이 연결 자체를 그룹별로 제한할 수 있습니다.</p>
-<p><img alt="일반 합성곱과 3개 그룹으로 나눈 그룹 합성곱 비교" src="../../assets/orca-paste-1793765390449-8ada2943-4194-4018-908e-c8ee90670d25.png"/></p>
+<p><img alt="일반 합성곱과 3개 그룹으로 나눈 그룹 합성곱 비교" src="../assets/orca-paste-1793765390449-8ada2943-4194-4018-908e-c8ee90670d25.png"/></p>
 <p><strong>그룹 합성곱은 입력·출력 채널을 여러 그룹으로 나누고, 각 그룹 안에서만 합성곱하는 방식</strong>입니다. 그림의 판 하나는 특징 맵, 즉 채널 하나를 나타냅니다.</p>
 <table>
 <thead>
@@ -532,11 +568,10 @@ $$</div>
 <p>다만 <strong>이 층에서는 서로 다른 그룹의 정보가 섞이지 않습니다.</strong> 필요하면 뒤에 일반 1×1 합성곱 등을 사용해 그룹 사이의 정보를 조합합니다. 일반적인 구현에서는 입력·출력 채널 수 모두 그룹 수로 나누어떨어져야 합니다.</p>
 <h4 id="그룹을-나눌-때의-장점과-제약">그룹을 나눌 때의 장점과 제약</h4>
 <p>그룹별로 독립적으로 계산하면 연결과 가중치 수가 줄어 모델을 가볍게 만들 수 있습니다. 그룹을 서로 다른 연산 장치에 나누어 처리할 수도 있지만, 실제 병렬 처리 효과는 하드웨어와 구현에 따라 달라집니다. 따라서 그룹 수를 늘릴 때는 연산 절감과 채널 간 정보 교환의 제약을 함께 고려해야 합니다.</p>
-<p>아래 그림에서처럼 그룹 내부의 연결만 남는다는 점이 핵심입니다.</p>
-<p><img alt="" src="../../assets/orca-paste-1793765390449-8ada2943-4194-4018-908e-c8ee90670d25.png"/></p>
+<p>그룹 내부의 연결만 남는다는 점이 핵심입니다.</p>
 <h3 id="depthwise-separable-convolution-공간-처리와-채널-조합을-분리하기">Depthwise Separable Convolution: 공간 처리와 채널 조합을 분리하기</h3>
 <p>그룹 수를 입력 채널 수까지 늘리면 채널별 공간 처리가 가능합니다. 여기에 앞서 배운 1×1 합성곱을 연결하면, 공간 특징 추출과 채널 조합을 분리할 수 있습니다.</p>
-<p><img alt="Depthwise 합성곱 후 Pointwise 합성곱으로 채널 정보를 조합하는 구조" src="../../assets/orca-paste-1793765514868-fd9d55bd-8ccc-41ad-96a8-d9ff682dfbfa.png"/></p>
+<p><img alt="Depthwise 합성곱 후 Pointwise 합성곱으로 채널 정보를 조합하는 구조" src="../assets/orca-paste-1793765514868-fd9d55bd-8ccc-41ad-96a8-d9ff682dfbfa.png"/></p>
 <p><strong>일반 합성곱이 한 번에 수행하는 공간 특징 추출과 채널 조합을 두 단계로 나눠, 가중치와 계산량을 줄이는 방식</strong>입니다.</p>
 <table>
 <thead>
@@ -571,16 +606,18 @@ $$</div>
 <p>즉, <strong>채널별로 특징을 먼저 찾고 → 채널들을 섞는다</strong>고 기억하면 됩니다. 효율적인 대신 일반 합성곱과 표현 방식이 달라, 같은 정확도가 항상 보장되는 것은 아닙니다.</p>
 <h4 id="경량-모델에-사용하는-이유">경량 모델에 사용하는 이유</h4>
 <p>앞의 예에서는 가중치가 <strong>216개에서 51개로 줄어듭니다.</strong> 같은 출력 공간 크기를 가정하면 곱셈·덧셈 연산량도 줄일 수 있어, 메모리와 연산 자원이 제한된 모바일·임베디드 기기에 유용합니다. 다만 실제 속도는 하드웨어와 구현에 따라 달라지므로, 정확도와 실행 효율을 함께 평가해야 합니다.</p>
-<h3 id="추가-합성곱-기법-수업-범위-안내">추가 합성곱 기법: 수업 범위 안내</h3>
-<p>합성곱에는 다음과 같은 변형도 있습니다. 원래 수업 메모에서 두 주제는 시험 범위에서 제외되어 있으므로, 이 문서에서는 이름만 남기고 설명을 생략합니다.</p>
-<ul>
-<li><strong>Transposed Convolution</strong>: 시험 범위에서 제외합니다.</li>
-<li><strong>Deformable Convolutional Networks</strong>: 시험 범위에서 제외합니다.</li>
-</ul>
+<h3 id="심화-해상도와-샘플링-위치를-바꾸는-합성곱">심화: 해상도와 샘플링 위치를 바꾸는 합성곱</h3>
+<p>기존 수업 메모에는 아래 주제가 시험 제외로 적혀 있었으나, 교안 26~31쪽에는 실제 내용이 있습니다. <strong>현재 시험 범위를 확정하는 근거로 쓰지 않고</strong>, 원문 이해를 위한 심화로 남깁니다.</p>
+<p>**전치 합성곱(Transposed convolution)**은 작은 특징 맵의 각 값을 커널로 펼친 뒤 겹친 위치를 합해 더 큰 맵을 만드는 학습 연산입니다. 일반 합성곱의 행렬 표현을 전치한 연산이지 손실된 원본을 정확히 복원하는 역함수가 아닙니다. 교육용 1차원 예에서 입력 <code>[1,2]</code>, 커널 <code>[1,2]</code>, stride 1이면 <code>[1,2,0]+[0,2,4]=[1,4,4]</code>입니다. 겹침이 균일하지 않으면 체커보드 형태의 흔적이 생길 수 있습니다. 분할의 업샘플링·생성 모델에 쓰며, 크기 확대만 필요하면 보간 뒤 합성곱도 비교할 수 있습니다.</p>
+<p>출력 한 변은 <code>(입력-1)×S-2P+D×(K-1)+output_padding+1</code>입니다. 입력 4, K=3, S=2, P=1, D=1, output_padding=1이면 <code>6-2+2+1+1=8</code>입니다. output_padding은 출력 크기 모호성을 조정하는 설정이며 원본 정보의 복구를 보장하지 않습니다. <a href="https://docs.pytorch.org/docs/2.15/generated/torch.nn.ConvTranspose2d.html">공식 ConvTranspose2d 설명</a></p>
+<p>**변형 합성곱(Deformable convolution)**은 고정된 격자의 각 표본 위치에 학습한 offset(좌표 이동량)을 더합니다. 보통 합성곱이 <code>x(p0+pk)</code>를 읽는다면 변형 합성곱은 <code>x(p0+pk+Δpk)</code>를 읽습니다. p0는 출력 중심, pk는 기본 커널 위치, Δpk는 입력 특징에서 예측한 이동량입니다. 3×3의 9개 위치를 2차원에서 움직이려면 위치당 두 값, 총 18개 offset 값이 필요합니다. 분수 좌표는 주변 픽셀 보간으로 읽습니다. 예를 들어 (2,3)에 (0.5,-1)을 더하면 (2.5,2)를 읽습니다. 이미지를 통째로 회전시키는 전처리와는 다릅니다.</p>
+<p>교안 28쪽은 offset 예측 경로와 표본을 읽는 경로가 만나는 구조입니다. 29쪽의 <strong>변형 RoI pooling</strong>은 관심 사각형(RoI)을 여러 bin으로 나눠 요약하되 bin의 표본 위치를 이동시킵니다. 고정 사각형 격자보다 물체의 변형에 맞추려는 목적이며, pooling으로 출력 크기를 고정하는 역할은 남습니다. 일반 합성곱의 가중치 공유와 학습된 이동량을 함께 사용하므로 계산·메모리 비용이 추가됩니다. <a href="https://arxiv.org/abs/1703.06211">원 논문, Dai 등 (2017)</a></p>
+<p>30쪽의 빨간 점은 학습된 샘플링 위치, 빨간 사각형은 변형된 pooling bin입니다. 물체와 배경에서 참조 위치가 달라지는 정성 예시이지 모든 점이 항상 물체 안에 모인다는 보장은 아닙니다. 31쪽 데모의 표는 Regular MNIST에서 일반 CNN 98.74%, 변형 CNN 97.27%, Scaled MNIST에서 57.01%, 92.55%를 제시합니다. 해당 데모에서는 크기 변화 조건의 차이가 크지만, 일반 MNIST에서는 오히려 낮습니다. 학습 설정이 모두 제시되지 않아 보편적 우위나 재현 결과로 단정하지 않습니다. 데모 동영상은 실행하지 않았습니다.</p>
+<p><a id="cnn-features"></a></p>
 <h2 id="3-cnn은-무엇을-학습할까">3. CNN은 무엇을 학습할까?</h2>
 <p>이제 합성곱의 구조와 계산 방법을 배웠으므로, 실제 학습을 통해 어떤 특징이 만들어지고 그 특징이 어떻게 활용되는지 살펴보겠습니다.</p>
 <p><strong>CNN은 학습을 통해 필터의 가중치를 조정하고, 층이 깊어질수록 단순한 특징들을 조합해 복잡한 특징을 찾습니다.</strong></p>
-<p><img alt="" src="../../assets/orca-paste-1793765924473-acc44cc7-7964-499e-8f6a-92c72b6a4b1e.png"/></p>
+<p><img alt="얕은 층에서 깊은 층으로 조합되는 얼굴 특징" src="../assets/orca-paste-1793765924473-acc44cc7-7964-499e-8f6a-92c72b6a4b1e.png"/></p>
 <p>왼쪽 그림은 합성곱 블록 하나의 흐름을 보여줍니다.</p>
 <table>
 <thead>
@@ -680,10 +717,12 @@ $$</div>
 <p>얼굴 크기가 다양하므로 여러 크기의 특징 맵을 활용하기도 합니다.</p>
 <p>즉, 앞서 본 <strong>CNN 특징 추출부 뒤에 ‘얼굴 여부’와 ‘박스 위치’를 예측하는 부분을 붙이면 얼굴 검출 모델</strong>을 만들 수 있습니다.</p>
 <p>얼굴 검출은 “누구인가?”가 아니라 **“얼굴이 어디 있는가?”**를 찾는 작업입니다.</p>
+<p><a id="cnn-vgg"></a></p>
 <h2 id="4-cnn-모델의-발전--vggnet">4. CNN 모델의 발전 — VGGNet</h2>
 <p>앞에서는 개별 연산과 특징의 활용을 살펴봤습니다. 이제 이를 조합한 대표 모델인 VGGNet과 ResNet을 통해, 층을 깊게 쌓는 방법과 그 과정에서 생기는 학습 문제를 연결해 보겠습니다.</p>
 <h3 id="cnn-models">CNN Models</h3>
-<p><img alt="" src="../../assets/orca-paste-1793766256211-bd1310e7-3a3f-436e-b1bc-1b9879b719a7.png"/></p>
+<p>교안 35쪽의 발전사는 문제별 설계 선택을 보여줍니다. LeNet-5(1998)는 지역 연결·공유 가중치로 문자 인식을 수행했고, AlexNet(2012)은 대규모 이미지 학습에서 GPU·ReLU·Dropout을 활용했습니다. VGG는 작은 필터를 반복하는 단순한 깊은 구조, ResNet은 깊은 구조의 최적화 문제에 초점을 둡니다. 이 연대표는 같은 데이터·학습 조건에서 모델을 평가한 순위표가 아닙니다. 교안의 ResNet 파라미터 범위 ‘25M~60M+’를 모든 변형에 적용하면 안 되며, ResNet-18은 1,000개 분류 기준 약 11.69M입니다.</p>
+<p><img alt="CNN 모델의 구조와 발전 비교" src="../assets/orca-paste-1793766256211-bd1310e7-3a3f-436e-b1bc-1b9879b719a7.png"/></p>
 <table>
 <thead>
 <tr>
@@ -724,7 +763,7 @@ $$</div>
 <p>이 <strong>잔차 연결(Residual connection 또는 Skip connection)</strong> 덕분에, 층을 깊게 쌓았을 때 학습이 어려워지는 문제를 완화합니다.</p>
 <p>특히 층을 추가했는데 오히려 <strong>학습 오차가 커지는 현상인 degradation 문제</strong>를 해결하는 데 중요한 역할을 했습니다.</p>
 <h3 id="vggnet">VGGNet</h3>
-<p><img alt="" src="../../assets/orca-paste-1793766430116-8065ee94-d901-422d-a379-f899f19e6f36.png"/></p>
+<p><img alt="VGG 구조의 특징 맵과 필터 차원" src="../assets/orca-paste-1793766430116-8065ee94-d901-422d-a379-f899f19e6f36.png"/></p>
 <p>이 그림은 <strong>VGGNet에서 이미지가 여러 합성곱·풀링 층을 지나 1,000개 클래스의 확률로 바뀌는 과정</strong>을 보여줍니다.</p>
 <h4 id="1-왼쪽-표-vggnet의-여러-버전">1. 왼쪽 표: VGGNet의 여러 버전</h4>
 <p>A~E는 깊이가 다른 구성입니다. 대표적으로 <strong>D가 VGG-16, E가 VGG-19</strong>입니다.</p>
@@ -828,246 +867,11 @@ $$</div>
 </code></pre>
 <p>두 층 모두 출력 채널은 64개지만, <strong>각 필터가 받아들이는 입력 채널 수가 다릅니다.</strong></p>
 <p>그림 아래 파라미터 표의 <code>138M</code>은 약 <strong>1억 3,800만 개</strong>라는 뜻입니다. VGG-16은 특히 Flatten 이후의 큰 완전연결 층 때문에 파라미터가 많습니다.</p>
-<h2 id="5-resnet--degradation과-잔차-학습">5. ResNet — Degradation과 잔차 학습</h2>
-<p>VGGNet처럼 작은 필터를 반복해 층을 늘리면 표현력을 높일 수 있습니다. 그러나 층 수를 늘리는 것만으로 성능이 좋아지지는 않습니다. 다음 실험은 깊은 모델에서 최적화가 왜 중요한지 보여줍니다.</p>
-<p><img alt="CIFAR-10에서 잔차 연결이 없는 20층과 56층 신경망의 학습 및 테스트 오차 비교" src="../../assets/orca-paste-1793766928479-e02c415f-0f8f-4a96-ab8d-54aa6cfbca26.png"/></p>
-<p>이 그림은 CIFAR-10에서 **잔차 연결이 없는 일반 신경망(plain network)**의 20층 모델과 56층 모델을 비교한 결과입니다. 가로축은 학습 반복 횟수, 세로축은 분류 오차율이며 <strong>낮을수록 좋습니다.</strong> 빨간색은 56층, 노란색은 20층입니다.</p>
-<table>
-<thead>
-<tr>
-<th>그래프</th>
-<th>관찰 결과</th>
-<th>의미</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>왼쪽: Training error</td>
-<td>56층이 20층보다 학습 오차가 높음</td>
-<td>깊은 모델이 학습 데이터조차 충분히 잘 맞히지 못함</td>
-</tr>
-<tr>
-<td>오른쪽: Test error</td>
-<td>56층이 20층보다 테스트 오차도 높음</td>
-<td>이 실험에서는 깊게 쌓는 것만으로 성능이 좋아지지 않음</td>
-</tr>
-</tbody>
-</table>
-<p><strong>층을 추가했는데 학습 오차가 오히려 커지는 현상을 degradation 문제라고 합니다.</strong> 과적합은 학습 데이터는 잘 맞히지만 새로운 데이터에서 성능이 떨어지는 현상입니다. 이 그림은 학습 오차부터 높으므로, 단순한 과적합보다 <strong>깊은 모델의 최적화가 어렵다는 점</strong>을 보여줍니다. 그래프만으로 원인을 기울기 소실 하나로 단정할 수는 없습니다.</p>
-<h3 id="resnet은-어떻게-도움을-줄까">ResNet은 어떻게 도움을 줄까?</h3>
-<p>ResNet은 여러 층의 계산 결과에 원래 입력을 더하는 <strong>잔차 연결</strong>을 사용합니다.</p>
-<div class="math">$$
-y = F(x) + x
-$$</div>
-<p>입력을 그대로 전달하는 경로가 있어 정보와 기울기가 흐르기 쉬워집니다. 입력을 바꿀 필요가 없는 블록은 F(x)를 0에 가깝게 학습하면 입력을 그대로 전달할 수 있어, 깊은 모델의 학습 부담을 줄입니다. 위 그래프 자체는 ResNet의 결과가 아니라 <strong>ResNet이 해결하려 했던 문제를 보여주는 비교</strong>입니다.</p>
-<h3 id="항등변환을-학습하기-어려운-이유">항등변환을 학습하기 어려운 이유</h3>
-<p>ResNet 맥락에서 <strong>항등행렬(identity matrix)을 학습한다</strong>는 것은, 입력을 그대로 출력하는 <strong>항등함수 H(x)=x</strong>를 학습한다는 뜻입니다.</p>
-<p>일반 신경망에서는 입력이 여러 가중치와 ReLU를 통과합니다. 입력을 그대로 보존하려 해도 <strong>여러 층의 가중치가 함께 맞아야 하고, ReLU는 음수 정보를 제거할 수 있어</strong> 학습이 쉽지 않습니다. 역전파도 각 층의 최종 가중치를 직접 알려주는 것이 아니라 조금씩 수정할 방향만 알려줍니다.</p>
-<p>ResNet은 이를 다음처럼 바꿉니다.</p>
-<p>H(x)=F(x)+x</p>
-<p><strong>입력 x는 지름길로 그대로 전달하고, 추가로 바꿀 부분 F(x)만 학습</strong>합니다. 항등함수가 필요하면 F(x)를 0에 가깝게 만들면 됩니다.</p>
-<table>
-<thead>
-<tr>
-<th>구조</th>
-<th>입력을 그대로 전달하려면</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>일반 신경망</td>
-<td>여러 층이 함께 항등변환을 구현해야 함</td>
-</tr>
-<tr>
-<td>ResNet</td>
-<td>직접 연결된 입력에 더하는 잔차를 0으로 만들면 됨</td>
-</tr>
-</tbody>
-</table>
-<p>항등행렬 자체가 복잡해서가 아니라, <strong>여러 층을 거쳐 항등변환을 찾아가는 최적화가 어려웠던 것</strong>입니다.</p>
-<h3 id="skip-connection-잔차-학습의-의미">Skip Connection: 잔차 학습의 의미</h3>
-<p>항등변환의 관점에서 잔차 연결의 역할을 더 구체적으로 살펴보겠습니다. 아래 세 그림은 각각 모델의 복잡도, 활성화 함수, 일반 연결과 잔차 연결을 보여줍니다. 서로 다른 개념이 섞이지 않도록 구분해서 읽어야 합니다.</p>
-<p><img alt="" src="../../assets/orca-paste-1793767098486-c84a0612-50e0-487a-b43c-625bb8a0498f.png"/></p>
-<p><img alt="" src="../../assets/orca-paste-1793767125683-93f6314e-e598-493e-9963-e23815a1da54.png"/></p>
-<p><img alt="" src="../../assets/orca-paste-1793767152453-497d5009-1379-4687-8518-4f174561e9cb.png"/></p>
-<p><strong>Skip connection은 입력을 그대로 전달하는 지름길을 만들어, 여러 층이 입력에 더할 변화량(잔차)만 학습하도록 돕는 연결</strong>입니다.</p>
-<table>
-<thead>
-<tr>
-<th>그림</th>
-<th>설명</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>첫 번째: 직선과 구불구불한 곡선</td>
-<td>복잡한 모델은 데이터의 잡음까지 따라가 과적합할 수 있다는 예시입니다. 이 그림 자체가 Skip connection의 효과나 손실 지형을 비교한 실험은 아닙니다.</td>
-</tr>
-<tr>
-<td>두 번째: 활성화 함수</td>
-<td>ReLU, Sigmoid 등 함수별 입력·출력 관계를 보여줍니다. 함수마다 기울기와 포화 구간이 다르므로, 0 근처가 항상 학습하기 좋다고 일반화할 수는 없습니다.</td>
-</tr>
-<tr>
-<td>세 번째: 일반 연결과 잔차 연결</td>
-<td>일반 연결은 원하는 출력 전체를 학습하지만, 잔차 연결은 원래 입력에 더할 변화량을 학습합니다.</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>구조</th>
-<th>학습 목표</th>
-<th>입력을 그대로 전달하려면</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>일반 연결</td>
-<td>원하는 변환 H(x)</td>
-<td>여러 층이 함께 H(x) = x를 구현해야 함</td>
-</tr>
-<tr>
-<td>Skip connection</td>
-<td>잔차 F(x) = H(x) − x</td>
-<td>잔차 F(x)를 0으로 만들면 됨. 덧셈 직후 기준</td>
-</tr>
-</tbody>
-</table>
-<p>예를 들어 입력이 10이고 원하는 출력이 11이면, 잔차 경로는 추가할 값 1을 학습합니다.</p>
-<div class="math">$$
-y = x + F(x) = 10 + 1 = 11
-$$</div>
-<p>지름길은 역전파 때 기울기가 전달되는 직접 경로도 제공하므로, 깊은 신경망의 학습을 돕습니다. 입력과 잔차를 그대로 더하려면 두 값의 형태가 같아야 하며, 다르면 1×1 합성곱 등으로 맞출 수 있습니다.</p>
-<h4 id="위-설명에서-주의할-점">위 설명에서 주의할 점</h4>
-<ul>
-<li><strong>Skip connection과 가중치 규제는 다릅니다.</strong> 가중치 변화가 크다는 사실만으로 과적합을 판단할 수 없으며, 작은 변화만으로 과적합이 방지되는 것도 아닙니다. Skip connection의 핵심은 최적화를 쉽게 해 degradation 문제를 완화하는 것입니다.</li>
-<li><strong>0 중심 초기화가 잔차 출력을 자동으로 0으로 만들지는 않습니다.</strong> Xavier·He 초기화는 주로 신호와 기울기의 규모를 적절히 유지하도록 설계된 방법입니다. 잔차 연결은 항등변환이 필요할 때 잔차를 0으로 학습할 수 있는 구조를 제공합니다.</li>
-<li><strong>마지막 그림에는 덧셈 뒤 ReLU도 있습니다.</strong> 따라서 실제 블록 출력은 아래 식과 같으며, F(x)가 0이어도 음수 입력은 그대로 통과하지 않습니다. 입력이 비음수라면 그대로 전달됩니다.</li>
-</ul>
-<div class="math">$$
-y = \operatorname{ReLU}(F(x) + x)
-$$</div>
-<h3 id="resnet의-성과-깊은-모델을-실제로-학습하기">ResNet의 성과: 깊은 모델을 실제로 학습하기</h3>
-<p>잔차 연결의 의미를 이해했다면, 이번에는 이를 적용한 모델의 성과를 살펴보겠습니다. 아래 결과는 깊은 구조를 학습할 수 있게 된 효과를 보여주되, 서로 다른 평가 조건을 구분해 읽어야 합니다.</p>
-<p><img alt="ImageNet 대회에서 모델 깊이와 분류 오차율의 변화" src="../../assets/orca-paste-1793767589412-10dcbd72-2619-4cba-8304-c63819866599.png"/></p>
-<p><strong>첫 번째 그림은 이미지 분류 기술이 발전하며 대회 오차율이 낮아진 흐름</strong>을 보여줍니다. 시간은 오른쪽의 2010년에서 왼쪽의 2015년 방향으로 흐르며, 막대가 낮을수록 좋습니다.</p>
-<table>
-<thead>
-<tr>
-<th>대표 모델</th>
-<th>그림의 층 수</th>
-<th>그림의 Top-5 오차율</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>AlexNet — 2012</td>
-<td>8</td>
-<td>16.4%</td>
-</tr>
-<tr>
-<td>VGG — 2014</td>
-<td>19</td>
-<td>약 7.3%</td>
-</tr>
-<tr>
-<td>GoogLeNet — 2014</td>
-<td>22</td>
-<td>약 6.7%</td>
-</tr>
-<tr>
-<td>ResNet — 2015</td>
-<td>152</td>
-<td>3.57%</td>
-</tr>
-</tbody>
-</table>
-<p>Top-5 오차율은 <strong>모델이 고른 상위 5개 후보에 정답이 없는 비율</strong>입니다. 3.57%는 약 100장 중 3~4장에서 상위 5개 안에 정답이 없다는 뜻이며, Top-1 정확도가 96.43%라는 뜻은 아닙니다.</p>
-<p>잔차 연결은 매우 깊은 모델을 학습할 수 있게 하는 중요한 요소였습니다. 다만 이 그림은 연도별 대회 결과이므로, 성능 향상을 층 수 증가만의 효과로 해석하면 안 됩니다. 또한 <strong>3.57%는 단일 152층 모델 하나의 점수가 아니라 여러 ResNet을 결합한 앙상블 결과</strong>입니다.</p>
-<h3 id="잔차-경로는-어떤-출력을-학습할까">잔차 경로는 어떤 출력을 학습할까?</h3>
-<p><img alt="일반 신경망과 ResNet의 층별 반응 표준편차 및 ImageNet 성능 비교" src="../../assets/orca-paste-1793767542546-9237f0d1-a35f-4e43-88a2-23c269f150d0.png"/></p>
-<p>두 번째 이미지의 왼쪽 그래프는 CIFAR-10에서 **각 층의 반응값이 얼마나 퍼져 있는지 나타내는 표준편차(std)**를 비교합니다. 가중치나 기울기 자체의 크기를 그린 그래프는 아닙니다.</p>
-<table>
-<thead>
-<tr>
-<th>구분</th>
-<th>읽는 방법</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>위 그래프</td>
-<td>원래 층 순서에 따라 반응의 표준편차를 표시</td>
-</tr>
-<tr>
-<td>아래 그래프</td>
-<td>같은 값을 표준편차가 큰 순서대로 정렬해 비교</td>
-</tr>
-<tr>
-<td>plain-20 / plain-56</td>
-<td>잔차 연결이 없는 20층·56층 모델</td>
-</tr>
-<tr>
-<td>ResNet-20 / 56 / 110</td>
-<td>잔차 연결을 사용하는 모델</td>
-</tr>
-</tbody>
-</table>
-<p>실험에서는 ResNet의 잔차 경로가 일반 신경망보다 대체로 작은 반응을 보였고, 깊은 ResNet에서는 반응이 더 작아지는 경향이 관찰됐습니다. 이는 <strong>원래 입력 전체를 새로 만들기보다 필요한 수정량을 학습한다</strong>는 잔차 학습의 해석을 뒷받침합니다. 다만 표준편차가 작다는 사실만으로 평균이 0이거나, 학습이 잘됐다고 단정할 수는 없습니다.</p>
-<p>오른쪽 표는 ImageNet 테스트의 Top-5 오차율을 비교합니다. 표시된 방법 중 ResNet의 3.57%가 가장 낮습니다. <strong>왼쪽은 CIFAR-10의 내부 반응 분석, 오른쪽은 ImageNet의 분류 성능 비교</strong>로 서로 다른 실험입니다.</p>
-<p>출처: <a href="https://arxiv.org/abs/1512.03385">ResNet 원 논문 — Deep Residual Learning for Image Recognition</a></p>
-<h3 id="resnet이-역전파를-돕는-원리">ResNet이 역전파를 돕는 원리</h3>
-<p>앞의 결과를 학습 과정과 연결하려면, 잔차 연결을 따라 기울기가 어떻게 전달되는지 보면 됩니다.</p>
-<p><strong>Skip connection은 기울기가 전달될 직접 경로를 제공하고, 잔차 블록이 입력에 필요한 수정량을 학습하도록 돕습니다.</strong> 역전파 알고리즘 자체를 바꾸는 것이 아니라, 신경망의 연결 구조를 바꿔 깊은 모델을 학습하기 쉽게 만듭니다.</p>
-<table>
-<thead>
-<tr>
-<th>구분</th>
-<th>일반 신경망</th>
-<th>ResNet</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>역전파</td>
-<td>여러 층의 미분값을 곱하면서 기울기가 약해질 수 있음</td>
-<td>입력을 그대로 전달하는 경로가 기울기 전달에도 기여</td>
-</tr>
-<tr>
-<td>블록의 학습 목표</td>
-<td>원하는 변환 전체를 학습</td>
-<td>입력에 더할 수정량인 잔차를 학습</td>
-</tr>
-<tr>
-<td>입력을 바꿀 필요가 없을 때</td>
-<td>여러 층이 함께 항등변환을 구현해야 함</td>
-<td>잔차를 0에 가깝게 만들면 덧셈 결과가 입력과 같아짐</td>
-</tr>
-<tr>
-<td>깊은 구조의 활용</td>
-<td>층을 늘려도 최적화가 어려워 학습 오차가 커질 수 있음</td>
-<td>최적화 부담을 줄여 깊은 구조를 활용하기 쉬워짐</td>
-</tr>
-</tbody>
-</table>
-<p>잔차 블록의 덧셈 부분을 간단한 스칼라 예로 보면 다음과 같습니다.</p>
-<div class="math">$$
-y = x + F(x)
-$$</div>
-<p>손실 L에서 입력 x로 전달되는 기울기는 연쇄법칙에 따라 다음과 같습니다.</p>
-<div class="math">$$
-\frac{\partial L}{\partial x}
-= \frac{\partial L}{\partial y}
-\left(1 + \frac{\partial F(x)}{\partial x}\right)
-$$</div>
-<p>여기서 <strong>1은 입력을 그대로 전달하는 경로에서 생깁니다.</strong> 잔차 경로의 미분값이 작아도 직접 경로를 통해 기울기가 전달될 수 있습니다. 실제 특징 맵처럼 벡터를 다루면 1에 해당하는 역할을 항등행렬이 합니다.</p>
-<p>위 식은 덧셈 직후를 기준으로 하며, 덧셈 뒤에 ReLU가 있으면 그 미분도 역전파에 반영됩니다. 따라서 잔차 연결이 모든 상황에서 기울기 소실을 완전히 없앤다는 뜻은 아닙니다.</p>
-<p><strong>여기서 효율이 좋아진다는 것은 학습과 최적화가 쉬워진다는 의미입니다.</strong> Skip connection 자체가 합성곱의 계산량을 줄이는 것은 아니며, 층을 더 쌓으면 연산량과 메모리 사용량이 증가할 수 있습니다.</p>
-<h2 id="6-사람의-시각계와-cnn-비교">6. 사람의 시각계와 CNN 비교</h2>
+<p><a id="cnn-human"></a></p>
+<h2 id="5-사람의-시각계와-cnn-비교">5. 사람의 시각계와 CNN 비교</h2>
 <p>지금까지 CNN의 연산과 깊은 구조의 학습을 살펴봤습니다. 마지막으로 이러한 계층적 특징 처리를 사람의 시각과 비교해, CNN이 설명하는 부분과 한계를 함께 정리하겠습니다.</p>
 <p><strong>CNN은 작은 특징을 조합해 물체를 인식하는 계층적 처리 방식을 사람의 시각과 공유합니다. 다만 뇌의 구조와 학습 과정을 그대로 재현한 것은 아닙니다.</strong></p>
-<p><img alt="사람의 시각 시스템과 CNN의 계층적 특징 처리 비교" src="../../assets/orca-paste-1793768537083-d6043c53-d745-451a-8116-70682058ed90.png"/></p>
+<p><img alt="사람의 시각 시스템과 CNN의 계층적 특징 처리 비교" src="../assets/orca-paste-1793768537083-d6043c53-d745-451a-8116-70682058ed90.png"/></p>
 <table>
 <thead>
 <tr>
@@ -1114,7 +918,27 @@ $$</div>
 </ul>
 <h3 id="판다-이미지가-보여주는-인식의-한계">판다 이미지가 보여주는 인식의 한계</h3>
 <p>판다 사진에 사람이 거의 알아차리지 못하는 교란을 더해 모델이 긴팔원숭이로 오분류하도록 만든 **적대적 공격(Adversarial attack)**의 예시입니다. 아무 잡음이나 넣으면 반드시 이런 결과가 나는 것은 아니며, 모델의 판단을 바꾸도록 교란을 설계합니다. 사람의 착시와 CNN의 적대적 취약성은 모두 인식의 한계이지만, 같은 원리로 발생한다고 볼 수는 없습니다.</p>
-<p>CNN의 핵심은 <strong>지역적인 특징을 공유된 필터로 추출하고, 이를 여러 층에서 조합하는 것</strong>입니다. 잔차 연결은 이 과정을 깊게 쌓아 학습하도록 돕습니다. 다음 문서에서는 이러한 특징 추출 관점을 바탕으로, 입력의 여러 위치가 서로를 참고하며 정보를 조합하는 <strong>Attention</strong>을 살펴봅니다.</p>
+<p>CNN의 핵심은 <strong>지역적인 특징을 공유된 필터로 추출하고, 이를 여러 층에서 조합하는 것</strong>입니다. 잔차 연결은 이 과정을 깊게 쌓아 학습하도록 돕습니다. 다음 <a href="02_03_CNN_ResNet_18Layer.html">ResNet 노트</a>에서는 잔차 연결과 실행을 배우고, 그 뒤 <a href="03_01_Attention_Note.html">Attention</a>에서 여러 위치의 정보를 결합하는 방법을 배웁니다.</p>
+<p><a id="cnn-practice"></a></p>
+<h2 id="6-직접-계산하고-확인하기">6. 직접 계산하고 확인하기</h2>
+<p><strong>실행 실습(표준 Python 3):</strong> 저장소 루트에서 아래 명령을 실행합니다. 패키지 설치나 데이터 다운로드 없이 손계산·차원·파라미터 수를 검산합니다. <a href="../assets/cnn-selfstudy/check_arithmetic.py" rel="noopener" target="_blank">실행 파일</a>은 교육용 계산기이며 CNN을 학습하는 코드는 아닙니다.</p>
+<pre><code class="language-text">python 05_VISION/학습자료/assets/cnn-selfstudy/check_arithmetic.py
+</code></pre>
+<p>필터 결과 -6, 합성곱 출력 한 변 16, 수용영역 8, 출력 간격 2를 확인한 뒤 <code>all arithmetic checks passed</code>가 나와야 합니다. 이 스크립트는 집필 환경의 Python 3.12.8에서 실행해 모든 assert가 통과했습니다. 실제 CNN의 forward/backward는 <a href="02_03_CNN_ResNet_18Layer.html#resnet-code">ResNet 실습</a>에서 다루며 그 실행 검증 범위는 별도로 표시했습니다.</p>
+<p><strong>질문:</strong> 먼저 계산하거나 이유를 적고 해설을 확인하세요.</p>
+<ol>
+<li>6×6×3 입력에 3×3 필터 2개, stride 1, padding 0, bias 사용이면 출력과 파라미터 수는?</li>
+<li>3×3 Conv(S=1) → 2×2 Pool(S=2) → 3×3 Conv(S=1)의 수용영역을 왜 단순히 3+2+3으로 더하면 안 될까요?</li>
+<li>위 첫 질문에서 stride만 2로 바꾸면 무엇이 달라지고 무엇이 유지될까요?</li>
+<li>3입력·8출력 채널의 depthwise+pointwise에서 pointwise를 빼면 8채널 혼합 특징을 얻을 수 있나요?</li>
+<li>모든 입력을 한 픽셀 옮기면 분류 결과가 반드시 같나요?</li>
+</ol>
+<p><strong>해설 1:</strong> 한 변은 <code>(6-3)/1+1=4</code>이므로 HWC 출력은 4×4×2, NCHW는 N×2×4×4입니다. 각 필터는 세 채널 전체를 보므로 <code>3×3×3×2+2=56</code>개입니다. 출력 32개와 학습 파라미터 56개를 구별합니다. <a href="#cnn-convolution">1절</a>로 돌아갑니다.</p>
+<p><strong>해설 2:</strong> 각 층의 필터는 원본 픽셀이 아니라 직전 특징 맵을 봅니다. 이미 한 칸이 원본 두 칸 간격이면 마지막 커널이 추가하는 폭은 2×2=4입니다. <code>(r,j): (1,1)→(3,1)→(4,2)→(8,2)</code>로 계산합니다. 8이라는 우연한 단순 합의 일치는 일반 규칙이 아닙니다. <a href="#cnn-receptive">2절</a>을 복습합니다.</p>
+<p><strong>해설 3:</strong> <code>floor((6-3)/2)+1=2</code>여서 출력은 2×2×2입니다. 필터 크기·채널·bias가 그대로이므로 파라미터 56개는 유지되고 공간 연산은 줄어듭니다. <a href="#cnn-convolution">1절</a>로 돌아갑니다.</p>
+<p><strong>해설 4:</strong> 기본 depth multiplier=1이면 depthwise 출력은 3채널이며 채널 간 정보를 섞지 않습니다. pointwise가 3채널을 조합해 8채널을 만듭니다. 가중치 27+24=51이라는 계산도 두 단계를 모두 포함합니다. <a href="#cnn-receptive">2절</a>로 돌아갑니다.</p>
+<p><strong>해설 5:</strong> 보장하지 않습니다. stride 1 합성곱의 이동 등변성과 최종 분류의 이동 불변성은 다릅니다. 경계 padding, 다운샘플링, 분류부 등이 영향을 줍니다. 교안 19쪽의 translation invariance는 이 조건을 구별해 읽어야 합니다. <a href="#cnn-convolution">1절</a>을 복습합니다.</p>
+<p>다음에는 <a href="02_03_CNN_ResNet_18Layer.html">ResNet</a>에서 합성곱을 깊게 쌓을 때 생기는 최적화 문제와 잔차 연결을 다룹니다.</p>
 <nav class="page-turn" aria-label="앞뒤 학습 문서"><a href="02_01_DNN_Note.html">← DNN: 이미지 학습의 기초</a><a href="02_03_CNN_ResNet_18Layer.html">ResNet 18-Layer: 구조와 구현 →</a></nav><p class="source-note">기준 본문은 기존 Markdown입니다. 수식·도표는 온라인 렌더러를 사용하며, 원문과 도표 원문으로도 확인할 수 있습니다.</p></main></div>
 <script>if(window.self!==window.top||matchMedia('(max-width:800px)').matches)document.querySelector('.document-toc details').open=false;</script>
 <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';mermaid.initialize({startOnLoad:true,securityLevel:'strict',theme:'neutral'});</script>

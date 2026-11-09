@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>객체 검출 | Vision 교안</title><link rel="stylesheet" href="textbook.css">
+<script>if(window.self!==window.top)document.documentElement.classList.add('embedded');window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['$$','$$']] },options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body><a class="skip" href="#content">본문으로 건너뛰기</a><div class="document-shell"><aside class="document-toc"><details open><summary>이 문서의 목차</summary><nav aria-label="문서 내부 목차"><a class="level-2" href="#1-출력과-어려움">1. 출력과 어려움</a><a class="level-3" href="#object-detection--무엇과-어디를-함께-예측하기">Object detection — 무엇과 어디를 함께 예측하기</a><a class="level-3" href="#applications--검출-결과가-실제-판단으로-이어지는-방식">Applications — 검출 결과가 실제 판단으로 이어지는 방식</a><a class="level-3" href="#challenges--크기가림자세배경-변화">Challenges — 크기·가림·자세·배경 변화</a><a class="level-2" href="#2-중복-제거와-평가">2. 중복 제거와 평가</a><a class="level-3" href="#detection-metric-14--iou">Detection metric (1/4) — IoU</a><a class="level-3" href="#nms--같은-물체의-중복-박스-줄이기">NMS — 같은 물체의 중복 박스 줄이기</a><a class="level-3" href="#detection-metric-24--tpfpfn과-중복-예측">Detection metric (2/4) — TP·FP·FN과 중복 예측</a><a class="level-3" href="#detection-metric-34--precisionrecallf1">Detection metric (3/4) — Precision·Recall·F1</a><a class="level-3" href="#detection-metric-44--apmapcoco-평가">Detection metric (4/4) — AP·mAP·COCO 평가</a><a class="level-3" href="#교육용-보충-하나의-예시로-iou--nms--ap-계산하기">교육용 보충: 하나의 예시로 IoU → NMS → AP 계산하기</a><a class="level-2" href="#3-설계-변화의-지도">3. 설계 변화의 지도</a><a class="level-3" href="#evolution--특징-설계에서-집합-예측까지">Evolution — 특징 설계에서 집합 예측까지</a><a class="level-3" href="#one-stage-vs-two-stage--후보-영역을-먼저-만들까">One-stage vs. Two-stage — 후보 영역을 먼저 만들까?</a><a class="level-3" href="#설계-선택을-같은-기준으로-비교하기">설계 선택을 같은 기준으로 비교하기</a><a class="level-2" href="#4-심화-고전-검출의-계산-절약">4. 심화: 고전 검출의 계산 절약</a><a class="level-3" href="#violajones--빠르게-비얼굴-영역을-제외하기">Viola–Jones — 빠르게 비얼굴 영역을 제외하기</a><a class="level-2" href="#5-r-cnn-계열-계산-공유와-학습형-후보">5. R-CNN 계열: 계산 공유와 학습형 후보</a><a class="level-3" href="#r-cnn--후보마다-cnn을-적용하기">R-CNN — 후보마다 CNN을 적용하기</a><a class="level-3" href="#fast-r-cnn--이미지-특징을-한-번만-계산하기">Fast R-CNN — 이미지 특징을 한 번만 계산하기</a><a class="level-3" href="#faster-r-cnn--학습하는-후보-생성기-rpn">Faster R-CNN — 학습하는 후보 생성기 RPN</a><a class="level-3" href="#rpn-12--objectness와-박스-보정-학습">RPN (1/2) — Objectness와 박스 보정 학습</a><a class="level-3" href="#rpn-22--anchor의-크기와-종횡비">RPN (2/2) — Anchor의 크기와 종횡비</a><a class="level-3" href="#faster-r-cnn-loss--분류와-위치를-함께-학습하기">Faster R-CNN Loss — 분류와 위치를 함께 학습하기</a><a class="level-3" href="#faster-r-cnn-experiments--정성-결과-읽기">Faster R-CNN Experiments — 정성 결과 읽기</a><a class="level-3" href="#two-stage-summary--반복-계산을-없앤-두-번의-개선">Two-stage Summary — 반복 계산을 없앤 두 번의 개선</a><a class="level-2" href="#6-centernet-중심점에서-박스로">6. CenterNet: 중심점에서 박스로</a><a class="level-3" href="#centernet-overview--물체를-중심점으로-표현하기">CenterNet Overview — 물체를 중심점으로 표현하기</a><a class="level-3" href="#centernet-architecture--heatmapoffsetsize">CenterNet Architecture — Heatmap·Offset·Size</a><a class="level-3" href="#centernet-applications-12--pose와-3d-박스">CenterNet Applications (1/2) — Pose와 3D 박스</a><a class="level-3" href="#centernet-applications-22--cuboid-detection의-범위">CenterNet Applications (2/2) — Cuboid detection의 범위</a><a class="level-3" href="#centernet-experiments--정확도와-시간의-교환">CenterNet Experiments — 정확도와 시간의 교환</a><a class="level-2" href="#7-detr-순서-없는-집합-예측">7. DETR: 순서 없는 집합 예측</a><a class="level-3" href="#detr--검출을-순서-없는-집합-예측으로-보기">DETR — 검출을 순서 없는 집합 예측으로 보기</a><a class="level-3" href="#detr-overview--수작업-후처리를-학습-목표로-흡수하기">DETR Overview — 수작업 후처리를 학습 목표로 흡수하기</a><a class="level-3" href="#detr-architecture-12--encoderdecoderobject-queries">DETR Architecture (1/2) — Encoder·Decoder·Object queries</a><a class="level-3" href="#detr-architecture-22--차원으로-데이터-흐름-확인하기">DETR Architecture (2/2) — 차원으로 데이터 흐름 확인하기</a><a class="level-3" href="#detr-loss-12--먼저-짝을-정하고-학습하기">DETR Loss (1/2) — 먼저 짝을 정하고 학습하기</a><a class="level-3" href="#detr-loss-22--hungarian-matching과-집합-손실">DETR Loss (2/2) — Hungarian matching과 집합 손실</a><a class="level-3" href="#iou-vs-giou--겹치지-않는-박스에도-학습-신호-주기">IoU vs. GIoU — 겹치지 않는 박스에도 학습 신호 주기</a><a class="level-3" href="#detr-experiments-12--attention에서-무엇을-참고할까">DETR Experiments (1/2) — Attention에서 무엇을 참고할까?</a><a class="level-3" href="#detr-experiments-22--panoptic-segmentation으로-확장">DETR Experiments (2/2) — Panoptic segmentation으로 확장</a><a class="level-3" href="#교육용-보충-detr의-일대일-매칭과-giou-손계산">교육용 보충: DETR의 일대일 매칭과 GIoU 손계산</a><a class="level-2" href="#8-스스로-확인하기-계산에서-설계-선택까지">8. 스스로 확인하기: 계산에서 설계 선택까지</a><a class="level-2" href="#9-원문과-보충-근거">9. 원문과 보충 근거</a></nav></details></aside><main class="document-main" id="content"><nav class="document-nav" aria-label="상위 이동"><a href="../../../index.html" target="_top">전체 과정</a><a href="index.html#04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.html" target="_top">Vision 강의 목차</a><a href="../04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.md" target="_blank" rel="noopener">Markdown 원문</a></nav><h1 id="객체-검출-박스를-만들고-중복을-줄이고-성능을-판단하기">객체 검출: 박스를 만들고, 중복을 줄이고, 성능을 판단하기</h1>
+<p><a href="04_01_Application_note.html">응용 학습 안내</a> · 다음: <a href="04_03_%EA%B0%9D%EC%B2%B4_%EC%B6%94%EC%A0%81.html">객체 추적</a> · 연결: <a href="04_04_%EC%98%81%EC%83%81_%EB%B6%84%ED%95%A0.html">영상 분할</a></p>
+<p>객체 검출은 이미지에 있는 여러 물체를 <strong>종류·박스·점수</strong>로 표현하는 문제입니다. 이 장은 “어떤 박스를 정답으로 셀 것인가”를 먼저 정하고, 그 출력을 만드는 구조가 왜 달라졌는지 설명합니다. 중복 제거를 이해하면 집합 예측을 사용하는 DETR의 설계 이유도 연결됩니다.</p>
+<p>선수지식은 <a href="02_02_CNN_Note.html">CNN의 특징 맵·Stride</a>, <a href="02_01_DNN_Note.html">분류 손실과 역전파</a>입니다. DETR에 들어가기 전에는 <a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT</a>의 Query·Key·Value를 복습하세요. 위치가 있는 특징을 출력으로 바꾸는 과정이 이 장의 출발점입니다.</p>
+<p>학습 목표는 (1) IoU·NMS·AP를 손으로 계산하기, (2) R-CNN→Fast→Faster의 병목 변화를 설명하기, (3) CenterNet의 세 출력으로 박스를 복원하기, (4) DETR의 학습 매칭과 추론을 구분하기입니다.</p>
+<p><strong>기본 경로:</strong> 1→2→3→5→6→7→8. <strong>심화:</strong> 4의 고전 검출기, 5의 손실·Anchor 상세, 7의 매칭 비용·GIoU. 복습할 때는 2의 계산 예제와 8의 질문부터 풀고 해설이 안내하는 절로 돌아갑니다.</p>
+<table>
+<thead>
+<tr>
+<th>절</th>
+<th>답할 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#1-출력과-어려움">1. 출력과 어려움</a></td>
+<td>무엇을 찾아야 하는가?</td>
+</tr>
+<tr>
+<td><a href="#detection-metrics">2. 중복과 평가</a></td>
+<td>박스를 어떤 조건에서 채택하고 정답으로 세는가?</td>
+</tr>
+<tr>
+<td><a href="#detection-design">3. 설계 지도</a></td>
+<td>병목을 어떤 표현으로 바꾸었는가?</td>
+</tr>
+<tr>
+<td><a href="#detection-classic">4. 고전 검출</a></td>
+<td>쉬운 배경을 어떻게 빨리 제외하는가?</td>
+</tr>
+<tr>
+<td><a href="#detection-rcnn">5. R-CNN 계열</a></td>
+<td>후보 계산을 어떻게 공유하는가?</td>
+</tr>
+<tr>
+<td><a href="#detection-center">6. CenterNet</a></td>
+<td>중심점에서 박스를 어떻게 복원하는가?</td>
+</tr>
+<tr>
+<td><a href="#detection-detr">7. DETR</a></td>
+<td>중복 없는 집합을 어떻게 학습하는가?</td>
+</tr>
+<tr>
+<td><a href="#detection-check">8. 확인 질문</a></td>
+<td>계산과 설계 이유를 설명할 수 있는가?</td>
+</tr>
+</tbody>
+</table>
+<p>원문 범위: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=3" rel="noopener" target="_blank">강의 PDF 실제 3–35쪽</a>. 표지·구분은 1–2쪽이며 아래 쪽수는 인쇄 쪽수가 아닌 PDF의 1-based 순서입니다. 강의 기반 설명과 기존 노트의 유익한 상세를 유지하되, <strong>교육용 보충</strong>으로 표시한 계산·질문은 새 예시입니다. 실험 수치는 해당 슬라이드의 역사적 설정이며 최신 모델 순위가 아닙니다. 원문 그림은 각 항목의 접기 영역에서 확인할 수 있습니다.</p>
+<p><a id="detection-basics"></a></p>
+<h2 id="1-출력과-어려움">1. 출력과 어려움</h2>
+<h3 id="object-detection--무엇과-어디를-함께-예측하기">Object detection — 무엇과 어디를 함께 예측하기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=3" rel="noopener" target="_blank">PDF 3쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Object detection — 무엇과 어디를 함께 예측하기 — 강의 그림" src="../assets/applications/page-003.png"/></p>
+</details>
+<ul>
+<li><strong>Classification</strong>는 이미지에 고양이가 있다는 판단이고,</li>
+<li><strong>Localization</strong>은 한 대상의 위치까지 찾는 것입니다.</li>
+<li><strong>Detection</strong>은 한 이미지의 여러 물체에 대해 <strong>클래스와 Bounding box를 각각 출력</strong>합니다.</li>
+<li><strong>Instance segmentation</strong>은 여기서 물체의 윤곽까지 예측합니다.</li>
+</ul>
+<p>검출 결과는 보통 <code>(클래스, 점수, 박스 좌표)</code>로 표현합니다.</p>
+<p>Confidence는 모델의 예측 점수이며 실제 정답 확률과 완전히 같다고 가정하면 안 됩니다. 박스의 위치 정확도는 정답 박스와의 IoU 등으로 별도 평가합니다.</p>
+<hr/>
+<h3 id="applications--검출-결과가-실제-판단으로-이어지는-방식">Applications — 검출 결과가 실제 판단으로 이어지는 방식</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=4" rel="noopener" target="_blank">PDF 4쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Applications — 검출 결과가 실제 판단으로 이어지는 방식 — 강의 그림" src="../assets/applications/page-004.png"/></p>
+</details>
+<p>그림은 자율주행·유통·농업·제조·환경·보안·스포츠 등 검출의 활용 범위를 보여줍니다. 예를 들어 차량 검출은 ‘차가 있다’는 결과를 제공하고, 차선 침범이나 충돌 위험 판단에는 위치·시간·거리 정보가 추가로 필요합니다.</p>
+<p>작은 결함을 찾는 제조 검사와 멀리 있는 사람을 찾는 영상 분석은 같은 검출 문제라도 필요한 해상도와 오검출·누락 비용이 다릅니다. <strong>사용 목적에 따라 정확도, 지연 시간, 놓치면 안 되는 대상의 크기</strong>를 함께 정해야 합니다.</p>
+<hr/>
+<h3 id="challenges--크기가림자세배경-변화">Challenges — 크기·가림·자세·배경 변화</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=5" rel="noopener" target="_blank">PDF 5쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Challenges — 크기·가림·자세·배경 변화 — 강의 그림" src="../assets/applications/page-005.png"/></p>
+</details>
+<p>가까운 물체와 먼 물체는 픽셀 크기가 다르고, 가림이나 회전은 관찰 가능한 특징을 바꿉니다.</p>
+<p>비슷한 배경과 어두운 조명에서는 물체와 주변을 구분하기도 어려워집니다.</p>
+<p>그림의 이상적인 검출기는 이런 변화에 강하면서 클래스 간에는 잘 구분해야 합니다.</p>
+<p><strong>다중 해상도 특징은 크기 차이, 증강은 관찰 조건 변화, 문맥 정보는 부분 가림</strong>을 다루는 데 도움을 줍니다.</p>
+<p>다만 작은 물체의 정보가 입력에서 사라지면 구조를 바꾸는 것만으로 복구할 수 없으므로 입력 해상도와 데이터 품질도 중요합니다.</p>
+<p><strong>Rigid는 물체 자체의 형태가 유지되는 변화</strong>, <strong>Non-rigid는 물체의 형태가 변하는 변화</strong>를 뜻합니다.</p>
+<table>
+<thead>
+<tr>
+<th>구분</th>
+<th>의미</th>
+<th></th>
+<th>예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rigid — 강체</strong></td>
+<td>부분 사이의 거리와 각도를 유지한 채 위치·방향이 바뀜</td>
+<td>자세·가림에 따라 난도가 달라짐</td>
+<td>자동차가 회전하거나 상자가 기울어짐</td>
+</tr>
+<tr>
+<td><strong>Non-rigid — 비강체</strong></td>
+<td>부분들이 상대적으로 움직여 모양이 바뀜</td>
+<td>형태 변화의 다양성도 학습해야 함</td>
+<td>사람이 팔을 들거나, 강아지가 몸을 굽힘</td>
+</tr>
+</tbody>
+</table>
+<p>객체 검출에서 보면, <strong>자동차는 방향이 달라져 보이는 특징이 바뀌고</strong>, <strong>사람은 팔다리 자세까지 달라져 윤곽이 바뀝니다.</strong> 모델은 이런 변화에도 같은 종류의 물체임을 알아봐야 합니다.</p>
+<p>사람의 관절 움직임은 더 엄밀하게는 **관절형 변형(articulated deformation)**이라고 부릅니다.</p>
+<hr/>
+<p><a id="detection-metrics"></a></p>
+<h2 id="2-중복-제거와-평가">2. 중복 제거와 평가</h2>
+<h3 id="detection-metric-14--iou">Detection metric (1/4) — IoU</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=6" rel="noopener" target="_blank">PDF 6쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Detection metric (1/4) — IoU — 강의 그림" src="../assets/applications/page-006.png"/></p>
+</details>
+<p>IoU는 예측 박스 P와 정답 박스 G가 겹치는 면적을 두 박스의 합집합 면적으로 나눈 값입니다.</p>
+<div class="math">$$
+\operatorname{IoU}(P,G)=\frac{|P\cap G|}{|P\cup G|}
+$$</div>
+<p>완전히 일치하면 1, 겹치지 않으면 0입니다.</p>
+<p>그림의 녹색 정답과 더 잘 겹치는 예측 박스가 높은 값을 얻습니다. <strong>IoU는 위치의 일치도이며 클래스의 정답 여부와는 별개</strong>입니다.</p>
+<p>큰 박스로 물체를 대충 덮으면 교집합뿐 아니라 합집합도 커져 점수가 낮아집니다.</p>
+<p>추론의 점수 임계값, 중복 제거의 IoU 임계값, 정답 평가의 IoU 임계값은 서로 다른 기준입니다. 다음 예제에서 각각 분리합니다.</p>
+<hr/>
+<h3 id="nms--같은-물체의-중복-박스-줄이기">NMS — 같은 물체의 중복 박스 줄이기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=14" rel="noopener" target="_blank">PDF 14쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="NMS — 같은 물체의 중복 박스 줄이기 — 강의 그림" src="../assets/applications/page-014.png"/></p>
+</details>
+<p>많은 후보가 동일 물체를 가리킬 수 있어 최종 결과에 중복이 생깁니다. <strong>NMS의 목적은 중복 억제</strong>이며 이미 수행한 후보별 CNN 계산을 되돌려 절약하지는 않습니다.</p>
+<p>그래서 점수가 가장 높은 박스를 남기고, 그 박스와 IoU가 임계값보다 큰 같은 클래스의 나머지 박스를 제거합니다.</p>
+<p>남은 박스에서 이 과정을 반복하는 것이 기본적인 Greedy NMS입니다.</p>
+<p><strong>NMS</strong>는 실제 정답을 보고 ‘가장 정확한 박스’를 고르는 것이 아니라 <strong>점수와 겹침만으로 선택</strong>합니다.</p>
+<p>가까이 붙은 다른 물체까지 지울 수 있어 임계값이 중요합니다.</p>
+<p>점수 필터링과 NMS는 각각 약한 예측과 중복 예측을 다루는 별도 단계입니다.</p>
+<hr/>
+<h3 id="detection-metric-24--tpfpfn과-중복-예측">Detection metric (2/4) — TP·FP·FN과 중복 예측</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=7" rel="noopener" target="_blank">PDF 7쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Detection metric (2/4) — TP·FP·FN과 중복 예측 — 강의 그림" src="../assets/applications/page-007.png"/></p>
+</details>
+<p>먼저 Confidence 임계값으로 예측을 선택하고, 클래스와 IoU를 기준으로 정답에 연결합니다. <strong>같은 정답 물체에 여러 예측이 겹쳐도 정답과 연결되는 예측은 하나</strong>이며, 나머지는 중복 FP가 됩니다.</p>
+<table>
+<thead>
+<tr>
+<th>결과</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TP</td>
+<td>올바른 클래스이며 IoU 기준을 만족하고 아직 연결되지 않은 정답에 매칭</td>
+</tr>
+<tr>
+<td>FP</td>
+<td>잘못된 클래스·위치, 배경 검출 또는 중복 예측</td>
+</tr>
+<tr>
+<td>FN</td>
+<td>어떤 예측과도 매칭되지 않은 정답</td>
+</tr>
+</tbody>
+</table>
+<p>슬라이드의 점수 0.5와 IoU 0.5는 예시입니다.</p>
+<p>두 임계값은 역할이 다릅니다. 잘못된 클래스의 예측은 FP가 되면서 원래 정답이 FN으로 남을 수도 있습니다.</p>
+<p>배경 영역의 수를 유한하게 세기 어려워 검출에서는 TN을 중심 지표로 사용하지 않습니다.</p>
+<ul>
+<li><strong>Confidence threshold:</strong><ul>
+<li>예측 점수가 기준 이상인 박스를 검출 결과로 남깁니다.</li>
+<li>점수 계산 방식은 모델마다 다르므로, 항상 ‘클래스 확률’이라고 부르기는 어렵습니다.</li>
+</ul>
+</li>
+<li><strong>NMS(Non-Maximum Suppression)의 IoU threshold:</strong><ul>
+<li>남은 박스끼리 비교해 중복 검출을 제거합니다.</li>
+</ul>
+</li>
+<li><strong>평가의 IoU threshold:</strong><ul>
+<li>예측 박스와 정답 박스를 비교해 위치가 맞는지 판정합니다.</li>
+<li>실제 추론에서는 정답 박스를 모르므로 이 기준을 직접 사용할 수 없습니다.</li>
+</ul>
+</li>
+</ul>
+<p>다음처럼 설명하면 더 정확합니다.</p>
+<blockquote>
+<p><strong>추론에서는 Confidence 임계값으로 검출 후보를 선택하고, 필요한 경우 IoU 기반 NMS로 중복을 제거한다. 평가에서는 클래스 일치 여부와 정답 박스에 대한 IoU, 일대일 매칭 여부로 올바른 검출(TP)을 판정한다.</strong></p>
+</blockquote>
+<p>또한 임계값은 점수나 확률분포 자체를 바꾸는 것이 아니라, <strong>어떤 예측을 채택할지 결정하는 기준</strong>입니다.</p>
+<hr/>
+<h3 id="detection-metric-34--precisionrecallf1">Detection metric (3/4) — Precision·Recall·F1</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=8" rel="noopener" target="_blank">PDF 8쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Detection metric (3/4) — Precision·Recall·F1 — 강의 그림" src="../assets/applications/page-008.png"/></p>
+</details>
+<div class="math">$$
+\operatorname{Precision}=\frac{TP}{TP+FP},\qquad
+\operatorname{Recall}=\frac{TP}{TP+FN},\qquad
+F_1=\frac{2PR}{P+R}
+$$</div>
+<ul>
+<li><strong>Precision</strong>은 ‘검출했다고 한 것 중 얼마나 맞는가’,</li>
+<li><strong>Recall</strong>은 ‘실제 물체 중 얼마나 찾았는가’입니다.<ul>
+<li>예: 작은 제조 결함의 누락 비용이 높다면 Recall을 중시하되, 재검사할 오검출 수와 함께 운영점을 정합니다.</li>
+</ul>
+</li>
+</ul>
+<p>정답 10개 중 8개를 찾고 잘못된 박스 2개를 추가하면 TP=8, FP=2, FN=2로 두 값 모두 0.8입니다.</p>
+<p>점수 임계값을 낮추면 약한 예측도 남아 Recall이 높아질 수 있지만 FP도 늘 수 있습니다.</p>
+<p><strong>단일 임계값의 F1과 여러 점수 임계값을 훑는 AP는 다른 평가</strong>입니다.</p>
+<hr/>
+<h3 id="detection-metric-44--apmapcoco-평가">Detection metric (4/4) — AP·mAP·COCO 평가</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=9" rel="noopener" target="_blank">PDF 9쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Detection metric (4/4) — AP·mAP·COCO 평가 — 강의 그림" src="../assets/applications/page-009.png"/></p>
+</details>
+<p>한 클래스의 예측을 점수순으로 정렬하고, 예측을 순차적으로 포함하며 Precision–Recall 곡선을 만듭니다.</p>
+<p>PR 좌표 영역은 가로·세로가 0~1이지만, 실제 곡선 아래 면적이 항상 1인 것은 아닙니다. AP는 정해진 보간·샘플링 규칙으로 Precision–Recall 관계를 요약한 값이며 일반 분류 Accuracy와 다릅니다.</p>
+<p>mAP는 클래스별 AP의 평균입니다. 평가 데이터셋과 IoU·보간 규칙을 함께 적어야 비교할 수 있습니다.</p>
+<table>
+<thead>
+<tr>
+<th>표기</th>
+<th>비교하는 조건</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AP50</td>
+<td>IoU 0.50에서의 AP</td>
+</tr>
+<tr>
+<td>AP75</td>
+<td>IoU 0.75에서의 AP로 더 정밀한 박스 요구</td>
+</tr>
+<tr>
+<td>COCO AP</td>
+<td>IoU 0.50~0.95를 0.05 간격으로 평가해 평균</td>
+</tr>
+<tr>
+<td>AP small·medium·large</td>
+<td>물체 면적별 성능</td>
+</tr>
+</tbody>
+</table>
+<p>같은 ‘mAP’라도 VOC AP50과 COCO AP는 직접 비교할 수 없습니다.</p>
+<p>강의의 면적 구분은 small 약 32² 픽셀 미만, medium 약 32²~96², large 약 96² 초과입니다. 경계값의 포함·제외는 공식 평가기 규칙을 따르며 입력 Resize 후 임의 면적으로 재분류하지 않습니다.</p>
+<p>작은 물체 성능이 낮아도 큰 물체가 많으면 전체 수치에 가려질 수 있으므로 크기별 지표도 확인합니다.</p>
+<hr/>
+<h3 id="교육용-보충-하나의-예시로-iou--nms--ap-계산하기">교육용 보충: 하나의 예시로 IoU → NMS → AP 계산하기</h3>
+<p><strong>조건:</strong> 같은 이미지에 사람 정답 G1=<code>(0,0,10,10)</code>, G2=<code>(20,0,30,10)</code> 두 개가 있습니다. 박스는 <code>(xmin,ymin,xmax,ymax)</code>의 연속 좌표이며 면적은 <code>(xmax-xmin)×(ymax-ymin)</code>입니다. 픽셀 인덱스의 양끝을 포함하는 <code>+1</code> 규칙은 쓰지 않습니다. 넓이 0인 박스는 이 예제에서 제외합니다.</p>
+<table>
+<thead>
+<tr>
+<th>예측</th>
+<th>사람 점수</th>
+<th>좌표</th>
+<th>평가에 필요한 사실</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>0.9</td>
+<td>(0,0,10,10)</td>
+<td>G1과 IoU=1</td>
+</tr>
+<tr>
+<td>B</td>
+<td>0.8</td>
+<td>(1,0,11,10)</td>
+<td>G1 및 A와 IoU=90/110</td>
+</tr>
+<tr>
+<td>C</td>
+<td>0.7</td>
+<td>(20,0,26,10)</td>
+<td>G2와 IoU=60/100</td>
+</tr>
+<tr>
+<td>D</td>
+<td>0.6</td>
+<td>(40,0,50,10)</td>
+<td>모든 정답과 IoU=0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>IoU 중간 계산:</strong> A와 B의 교집합 폭은 <code>min(10,11)-max(0,1)=9</code>, 높이는 10이므로 교집합 90입니다. 합집합은 <code>100+100-90=110</code>, IoU=<code>9/11≈0.818</code>입니다. C는 G2 안에 포함되므로 교집합 60, 합집합 100, IoU=0.6입니다. 단위는 면적의 비율이라 없습니다.</p>
+<p><strong>Greedy NMS:</strong> 점수 0.5 이상을 남기고, 같은 클래스끼리 IoU가 <strong>0.5보다 크면</strong> 제거한다고 정합니다. A를 먼저 채택하고 B를 제거합니다(0.818&gt;0.5). 남은 C와 D는 A 및 서로와 겹치지 않으므로 최종 A,C,D를 남깁니다. 0.9로 NMS 임계값을 높이면 B도 살아남습니다. 낮은 임계값이 더 공격적으로 제거하며, 근접한 실제 사람까지 지울 수 있습니다. 동일 점수의 처리 순서는 구현에 따라 달라질 수 있으므로 재현 실험에서는 tie-break도 고정합니다.</p>
+<p><strong>평가와 AP:</strong> NMS 후 A,C,D를 점수순으로 평가합니다. 같은 클래스이며 <strong>정답 IoU≥0.5</strong>이고 아직 연결되지 않은 정답과만 매칭합니다. 정답은 이미지별로 매칭하고, 일반 데이터셋 AP에서는 해당 클래스의 모든 이미지 예측을 점수순으로 모읍니다. 이 예는 이미지 한 장, ignore/crowd 없는 경우입니다.</p>
+<table>
+<thead>
+<tr>
+<th>포함한 예측</th>
+<th>TP</th>
+<th>FP</th>
+<th>FN</th>
+<th>Precision</th>
+<th>Recall</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1/1=1</td>
+<td>1/2=0.5</td>
+</tr>
+<tr>
+<td>A,C</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>2/2=1</td>
+<td>2/2=1</td>
+</tr>
+<tr>
+<td>A,C,D</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>2/3</td>
+<td>2/2=1</td>
+</tr>
+</tbody>
+</table>
+<p>이후 Recall이 증가하지 않는 D는 거짓 양성이지만 이미 모든 정답을 높은 순위에서 찾았습니다. <strong>연속 Recall 구간의 보간 면적 방식</strong>으로 <code>p_interp(r)=max_{r'≥r}p(r')</code>를 쓰면 AP50=<code>0.5×1+0.5×1=1</code>입니다. 마지막 행의 Precision=2/3과 AP=1은 모순이 아닙니다. AP는 단일 운영점보다 순위 전체를 봅니다.</p>
+<p>NMS를 생략하면 A,B,C,D의 판정은 TP,FP,TP,FP입니다. B는 G1과 잘 겹치지만 이미 A가 정답을 차지해 중복 FP입니다. Recall 0.5까지의 보간 Precision은 1, 그 다음 1까지는 2/3이므로 AP50=<code>0.5×1+0.5×(2/3)=5/6≈0.8333</code>입니다.</p>
+<p>평가 IoU만 0.75로 올리면 C가 탈락하므로 NMS 후 TP,FP,FP이고 최대 Recall은 0.5입니다. 나머지 Recall 구간의 Precision을 0으로 두면 연속 면적 AP75=0.5입니다. <strong>NMS는 그대로여도 평가가 더 엄격해져 결과가 변합니다.</strong></p>
+<p>이 손계산은 COCO 공식 평가 숫자와 동일한 알고리즘이 아닙니다. COCO는 101개 Recall 지점(0,0.01,…,1)을 샘플링하므로 위 NMS 생략 예는 <code>(51×1+50×2/3)/101≈0.8350</code>, AP75 예는 <code>51/101≈0.5050</code>입니다. 공식 COCO AP는 IoU 10개와 클래스 평균뿐 아니라 이미지별 최대 검출 수, 영역 범위, ignore/crowd 처리도 따릅니다. 임의의 높은 점수 컷으로 AP를 계산하면 최대 Recall을 잘라 성능을 바꿀 수 있습니다. 분모가 0인 빈 예측/빈 정답의 집계도 평가기 규칙을 따라야 합니다. <a href="https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py">COCO 공식 평가 구현</a>.</p>
+<p><a id="detection-design"></a></p>
+<h2 id="3-설계-변화의-지도">3. 설계 변화의 지도</h2>
+<h3 id="evolution--특징-설계에서-집합-예측까지">Evolution — 특징 설계에서 집합 예측까지</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=10" rel="noopener" target="_blank">PDF 10쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Evolution — 특징 설계에서 집합 예측까지 — 강의 그림" src="../assets/applications/page-010.png"/></p>
+</details>
+<p>그림의 흐름은 사람이 특징을 설계하던 검출기에서 CNN 특징 학습, 계산 공유, 중심점 예측, Transformer 기반 집합 예측으로 이어집니다.</p>
+<p>이 노트는 <strong>R-CNN의 후보별 계산 → Fast/Faster R-CNN의 계산 공유 → CenterNet의 중심점 → DETR의 Query 집합</strong>을 중심으로 읽습니다.</p>
+<p>연대표는 연구 방향의 개요입니다.</p>
+<p>발표·사전 공개·학회 출판 연도가 섞일 수 있으며, 나중에 나온 방식이 모든 데이터와 실행 환경에서 앞선 방식을 대체한다는 뜻은 아닙니다.</p>
+<hr/>
+<h3 id="one-stage-vs-two-stage--후보-영역을-먼저-만들까">One-stage vs. Two-stage — 후보 영역을 먼저 만들까?</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=11" rel="noopener" target="_blank">PDF 11쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="One-stage vs. Two-stage — 후보 영역을 먼저 만들까? — 강의 그림" src="../assets/applications/page-011.png"/></p>
+</details>
+<p>여기서 Two-stage는 <strong>명시적인 후보 영역 생성과 후보별 정제</strong>를 구분한다는 뜻입니다. 네트워크 층이나 실행 함수가 정확히 두 개라는 뜻은 아닙니다.</p>
+<p>그림은 두 단계의 기능적 차이를 나타냅니다.</p>
+<ul>
+<li>Two-stage는 물체 후보 영역을 만든 뒤 각 후보의 클래스와 박스를 정교하게 예측합니다.</li>
+<li>One-stage는 특징 맵에서 클래스와 위치를 직접 예측합니다.</li>
+</ul>
+<p>전통적으로 One-stage는 속도, Two-stage는 정확도가 강조됐지만 이는 절대 규칙이 아닙니다.</p>
+<p>Backbone·해상도·학습·구현에 따라 결과가 달라집니다. 또한 <strong>One-stage가 반드시 Anchor 기반인 것은 아니며</strong>, 뒤의 CenterNet은 Anchor-free 방식입니다.</p>
+<hr/>
+<h3 id="설계-선택을-같은-기준으로-비교하기">설계 선택을 같은 기준으로 비교하기</h3>
+<table>
+<thead>
+<tr>
+<th>방법</th>
+<th>줄이려는 병목</th>
+<th>핵심 설계</th>
+<th>남는 조건·한계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R-CNN</td>
+<td>수작업 특징의 표현 한계</td>
+<td>후보별 CNN 특징</td>
+<td>겹친 후보에서 CNN 반복</td>
+</tr>
+<tr>
+<td>Fast R-CNN</td>
+<td>후보별 특징 중복 계산</td>
+<td>전체 특징 공유·RoI Pooling</td>
+<td>외부 후보 생성 병목</td>
+</tr>
+<tr>
+<td>Faster R-CNN</td>
+<td>비학습 후보 생성 비용</td>
+<td>공유 특징 위 RPN</td>
+<td>Anchor·후보 수·NMS 설정</td>
+</tr>
+<tr>
+<td>CenterNet</td>
+<td>다수 Anchor 설계와 후보 처리</td>
+<td>중심 Heatmap·Offset·Size</td>
+<td>가까운 중심의 충돌·해상도</td>
+</tr>
+<tr>
+<td>DETR</td>
+<td>후보·Anchor·중복 제거의 복잡성</td>
+<td>Query 집합과 일대일 학습</td>
+<td>학습 비용·작은 물체·슬롯 상한</td>
+</tr>
+</tbody>
+</table>
+<p>속도 요구가 있다면 모델 이름으로 결정하지 말고 같은 입력·장비에서 전처리와 후처리까지 측정합니다. Anchor 유무와 One/Two-stage는 다른 분류축이므로 같은 열의 배타적 선택지로 섞지 않습니다.</p>
+<p><a id="detection-classic"></a></p>
+<h2 id="4-심화-고전-검출의-계산-절약">4. 심화: 고전 검출의 계산 절약</h2>
+<h3 id="violajones--빠르게-비얼굴-영역을-제외하기">Viola–Jones — 빠르게 비얼굴 영역을 제외하기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=12" rel="noopener" target="_blank">PDF 12쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Viola–Jones — 빠르게 비얼굴 영역을 제외하기 — 강의 그림" src="../assets/applications/page-012.png"/></p>
+</details>
+<p>밝고 어두운 직사각형 영역의 차이를 나타내는 Haar-like 특징을 사용하고, Integral image로 영역 합을 빠르게 계산합니다. AdaBoost는 유용한 특징과 약한 분류기를 선택해 강한 분류기를 구성합니다.</p>
+<p>Cascade는 쉬운 단계부터 적용해 <strong>얼굴이 아닌 대부분의 영역을 일찍 탈락</strong>시키고, 남은 후보에 더 많은 계산을 씁니다. CNN 이전 검출기의 대표적 설계이며, 정면 얼굴에서 효과적이지만 큰 자세·조명 변화에는 제약이 있습니다.</p>
+<hr/>
+<p><a id="detection-rcnn"></a></p>
+<h2 id="5-r-cnn-계열-계산-공유와-학습형-후보">5. R-CNN 계열: 계산 공유와 학습형 후보</h2>
+<h3 id="r-cnn--후보마다-cnn을-적용하기">R-CNN — 후보마다 CNN을 적용하기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=13" rel="noopener" target="_blank">PDF 13쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="R-CNN — 후보마다 CNN을 적용하기 — 강의 그림" src="../assets/applications/page-013.png"/></p>
+</details>
+<p>**Selective Search(Object proposal)**로 약 2,000개의 후보 영역을 찾고, 각 영역을 227×227로 변형해 CNN 특징을 추출합니다.</p>
+<p>클래스별 SVM이 물체를 분류하고, 박스 회귀기가 좌표를 보정한 뒤 NMS로 중복을 줄입니다.</p>
+<p>Selective Search는 색·질감·크기 등의 유사성으로 작은 영역을 계층적으로 합치는 후보 생성법입니다.</p>
+<p><strong>서로 크게 겹치는 후보도 CNN을 각각 통과하므로 계산이 반복</strong>되는 점이 R-CNN의 큰 비용입니다.</p>
+<hr/>
+<h3 id="fast-r-cnn--이미지-특징을-한-번만-계산하기">Fast R-CNN — 이미지 특징을 한 번만 계산하기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=15" rel="noopener" target="_blank">PDF 15쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Fast R-CNN — 이미지 특징을 한 번만 계산하기 — 강의 그림" src="../assets/applications/page-015.png"/></p>
+</details>
+<p>기존 R-CNN이 후보 데이터량이 많아 계산이 많아지는 문제점이 있으므로 이를 해결하기 위해</p>
+<ul>
+<li>전체 이미지를 CNN에 한 번 넣어 특징 맵을 만든 뒤, 후보 영역을 이 맵 위로 옮깁니다.</li>
+<li>RoI Pooling이 서로 다른 크기의 후보를 고정 크기 특징으로 바꾸고, 분류와 박스 회귀를 함께 수행합니다.</li>
+</ul>
+<p><strong>후보마다 원본 픽셀에서 CNN을 다시 돌리던 계산을 공유</strong>하는 것이 핵심입니다.</p>
+<p>그러나 후보 생성은 여전히 외부 Selective Search에 의존합니다.</p>
+<p>그림의 실행 시간은 후보 생성 포함 여부에 따라 크게 달라지므로, CNN 부분의 속도만으로 전체 지연을 판단하면 안 됩니다.</p>
+<p>정정: CPU 병목이라는 설명은 주로 외부 Selective Search를 가리킵니다. Fast R-CNN 전체가 CPU 전용이라는 뜻은 아닙니다. 배속은 후보 생성 포함 여부와 실험 설정에 따라 달라집니다.</p>
+<hr/>
+<h3 id="faster-r-cnn--학습하는-후보-생성기-rpn">Faster R-CNN — 학습하는 후보 생성기 RPN</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=16" rel="noopener" target="_blank">PDF 16쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Faster R-CNN — 학습하는 후보 생성기 RPN — 강의 그림" src="../assets/applications/page-016.png"/></p>
+</details>
+<p>Faster R-CNN은 비학습 후보 생성기 Selective Search를 **공유 CNN 특징 위에서 동작하는 Region Proposal Network(RPN)**로 대체합니다. 단순한 CPU→GPU 이식이 아니라 후보 생성까지 학습하고 특징 계산을 공유하는 구조 변화입니다.</p>
+<p>RPN이 물체 가능성과 후보 박스를 예측하고, RoI 기반 검출 Head가 최종 클래스·좌표를 정합니다.</p>
+<p>슬라이드의 ‘Selective Search (i.e., RPN)’은 두 방식이 같다는 뜻으로 읽으면 안 됩니다.</p>
+<p>Selective Search는 기존의 비학습 후보 생성이고, RPN은 이를 대체하는 학습 네트워크입니다. 핵심 이득은 후보 생성과 검출에서 특징을 공유하는 것입니다.</p>
+<hr/>
+<h3 id="rpn-12--objectness와-박스-보정-학습">RPN (1/2) — Objectness와 박스 보정 학습</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=17" rel="noopener" target="_blank">PDF 17쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="RPN (1/2) — Objectness와 박스 보정 학습 — 강의 그림" src="../assets/applications/page-017.png"/></p>
+</details>
+<p>RPN은 Faster R-CNN의 주요 특징입니다.</p>
+<p><strong>각 특징 맵 위치의 Anchor마다 물체/배경 분류와 네 좌표 보정값의 연속값 회귀</strong>를 수행합니다. 예/아니오는 분류에만 해당합니다. </p>
+<p>Anchor가 9개라면 그림의 분류 출력은 2×9, 회귀 출력은 4×9입니다. 이는 최종 물체 종류 9개를 의미하지 않습니다.</p>
+<p>Anchor와 정답의 IoU가 높은 경우 Positive, 낮으면 Negative로 삼고 애매한 경우는 제외합니다.</p>
+<p>슬라이드의 0.7·0.3 기준 외에도 원 방식은 <strong>각 정답과 가장 높은 IoU를 갖는 Anchor를 Positive로 지정</strong>합니다.</p>
+<p>회귀 손실은 Positive Anchor에만 적용합니다.</p>
+<hr/>
+<h3 id="rpn-22--anchor의-크기와-종횡비">RPN (2/2) — Anchor의 크기와 종횡비</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=18" rel="noopener" target="_blank">PDF 18쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="RPN (2/2) — Anchor의 크기와 종횡비 — 강의 그림" src="../assets/applications/page-018.png"/></p>
+</details>
+<p>Anchor boxes 분류</p>
+<p>내가 찾은 box가 객체인지 아닌지 예/아니오 로 분류.</p>
+<ul>
+<li>서로 다른 크기와 가로세로 비율의 기준 박스를 각 격자 위치에 배치합니다.</li>
+<li>3개 크기×3개 비율이면 위치마다 9개입니다.</li>
+<li>물체가 어느 위치·모양에 가까운지 기준을 제공하고, 회귀가 그 기준에서 정답까지의 이동·크기 변화를 학습합니다.</li>
+</ul>
+<p>Anchor 수는 <code>특징 맵 높이×너비×위치당 Anchor 수</code>입니다.</p>
+<p>입력 크기와 특징 맵의 Stride가 달라지면 총수도 달라지므로, 슬라이드의 17,100개는 해당 격자 예시의 값입니다.</p>
+<hr/>
+<h3 id="faster-r-cnn-loss--분류와-위치를-함께-학습하기">Faster R-CNN Loss — 분류와 위치를 함께 학습하기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=19" rel="noopener" target="_blank">PDF 19쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Faster R-CNN Loss — 분류와 위치를 함께 학습하기 — 강의 그림" src="../assets/applications/page-019.png"/></p>
+</details>
+<p>RPN은 Object/Background 분류와 후보 박스 회귀, 최종 검출 Head는 다중 클래스 분류와 최종 박스 회귀를 수행합니다.</p>
+<p>배경 후보에는 물체 좌표를 맞추는 회귀 손실을 적용하지 않습니다.</p>
+<p>그림의 Smooth L1은 작은 오차에서 이차식, 큰 오차에서 일차식으로 동작합니다.</p>
+<p>L2보다 큰 오차의 영향을 완화하면서 작은 오차를 부드럽게 줄입니다.</p>
+<p>전체 손실은 각 항의 정규화와 가중치를 포함하므로 서로 다른 역할의 손실값을 단순 크기만으로 비교하면 안 됩니다.</p>
+<hr/>
+<h3 id="faster-r-cnn-experiments--정성-결과-읽기">Faster R-CNN Experiments — 정성 결과 읽기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=20" rel="noopener" target="_blank">PDF 20쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Faster R-CNN Experiments — 정성 결과 읽기 — 강의 그림" src="../assets/applications/page-020.png"/></p>
+</details>
+<p>여러 장면에서 크기·배경·물체 수가 달라도 박스와 클래스가 생성되는 모습을 보여줍니다.</p>
+<p>작은 대상이나 겹친 물체의 박스가 있는지, 배경을 물체로 잘못 검출하는지, 하나를 여러 번 잡는지를 살펴보면 됩니다.</p>
+<p><strong>이 페이지는 성공·실패 사례를 보는 정성 시각화</strong>이며 AP나 속도 비교표는 아닙니다. 몇 장의 예시만으로 전체 정확도나 특정 크기의 물체 성능을 확정할 수는 없습니다. 슬라이드의 MSSOCO는 MS COCO를 가리킵니다.</p>
+<hr/>
+<h3 id="two-stage-summary--반복-계산을-없앤-두-번의-개선">Two-stage Summary — 반복 계산을 없앤 두 번의 개선</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=21" rel="noopener" target="_blank">PDF 21쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="Two-stage Summary — 반복 계산을 없앤 두 번의 개선 — 강의 그림" src="../assets/applications/page-021.png"/></p>
+</details>
+<table>
+<thead>
+<tr>
+<th>방식</th>
+<th>CNN 계산</th>
+<th>후보 생성</th>
+<th>슬라이드 시간·VOC 2007 mAP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R-CNN</td>
+<td>후보마다 독립 계산</td>
+<td>Selective Search</td>
+<td>50초·66.0</td>
+</tr>
+<tr>
+<td>Fast R-CNN</td>
+<td>전체 이미지의 특징 공유</td>
+<td>Selective Search</td>
+<td>2초·66.9</td>
+</tr>
+<tr>
+<td>Faster R-CNN</td>
+<td>특징 공유</td>
+<td>학습형 RPN</td>
+<td>0.2초·66.9</td>
+</tr>
+</tbody>
+</table>
+<p>그림의 요점은</p>
+<ul>
+<li><strong>Fast에서 후보별 CNN 중복을 줄이고,</strong></li>
+<li><strong>Faster에서 후보 생성 병목을 줄였다</strong>는 것입니다.</li>
+</ul>
+<p>표의 시간은 강의에서 제시한 역사적 설정의 예이며 현대 장비의 보장 속도가 아닙니다. 같은 mAP가 모든 실험 조건에서 유지된다는 의미도 아닙니다.</p>
+<hr/>
+<p><a id="detection-center"></a></p>
+<h2 id="6-centernet-중심점에서-박스로">6. CenterNet: 중심점에서 박스로</h2>
+<h3 id="centernet-overview--물체를-중심점으로-표현하기">CenterNet Overview — 물체를 중심점으로 표현하기</h3>
+<p>(One-stage)</p>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=22" rel="noopener" target="_blank">PDF 22쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="CenterNet Overview — 물체를 중심점으로 표현하기 — 강의 그림" src="../assets/applications/page-022.png"/></p>
+</details>
+<p>여기서 CenterNet은 <strong>Objects as Points</strong>의 방법입니다.</p>
+<p>미리 정한 Anchor를 다수 분류하는 대신 클래스별 중심점 Heatmap, Local offset, 물체 폭·높이를 예측합니다.</p>
+<p>슬라이드의 <strong>Predict 3개는 하나의 박스를 만들기 위한 서로 다른 예측</strong>입니다.</p>
+<ul>
+<li><strong>Center heatmap:</strong> “어떤 클래스의 물체 중심이 어디에 있는가?”</li>
+<li><strong>Local offset:</strong> “거친 출력 격자에서 중심이 얼마나 어긋나 있는가?”</li>
+<li><strong>Object size:</strong> “그 중심에 있는 물체의 박스 폭과 높이는 얼마인가?”</li>
+</ul>
+<p>Heatmap으로 중심 후보와 클래스를 찾은 뒤, <strong>같은 위치의 Offset과 Size를 읽어 최종 박스를 복원</strong>합니다.</p>
+<p>세 값은 공통 특징 맵 위의 서로 다른 Head에서 예측합니다.</p>
+<p>중심을 찾은 뒤 폭·높이로 박스를 복원하므로 Anchor 크기·비율 설계를 줄일 수 있습니다.</p>
+<p>다만 겹친 중심, 작은 물체, 출력 격자의 양자화는 여전히 어려운 문제입니다.</p>
+<p>‘박스를 쓰지 않는다’가 아니라 <strong>박스를 중심점 기반으로 계산한다</strong>는 뜻입니다.</p>
+<hr/>
+<h3 id="centernet-architecture--heatmapoffsetsize">CenterNet Architecture — Heatmap·Offset·Size</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=23" rel="noopener" target="_blank">PDF 23쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="CenterNet Architecture — Heatmap·Offset·Size — 강의 그림" src="../assets/applications/page-023.png"/></p>
+</details>
+<table>
+<thead>
+<tr>
+<th>Head</th>
+<th>예측</th>
+<th>학습 목적</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Keypoint heatmap</td>
+<td>클래스별 중심의 봉우리</td>
+<td>Gaussian 목표를 이용하는 수정 Focal Loss</td>
+</tr>
+<tr>
+<td>Local offset</td>
+<td>격자화로 사라진 소수 좌표</td>
+<td>중심 위치의 L1 보정</td>
+</tr>
+<tr>
+<td>Object size</td>
+<td>중심에서의 폭·높이</td>
+<td>정답 크기의 L1 회귀</td>
+</tr>
+</tbody>
+</table>
+<h4 id="1-center-heatmap--중심-위치와-클래스">1. Center heatmap — 중심 위치와 클래스</h4>
+<ul>
+<li>이미지의 각 출력 격자에서 <strong>클래스별로 물체 중심일 가능성을 나타내는 점수</strong>를 예측합니다.</li>
+<li>입력이 512×512, 출력 Stride가 4, 클래스가 80개이면 Heatmap 크기는 <code>128×128×80</code>입니다.</li>
+<li>물체의 전체 영역을 칠하는 분할 마스크가 아니라 중심 부근에 봉우리가 생기는 지도입니다.</li>
+<li>학습 시 정답 박스의 중심을 출력 격자로 옮겨 Gaussian 모양의 목표를 만듭니다.</li>
+<li>수정 Focal Loss는 중심을 잘 찾게 하면서 중심 주변의 약간 어긋난 위치에 대한 Negative 벌점을 완화합니다.</li>
+<li>추론에서는 국소 최댓값인 봉우리들을 중심 후보로 선택합니다.</li>
+<li>클래스별 점수는 Sigmoid로 계산하므로 <strong>한 위치의 80개 점수 합이 1이 되는 Softmax 분포는 아닙니다.</strong></li>
+<li>봉우리의 채널이 물체 클래스, 값이 검출 점수 역할을 합니다.</li>
+</ul>
+<h4 id="2-local-offset--격자화로-생긴-중심-좌표-오차">2. Local offset — 격자화로 생긴 중심 좌표 오차</h4>
+<ul>
+<li>출력 해상도를 줄이면 실제 중심 좌표를 정수 격자로 표현하면서 소수 부분을 잃습니다.</li>
+<li>예를 들어 입력 중심이 <code>(101, 79)</code>이고 Stride가 4이면 출력 좌표는 <code>(25.25, 19.75)</code>인데, 중심을 배치한 정수 격자는 <code>(25, 19)</code>입니다.</li>
+<li>Offset Head는 이때 잃어버린 **출력 격자 단위의 보정값 <code>(0.25, 0.75)</code>**를 예측합니다.</li>
+<li>출력 크기는 <code>128×128×2</code>이고 두 채널은 x·y 보정입니다.</li>
+<li>원 방식에서는 클래스별로 따로 만들지 않고 공유합니다.</li>
+<li>학습은 정답 중심 위치에서 L1 손실로 수행합니다.</li>
+</ul>
+<div class="math">$$
+c_x=s(u+\delta_x),\qquad c_y=s(v+\delta_y)
+$$</div>
+<ul>
+<li>따라서 <code>4×(25+0.25)=101</code>, <code>4×(19+0.75)=79</code>로 중심을 복원합니다. Offset은 물체의 이동 속도나 박스 폭·높이를 뜻하지 않습니다.</li>
+</ul>
+<h4 id="3-object-size--중심에서-박스-폭높이-예측">3. Object size — 중심에서 박스 폭·높이 예측</h4>
+<ul>
+<li>Size Head는 해당 물체의 <strong>축 정렬 Bounding box의 폭 w와 높이 h</strong>를 예측합니다.</li>
+<li>이 예의 출력 크기도 <code>128×128×2</code>이지만, 두 채널의 의미는 x·y 보정이 아니라 폭·높이입니다.</li>
+<li>기본 방식에서는 크기도 클래스 간에 공유하고, 정답 중심 위치에서 L1 손실로 학습합니다.</li>
+<li>원 논문의 2D 검출에서는 크기를 모델 입력 이미지 좌표계의 픽셀 단위로 회귀합니다.</li>
+<li>원본 이미지를 Resize하거나 Crop했다면 최종 박스를 원본 좌표계로 되돌리는 변환이 추가로 필요합니다.</li>
+</ul>
+<div class="math">$$
+(x_{min},y_{min},x_{max},y_{max})=
+\left(c_x-\frac w2,\ c_y-\frac h2,\ c_x+\frac w2,\ c_y+\frac h2\right)
+$$</div>
+<h4 id="세-예측을-합친-숫자-예시">세 예측을 합친 숫자 예시</h4>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>예측 또는 계산</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heatmap</td>
+<td>자동차 채널의 <code>(u,v)=(25,19)</code>, 점수 0.9</td>
+<td>자동차 중심 후보 선택</td>
+</tr>
+<tr>
+<td>Offset</td>
+<td><code>(δx,δy)=(0.25,0.75)</code></td>
+<td>중심의 소수 위치 보정</td>
+</tr>
+<tr>
+<td>중심 복원</td>
+<td>Stride 4 → <code>(cx,cy)=(101,79)</code></td>
+<td>입력 이미지 좌표로 변환</td>
+</tr>
+<tr>
+<td>Size</td>
+<td><code>(w,h)=(60,40)</code></td>
+<td>박스 폭 60, 높이 40</td>
+</tr>
+<tr>
+<td>최종 박스</td>
+<td><code>(71,59,131,99)</code></td>
+<td>중심에서 좌우·상하로 반 크기만큼 확장</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>이 값들은 계산을 설명하기 위한 예시입니다.</li>
+<li><strong>Heatmap은 중심·클래스, Offset은 중심 정밀도, Size는 박스 범위</strong>를 담당하므로 세 출력의 역할을 구분하면 됩니다.</li>
+</ul>
+<p>출처: <a href="https://arxiv.org/html/1904.07850v2#S3">Objects as Points — §3·4의 Heatmap, Offset, Size 및 박스 복원</a>.</p>
+<hr/>
+<h3 id="centernet-applications-12--pose와-3d-박스">CenterNet Applications (1/2) — Pose와 3D 박스</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=24" rel="noopener" target="_blank">PDF 24쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="CenterNet Applications (1/2) — Pose와 3D 박스 — 강의 그림" src="../assets/applications/page-024.png"/></p>
+</details>
+<p>위쪽은 사람 관절을 예측하는 Pose estimation, 아래쪽은 도로 장면의 3D 박스 예시입니다.</p>
+<ul>
+<li>중심점에서 추가 속성을 예측하는 틀을 관절 위치·깊이·회전 등으로 확장할 수 있음을 보여줍니다.</li>
+<li><strong>2D 중심·크기만으로 3D가 자동으로 복원되는 것은 아닙니다.</strong></li>
+<li>각 과제에 필요한 Head, 정답 주석과 손실이 추가됩니다.</li>
+<li>적용 사례를 공통 표현의 확장으로 읽되 학습 목표까지 같은 것으로 보지 않아야 합니다.</li>
+</ul>
+<hr/>
+<h3 id="centernet-applications-22--cuboid-detection의-범위">CenterNet Applications (2/2) — Cuboid detection의 범위</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=25" rel="noopener" target="_blank">PDF 25쪽</a>. 실제 PDF에는 “Cuboid detection” 제목만 있고 정적 결과 그림·수치·복원식은 없습니다. 따라서 이 페이지에서 3D 복원 알고리즘이나 성능이 입증되었다고 해석하지 않습니다. 교육용 보충: Cuboid는 직육면체 형태의 3차원 박스를 뜻하며, 2D 축 정렬 박스와 달리 깊이·방향 등 추가 정보가 필요합니다. 24쪽의 3D 확장 설명과 함께 읽되 PDF에 없는 구현 세부는 추정하지 않습니다.</p>
+<h3 id="centernet-experiments--정확도와-시간의-교환">CenterNet Experiments — 정확도와 시간의 교환</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=26" rel="noopener" target="_blank">PDF 26쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="CenterNet Experiments — 정확도와 시간의 교환 — 강의 그림" src="../assets/applications/page-026.png"/></p>
+</details>
+<p>그래프는 가로축이 추론 시간(ms), 세로축이 COCO AP이므로 <strong>왼쪽 위일수록 유리</strong>합니다. 같은 CenterNet도 Backbone과 추론 증강에 따라 결과가 달라집니다.</p>
+<table>
+<thead>
+<tr>
+<th>Backbone</th>
+<th>증강 없음 AP / 시간</th>
+<th>Flip AP / 시간</th>
+<th>Multi-scale AP / 시간</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ResNet-18</td>
+<td>28.1 / 7ms</td>
+<td>30.0 / 14ms</td>
+<td>33.2 / 81ms</td>
+</tr>
+<tr>
+<td>ResNet-101</td>
+<td>36.6 / 22ms</td>
+<td>38.3 / 40ms</td>
+<td>39.3 / 259ms</td>
+</tr>
+<tr>
+<td>DLA-34</td>
+<td>37.4 / 19ms</td>
+<td>39.2 / 36ms</td>
+<td>41.7 / 248ms</td>
+</tr>
+<tr>
+<td>Hourglass-104</td>
+<td>40.3 / 71ms</td>
+<td>42.2 / 129ms</td>
+<td>45.1 / 672ms</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>DLA-34는 ResNet-18보다 느리지만 더 정확합니다.</li>
+<li>Hourglass의 Multi-scale은 높은 AP를 얻는 대신 단일 입력보다 훨씬 많은 시간이 듭니다.</li>
+<li><strong>모델 구조와 추론 증강의 효과를 분리</strong>하고, 동일 장비·입력 조건에서 선택해야 합니다.</li>
+</ul>
+<hr/>
+<p><a id="detection-detr"></a></p>
+<h2 id="7-detr-순서-없는-집합-예측">7. DETR: 순서 없는 집합 예측</h2>
+<h3 id="detr--검출을-순서-없는-집합-예측으로-보기">DETR — 검출을 순서 없는 집합 예측으로 보기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=27" rel="noopener" target="_blank">PDF 27쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="DETR — 검출을 순서 없는 집합 예측으로 보기 — 강의 그림" src="../assets/applications/page-027.png"/></p>
+</details>
+<ul>
+<li>DETR은 이미지의 물체들을 순서 없는 집합으로 예측합니다.</li>
+<li>고정 개수의 출력 슬롯이 각각 클래스·박스를 만들고, 물체가 없는 슬롯은 <code>no-object</code>를 예측합니다.</li>
+</ul>
+<p>핵심은 <strong>학습 시 예측과 정답을 일대일로 연결</strong>해 하나의 물체를 여러 슬롯이 중복 설명하지 않게 하는 것입니다.</p>
+<p>기본 DETR은 별도 Anchor 설계나 박스 NMS를 필요로 하지 않습니다. 출력 개수의 상한은 Query 수에 의해 정해집니다.</p>
+<hr/>
+<h3 id="detr-overview--수작업-후처리를-학습-목표로-흡수하기">DETR Overview — 수작업 후처리를 학습 목표로 흡수하기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=28" rel="noopener" target="_blank">PDF 28쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="DETR Overview — 수작업 후처리를 학습 목표로 흡수하기 — 강의 그림" src="../assets/applications/page-028.png"/></p>
+</details>
+<p>기존 검출기는 Anchor 설정, 후보 생성, 중복 제거가 복잡하게 얽혀 있습니다.</p>
+<p>DETR은 CNN 특징과 Transformer Encoder–Decoder, 집합 손실을 연결해 검출을 끝까지 학습합니다.</p>
+<p>Transformer가 전체 특징의 관계를 다루고 Query가 각 물체를 찾습니다.</p>
+<p><strong>End-to-end라는 말은 전처리·점수 선택까지 모두 없다는 뜻은 아니며</strong>, 별도 RPN과 Greedy NMS에 기대던 검출 구성을 단순화했다는 의미입니다.</p>
+<hr/>
+<h3 id="detr-architecture-12--encoderdecoderobject-queries">DETR Architecture (1/2) — Encoder·Decoder·Object queries</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=29" rel="noopener" target="_blank">PDF 29쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="DETR Architecture (1/2) — Encoder·Decoder·Object queries — 강의 그림" src="../assets/applications/page-029.png"/></p>
+</details>
+<ul>
+<li>CNN이 공간 특징을 추출하고, 위치 정보를 더한 특징이 Encoder를 통과합니다.</li>
+<li>Decoder의 학습 가능한 Object query는 이미지 특징에 Cross-Attention하여 슬롯별 출력을 만듭니다.</li>
+<li>공통 Head가 이를 클래스와 정규화 박스 좌표로 바꿉니다.</li>
+</ul>
+<h4 id="decoder에서-미리-정하는-것은-객체가-아니라-query-슬롯-수">Decoder에서 미리 정하는 것은 ‘객체’가 아니라 ‘Query 슬롯 수’</h4>
+<ul>
+<li>DETR은 <strong>고정 개수 N의 학습 가능한 Object query 벡터</strong>를 사용합니다.</li>
+<li>원 DETR의 대표 설정은 N=100이며, 각 Query는 한 물체의 예측을 담당할 수 있는 슬롯입니다.</li>
+<li>‘검출할 객체가 미리 정해져 있다’기보다 <strong>예측을 담을 자리 100개를 미리 준비한다</strong>고 이해하면 됩니다.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>구분</th>
+<th>무엇이 정해지거나 달라질까?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Query 개수 N과 차원 d</td>
+<td>설계할 때 정하는 하이퍼파라미터</td>
+</tr>
+<tr>
+<td>N×d개의 Query embedding 값</td>
+<td>학습 데이터와 손실을 통해 갱신되는 파라미터</td>
+</tr>
+<tr>
+<td>학습 후 추론에 넣는 Query embedding</td>
+<td>이미지마다 새로 학습하지 않고 같은 값을 재사용</td>
+</tr>
+<tr>
+<td>Decoder가 출력하는 물체 표현·클래스·박스</td>
+<td>현재 이미지 특징을 참고하므로 이미지마다 달라짐</td>
+</tr>
+</tbody>
+</table>
+<p>예를 들어</p>
+<ol>
+<li>사람 2명과 자동차 1대가 있는 이미지에서도 100개 슬롯의 예측은 모두 계산합니다.</li>
+<li>학습에서는 그중 3개를 정답 물체에 일대일로 연결하고, 나머지는 <code>no-object</code>를 예측하도록 합니다.</li>
+<li>추론에서는 점수와 <code>no-object</code> 예측 등을 바탕으로 유효한 결과를 선택합니다.</li>
+</ol>
+<p><strong>Query 1은 항상 사람, Query 2는 항상 자동차처럼 클래스를 미리 배정하지 않습니다.</strong></p>
+<p>같은 Query도 입력에 따라 다른 물체나 <code>no-object</code>를 예측할 수 있습니다.</p>
+<p>학습 과정에서 위치·크기에 대한 선호가 생길 수는 있지만, 사람이 지정한 고정 클래스·박스와는 다릅니다.</p>
+<p>검출 가능한 클래스 목록은 분류 Head의 학습 설정으로 정하며 Query 수와 별개입니다.</p>
+<p>Decoder의 <strong>Self-Attention은 슬롯 사이 관계를 조정하고, Cross-Attention은 각 슬롯이 현재 이미지의 정보를 참고</strong>하게 합니다.</p>
+<p>기본 DETR은 이 슬롯들의 출력을 병렬로 계산합니다.</p>
+<p>출처: <a href="https://arxiv.org/html/2005.12872v3#S3.SS2">DETR 원 논문 §3.2 — Transformer Decoder와 Object queries</a>.</p>
+<hr/>
+<h3 id="detr-architecture-22--차원으로-데이터-흐름-확인하기">DETR Architecture (2/2) — 차원으로 데이터 흐름 확인하기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=30" rel="noopener" target="_blank">PDF 30쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="DETR Architecture (2/2) — 차원으로 데이터 흐름 확인하기 — 강의 그림" src="../assets/applications/page-030.png"/></p>
+</details>
+<ol>
+<li>입력이 <code>3×H0×W0</code>이면 CNN은 예를 들어 <code>2048×h×w</code> 특징을 만듭니다.</li>
+<li>1×1 Conv로 채널을 d로 줄이고 공간을 펼쳐 <code>hw×d</code> 토큰을 얻습니다.</li>
+<li>위치 정보는 펼친 뒤에도 원래 위치를 구분하게 합니다.</li>
+<li>N개 Object query의 Decoder 출력은 <code>N×d</code>, 클래스 Head는 <code>N×(C+1)</code>, 박스 Head는 <code>N×4</code>입니다.</li>
+<li>C+1의 추가 클래스는 no-object입니다.</li>
+</ol>
+<p><strong>N은 이미지 패치 수가 아니라 출력 슬롯 수</strong>이며, 이미지 토큰 수 hw와 구분합니다.</p>
+<hr/>
+<h3 id="detr-loss-12--먼저-짝을-정하고-학습하기">DETR Loss (1/2) — 먼저 짝을 정하고 학습하기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=31" rel="noopener" target="_blank">PDF 31쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="DETR Loss (1/2) — 먼저 짝을 정하고 학습하기 — 강의 그림" src="../assets/applications/page-031.png"/></p>
+</details>
+<p>정답 물체와 예측 슬롯의 순서는 일치하지 않습니다.</p>
+<ul>
+<li>매칭<ul>
+<li>그림의 의자 배치 비유처럼, 클래스와 위치가 가장 잘 맞는 일대일 배치를 먼저 찾습니다. 그 뒤 연결된 쌍의 오차를 줄입니다.</li>
+<li>일대일 Matching이 없으면 여러 슬롯이 같은 물체만 예측해도 유리할 수 있습니다.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Hungarian matching은 학습용 정답 할당이고 NMS는 추론 후 중복 박스 제거</strong>이므로 서로 같은 연산이 아닙니다.</p>
+<hr/>
+<h3 id="detr-loss-22--hungarian-matching과-집합-손실">DETR Loss (2/2) — Hungarian matching과 집합 손실</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=32" rel="noopener" target="_blank">PDF 32쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="DETR Loss (2/2) — Hungarian matching과 집합 손실 — 강의 그림" src="../assets/applications/page-032.png"/></p>
+</details>
+<ul>
+<li>Matching 비용은 클래스 적합도와 박스 L1·GIoU 비용을 결합합니다.</li>
+<li>최적 매칭을 고른 뒤 클래스 Cross-Entropy와 박스 회귀 손실을 계산합니다.</li>
+<li>답이 없는 슬롯에는 no-object 분류 목표를 줍니다.</li>
+</ul>
+<h4 id="그림의-①②③--어떤-예측을-어떤-정답에-연결할까">그림의 ①·②·③ — 어떤 예측을 어떤 정답에 연결할까?</h4>
+<p>세 번호는 위쪽 <strong>Matching 비용을 구성하는 항</strong>을 가리킵니다.</p>
+<p>정답 i의 클래스는 <span class="math">\(c_i\)</span>, 박스는 <span class="math">\(b_i\)</span>, 그 정답에 연결할 예측 슬롯은 <span class="math">\(\sigma(i)\)</span>입니다.</p>
+<p>Hungarian algorithm은 각 쌍의 비용을 더했을 때 전체 합이 가장 작은 일대일 연결을 찾습니다.</p>
+<table>
+<thead>
+<tr>
+<th>번호</th>
+<th>수식 항</th>
+<th>비교하는 내용</th>
+<th>비용이 작아지는 조건</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><span class="math">\(-\hat p_{\sigma(i)}(c_i)\)</span></td>
+<td>정답 클래스에 대한 예측 확률</td>
+<td>정답 클래스 확률이 높음</td>
+</tr>
+<tr>
+<td>②</td>
+<td><span class="math">\(\lambda_{iou}\mathcal L_{GIoU}\)</span></td>
+<td>두 박스의 겹침과 공간적 배치</td>
+<td>박스가 잘 겹치고 정답과 가까운 배치</td>
+</tr>
+<tr>
+<td>③</td>
+<td><span class="math">\(\lambda_{L1}\lVert b_i-\hat b_{\sigma(i)}\rVert_1\)</span></td>
+<td>박스 좌표·크기의 직접적인 차이</td>
+<td>중심 위치와 폭·높이의 오차가 작음</td>
+</tr>
+</tbody>
+</table>
+<h4 id="①-클래스-비용--정답-종류를-잘-예측했는가">① 클래스 비용 — 정답 종류를 잘 예측했는가?</h4>
+<ul>
+<li>정답이 사람이라면 각 슬롯의 <strong>사람 클래스 확률</strong>을 읽어 음수를 취합니다.</li>
+<li>예측 A가 0.9, B가 0.2라면 비용은 각각 −0.9와 −0.2입니다.</li>
+<li>최소화할 때 더 작은 −0.9가 유리하므로 A를 사람 정답에 연결하려는 방향으로 작동합니다.</li>
+</ul>
+<p>그림의 지시 함수 <span class="math">\(\mathbf1_{\{c_i\ne\varnothing\}}\)</span>는 <strong>실제 물체가 있는 정답에만 해당 비용을 적용</strong>한다는 표시입니다. <span class="math">\(\varnothing\)</span>는 출력 슬롯 수를 맞추기 위해 채운 <code>no-object</code>입니다.</p>
+<h4 id="②-giou-비용--박스가-공간적으로-잘-맞는가">② GIoU 비용 — 박스가 공간적으로 잘 맞는가?</h4>
+<ul>
+<li>두 박스의 겹침을 평가하되, 겹치지 않는 경우에도 두 박스를 감싸는 영역의 빈 공간을 반영합니다.</li>
+<li>손실을 <span class="math">\(1-GIoU\)</span>로 쓰면 완전히 일치할 때 0이고, 공간적으로 잘 맞지 않을수록 커집니다.</li>
+<li>자세한 계산은 다음 <code>IoU vs. GIoU</code> 항목에서 설명합니다.</li>
+</ul>
+<p>이 항은 <strong>확률분포가 아니라 박스의 기하학적 관계</strong>를 비교합니다. <span class="math">\(\lambda_{iou}\)</span>는 전체 비용에서 이 항의 비중을 정합니다.</p>
+<h4 id="③-l1-비용--중심과-크기가-얼마나-다른가">③ L1 비용 — 중심과 크기가 얼마나 다른가?</h4>
+<p>DETR의 박스를 정규화된 <code>(cx, cy, w, h)</code>로 표현하면, 두 박스의 네 성분 차이에 절댓값을 취해 더합니다.</p>
+<div class="math">$$
+\lVert b-\hat b\rVert_1=
+|c_x-\hat c_x|+|c_y-\hat c_y|+|w-\hat w|+|h-\hat h|
+$$</div>
+<p>예를 들어</p>
+<ul>
+<li>정답이 <code>(0.5, 0.5, 0.4, 0.2)</code>,</li>
+<li>예측이 <code>(0.6, 0.5, 0.3, 0.2)</code>라면</li>
+<li>L1 오차는 <code>0.1+0+0.1+0=0.2</code>입니다.</li>
+<li>여기에 <span class="math">\(\lambda_{L1}\)</span>을 곱합니다.</li>
+<li>GIoU는 영역의 관계를, L1은 좌표·크기의 차이를 직접 보므로 함께 사용합니다.</li>
+</ul>
+<h4 id="matching-비용과-최종-학습-손실의-차이">Matching 비용과 최종 학습 손실의 차이</h4>
+<ul>
+<li>위쪽의 ①은 **연결을 고르기 위한 음의 클래스 확률 <span class="math">\(-p\)</span>**이고,</li>
+<li>아래 Hungarian loss의 분류 항은 **가중치를 학습하기 위한 음의 로그 확률 <span class="math">\(-\log p\)</span>**입니다. 두 수식을 같은 값으로 읽으면 안 됩니다.</li>
+</ul>
+<p>최적 연결 <span class="math">\(\hat\sigma\)</span>를 정한 뒤에는 실제 물체 슬롯에 클래스·박스 손실을, <code>no-object</code> 슬롯에는 분류 손실을 적용합니다.</p>
+<p>즉, <strong>클래스·겹침·좌표를 함께 고려해 짝을 고르고, 고른 짝의 예측 오차를 줄이는 두 단계</strong>입니다.</p>
+<div class="math">$$
+\mathcal L=\mathcal L_{cls}+\lambda_1\mathcal L_{L1}+\lambda_g\mathcal L_{GIoU}
+$$</div>
+<p>박스 항은 실제 물체와 연결된 슬롯에 적용합니다.</p>
+<p>기본 DETR에서는 이 학습 목표가 중복을 억제해 박스 NMS를 생략할 수 있습니다.</p>
+<p>추론에 Hungarian matching으로 정답을 찾는 단계가 있는 것은 아닙니다.</p>
+<hr/>
+<h3 id="iou-vs-giou--겹치지-않는-박스에도-학습-신호-주기">IoU vs. GIoU — 겹치지 않는 박스에도 학습 신호 주기</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=33" rel="noopener" target="_blank">PDF 33쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="IoU vs. GIoU — 겹치지 않는 박스에도 학습 신호 주기 — 강의 그림" src="../assets/applications/page-033.png"/></p>
+</details>
+<ul>
+<li>IoU만 사용하면 두 박스가 겹치지 않을 때 모두 0이 되어 상대적인 거리를 표현하기 어렵습니다.</li>
+<li>GIoU는 두 박스를 모두 감싸는 가장 작은 축 정렬 박스 C의 빈 공간을 벌점으로 반영합니다.</li>
+</ul>
+<div class="math">$$
+GIoU=IoU-\frac{|C\setminus(P\cup G)|}{|C|},\qquad
+\mathcal L_{GIoU}=1-GIoU
+$$</div>
+<p>GIoU는 음수가 될 수 있습니다.</p>
+<ul>
+<li>완전 일치에서는 1이므로 손실은 0입니다.</li>
+<li>비겹침에서 추가 신호를 제공하지만 모든 위치·크기 문제를 단독으로 해결하지는 않아 DETR은 L1과 함께 사용합니다.</li>
+</ul>
+<hr/>
+<h3 id="detr-experiments-12--attention에서-무엇을-참고할까">DETR Experiments (1/2) — Attention에서 무엇을 참고할까?</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=34" rel="noopener" target="_blank">PDF 34쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="DETR Experiments (1/2) — Attention에서 무엇을 참고할까? — 강의 그림" src="../assets/applications/page-034.png"/></p>
+</details>
+<ul>
+<li>Encoder의 기준 위치별 Attention은 같은 개체의 다른 부분을 참고하는 모습을,</li>
+<li>Decoder의 물체별 Attention은 머리·다리·경계 같은 위치를 참고하는 모습을 보여줍니다. <ul>
+<li>그림에서는 객체의 끝부분을 참고하는 패턴이 보이지만, 모든 예측에서 반드시 같은 위치만 사용한다는 규칙은 아닙니다.</li>
+</ul>
+</li>
+</ul>
+<p>이는 전역 관계를 활용해 물체를 구분하는 동작을 살펴보는 <strong>정성 시각화</strong>입니다.</p>
+<p>Attention이 높다고 그 위치가 인과적으로 유일한 판단 근거인 것은 아닙니다. 이 페이지에는 AP 비교표가 없으므로 시각화로 정량 성능을 대신 판단하지 않습니다.</p>
+<hr/>
+<h3 id="detr-experiments-22--panoptic-segmentation으로-확장">DETR Experiments (2/2) — Panoptic segmentation으로 확장</h3>
+<p>자료: <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf#page=35" rel="noopener" target="_blank">PDF 35쪽</a>.</p>
+<details>
+<summary>강의 원문 그림 펼치기</summary>
+<p><img alt="DETR Experiments (2/2) — Panoptic segmentation으로 확장 — 강의 그림" src="../assets/applications/page-035.png"/></p>
+</details>
+<p>물체별 Decoder 표현과 공간 특징을 이용해 마스크를 생성하고, 개체인 Things와 배경 재질 영역인 Stuff를 하나의 장면 분할로 합칩니다.</p>
+<p>아래 그림은 물체 박스만으로는 담기 어려운 도로·벽·동물 윤곽까지 표현합니다.</p>
+<p><strong>검출용 기본 DETR이 추가 학습 없이 픽셀 정답을 예측하는 것은 아닙니다.</strong></p>
+<p>마스크 Head와 분할 학습 목표를 추가한 확장입니다.</p>
+<p>뒤의 Semantic·Instance·Panoptic segmentation 구분과 연결해 이해하면 됩니다.</p>
+<hr/>
+<h3 id="교육용-보충-detr의-일대일-매칭과-giou-손계산">교육용 보충: DETR의 일대일 매칭과 GIoU 손계산</h3>
+<p>정답 g1,g2와 예측 q1,q2,q3 사이의 클래스·박스 합성 비용을 다음처럼 가정합니다. 숫자는 실제 모델 출력이 아닌 설명용 비용입니다.</p>
+<table>
+<thead>
+<tr>
+<th>예측</th>
+<th>g1 비용</th>
+<th>g2 비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>q1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>q2</td>
+<td>2</td>
+<td>100</td>
+</tr>
+<tr>
+<td>q3</td>
+<td>9</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<p>g1부터 가장 싼 q1을 고르면 g2는 q3(9)가 되어 총비용 10입니다. 전체를 함께 최적화하면 g1→q2(2), g2→q1(2)로 총비용 4가 더 작습니다. 이것이 각 정답을 독립적으로 고르지 않고 전체 일대일 배치를 찾는 이유입니다. 남은 q3는 no-object 분류를 학습하며 정답 박스 회귀는 받지 않습니다. 매칭 선택 자체를 미분하는 것이 아니라 선택된 쌍에 대한 손실로 모델 파라미터를 갱신합니다.</p>
+<p>GIoU도 손으로 확인할 수 있습니다. A=(0,0,2,2), B=(3,0,5,2)이면 각각 면적 4, 교집합 0, 합집합 8입니다. 둘을 감싸는 C=(0,0,5,2)의 면적은 10이므로 GIoU=<code>0-(10-8)/10=-0.2</code>, 손실=<code>1-(-0.2)=1.2</code>입니다. 두 박스를 떨어뜨린 정도가 달라도 IoU는 0이지만 GIoU는 감싸는 박스의 빈 공간을 반영합니다.</p>
+<p><strong>조건과 한계:</strong> 원 DETR은 많은 학습 epoch가 필요하고 작은 물체 처리에 제약이 있습니다. Query 수가 출력 상한이며, 표준 학습의 일대일 할당은 정답 수보다 충분한 Query가 있다는 조건을 전제합니다. Anchor-free라는 사실만으로 CenterNet과 DETR의 학습 목표가 같아지지는 않습니다. 전자는 위치별 중심점을 학습하고 후자는 출력 슬롯을 정답 집합에 할당합니다. <a href="https://arxiv.org/html/2005.12872v3">원 DETR 논문 §3–4</a>.</p>
+<p><a id="detection-check"></a></p>
+<h2 id="8-스스로-확인하기-계산에서-설계-선택까지">8. 스스로 확인하기: 계산에서 설계 선택까지</h2>
+<p>먼저 해설을 접은 채 답하세요. 다음 질문은 학습 목표를 확인하기 위한 것이며 실제 학습자의 이해도 실험을 수행했다는 뜻은 아닙니다.</p>
+<ol>
+<li>예제 B의 점수 0.8과 A와의 IoU 0.818은 각각 무엇을 뜻하는가? 추론 때 정답 IoU를 사용할 수 있는가?</li>
+<li>NMS 임계값을 0.5에서 0.9로 바꾸면 B는 어떻게 되는가? 평가 IoU만 0.75로 바꾸면 C는 어떻게 되는가?</li>
+<li>NMS 뒤 마지막 Precision이 2/3인데 AP50이 1인 이유는 무엇인가? NMS를 생략했을 때 연속 보간 AP를 계산하라.</li>
+<li>Fast R-CNN에 남은 병목을 Faster R-CNN은 어떻게 바꾸는가? “CPU 코드를 GPU로 옮겼다”만으로 충분한 설명인가?</li>
+<li>CenterNet에서 Stride=4, 격자=(10,5), Offset=(0.5,0.25), Size=(12,8)일 때 입력 좌표계의 박스를 구하라.</li>
+<li>DETR Query가 100개이고 실제 물체가 3개라면 학습 때 나머지 97개는 어떤 목표를 받는가? Query 1을 사람 전용으로 지정하는가?</li>
+<li>같은 장비에서 CenterNet ResNet-18의 7ms와 다중 스케일 81ms 중 지연 20ms 이내 조건을 만족하는 쪽은? 그 표만으로 실제 서비스 지연을 보장할 수 있는가?</li>
+</ol>
+<details>
+<summary>해설과 복귀 위치</summary>
+<ol>
+<li>점수는 모델이 계산한 후보 신뢰도이고 IoU는 두 영역의 기하학적 겹침입니다. 점수가 실제 정답 확률과 같다고 보장되지 않습니다. 추론에서는 정답이 없으므로 정답과의 IoU를 사용할 수 없습니다. <a href="#detection-metrics">2절</a>의 세 임계값을 복습하세요.</li>
+<li>0.818은 0.9보다 작으므로 B가 남습니다. 평가에서는 A가 G1을 차지해 B는 중복 FP가 됩니다. C의 정답 IoU는 0.6이므로 평가 임계값 0.75에서는 FP이고 G2가 FN입니다. <a href="#detection-metrics">2절</a>.</li>
+<li>낮은 점수의 D를 추가하기 전에 Recall=1, Precision=1에 도달했기 때문입니다. NMS 없이는 TP,FP,TP,FP 순서이고 보간 면적은 <code>0.5+0.5×2/3=5/6</code>입니다. 공식 COCO의 101점 평균과 연속 면적을 구분하세요. <a href="#detection-metrics">2절</a>.</li>
+<li>Fast는 후보별 CNN을 전체 이미지 특징 공유로 바꾸지만 Selective Search가 남습니다. Faster는 후보 생성 자체를 RPN으로 학습하고 검출기와 특징을 공유합니다. 하드웨어 변경만으로는 구조·학습 목표의 변화를 설명하지 못합니다. <a href="#detection-rcnn">5절</a>.</li>
+<li>중심은 <code>(4×10.5,4×5.25)=(42,21)</code>이고 반 크기는 <code>(6,4)</code>입니다. 따라서 박스는 <code>(36,17,48,25)</code>입니다. Size는 이 설명에서 이미 입력 픽셀 단위이므로 Stride를 다시 곱하지 않습니다. Resize 전 원본 좌표는 별도 역변환이 필요합니다. <a href="#detection-center">6절</a>.</li>
+<li>연결되지 않은 97개는 no-object 분류 목표를 받습니다. 100은 클래스 수가 아니라 예측 슬롯 수이며 클래스와 박스는 현재 이미지에 따라 달라집니다. <a href="#detection-detr">7절</a>.</li>
+<li>표의 순수 추론값으로는 7ms만 만족합니다. 실제 서비스에는 전처리·전송·후처리·배치·장비 조건도 있어 같은 시간 보장은 불가합니다. <a href="#detection-center">6절</a>의 실험 조건을 복습하세요.</li>
+</ol>
+</details>
+<p>이제 검출 결과를 시간에 걸쳐 연결하면 <a href="04_03_%EA%B0%9D%EC%B2%B4_%EC%B6%94%EC%A0%81.html">객체 추적</a>, 박스 내부의 정확한 픽셀 영역을 추가하면 <a href="04_04_%EC%98%81%EC%83%81_%EB%B6%84%ED%95%A0.html">영상 분할</a>로 이어집니다. 같은 박스가 잘 나와도 ID 유지나 경계 품질이 자동으로 해결되지는 않습니다.</p>
+<h2 id="9-원문과-보충-근거">9. 원문과 보충 근거</h2>
+<p>강의의 정의·그림·역사적 실험 수치는 <a href="../../%EA%B5%90%EC%95%88/04_00_Applications.pdf" rel="noopener" target="_blank">Applications PDF</a>의 3–35쪽을 기준으로 했습니다. 그림 해설은 기존 노트를 대조·정정했고 위 수치 예제·질문은 교육용으로 작성했습니다. 실행용 모델 코드는 포함하지 않았고 모델 학습·추론은 실행하지 않았습니다.</p>
+<ul>
+<li><a href="https://arxiv.org/abs/1311.2524">R-CNN 원 논문</a>, <a href="https://arxiv.org/abs/1504.08083">Fast R-CNN 원 논문</a>: 후보별 특징과 공유 특징의 차이.</li>
+<li><a href="https://arxiv.org/abs/1506.01497">Faster R-CNN 원 논문</a>: Selective Search와 RPN의 구분, 특징 공유에 대한 정정 근거.</li>
+<li><a href="https://arxiv.org/html/1904.07850v2">Objects as Points</a>: CenterNet의 중심·Offset·Size 좌표 의미 확인.</li>
+<li><a href="https://arxiv.org/html/2005.12872v3">DETR 원 논문</a>: Query, 집합 매칭, no-object, 박스 손실과 원 모델의 한계 확인.</li>
+<li><a href="https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py">COCO 공식 평가기</a>: 101 Recall 샘플·IoU별 평가와 예외 조건 확인(2026-11-09 열람). 이 장의 손계산은 별도 단순화 예제입니다.</li>
+</ul>
+<nav class="page-turn" aria-label="앞뒤 학습 문서"><a href="04_01_Application_note.html">← Vision Applications 학습 안내</a><a href="04_03_객체_추적.html">객체 추적 →</a></nav><p class="source-note">기준 본문은 기존 Markdown입니다. 수식·도표는 온라인 렌더러를 사용하며, 원문과 도표 원문으로도 확인할 수 있습니다.</p></main></div>
+<script>if(window.self!==window.top||matchMedia('(max-width:800px)').matches)document.querySelector('.document-toc details').open=false;</script>
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';mermaid.initialize({startOnLoad:true,securityLevel:'strict',theme:'neutral'});</script>
+</body></html>

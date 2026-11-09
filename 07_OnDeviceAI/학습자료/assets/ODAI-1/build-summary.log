@@ -1,0 +1,186 @@
+{
+  "chapters": [
+    {
+      "chapter": 1,
+      "file": "ODAI-1_01_AI연산과성능.md",
+      "chars": 20133,
+      "pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "missing_pages": [],
+      "missing_figures": [],
+      "tables": 10
+    },
+    {
+      "chapter": 2,
+      "file": "ODAI-1_02_실행환경.md",
+      "chars": 13172,
+      "pages": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "missing_pages": [],
+      "missing_figures": [],
+      "tables": 9
+    },
+    {
+      "chapter": 3,
+      "file": "ODAI-1_03_양자화기초.md",
+      "chars": 15710,
+      "pages": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "missing_pages": [],
+      "missing_figures": [],
+      "tables": 11
+    },
+    {
+      "chapter": 4,
+      "file": "ODAI-1_04_PTQ와비균일양자화.md",
+      "chars": 18587,
+      "pages": [
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54
+      ],
+      "missing_pages": [],
+      "missing_figures": [],
+      "tables": 6
+    },
+    {
+      "chapter": 5,
+      "file": "ODAI-1_05_QAT와정수추론.md",
+      "chars": 8406,
+      "pages": [
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+      ],
+      "missing_pages": [],
+      "missing_figures": [],
+      "tables": 4
+    },
+    {
+      "chapter": 6,
+      "file": "ODAI-1_06_LLM양자화.md",
+      "chars": 19189,
+      "pages": [
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ],
+      "missing_pages": [],
+      "missing_figures": [],
+      "tables": 8
+    }
+  ],
+  "total_pdf_pages": 80,
+  "crop_files": 80,
+  "figure_files": 80,
+  "canvas": [
+    {
+      "file": "deployment-components-tree.canvas",
+      "nodes": 8,
+      "edges": 6
+    },
+    {
+      "file": "inference-flow.canvas",
+      "nodes": 6,
+      "edges": 5
+    },
+    {
+      "file": "learning-flow.canvas",
+      "nodes": 6,
+      "edges": 5
+    },
+    {
+      "file": "llm-methods-tree.canvas",
+      "nodes": 9,
+      "edges": 7
+    },
+    {
+      "file": "ptq-error-control-tree.canvas",
+      "nodes": 8,
+      "edges": 6
+    },
+    {
+      "file": "quantization-flow.canvas",
+      "nodes": 7,
+      "edges": 6
+    },
+    {
+      "file": "quantization-taxonomy.canvas",
+      "nodes": 11,
+      "edges": 8
+    }
+  ],
+  "local_links_checked": 475,
+  "issues": []
+}

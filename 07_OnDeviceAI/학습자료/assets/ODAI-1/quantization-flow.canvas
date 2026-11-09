@@ -1,0 +1,124 @@
+{
+  "nodes": [
+    {
+      "id": "p1",
+      "type": "text",
+      "x": 30,
+      "y": 120,
+      "width": 310,
+      "height": 160,
+      "text": "PTQ: 사전학습 모델\n\n대표 calibration 데이터\n\n목표 비트·범위 선택",
+      "color": "4"
+    },
+    {
+      "id": "p2",
+      "type": "text",
+      "x": 400,
+      "y": 120,
+      "width": 310,
+      "height": 160,
+      "text": "오프라인 보정\n\nclipping / scale 탐색\n\nrounding·가중치 보정",
+      "color": "4"
+    },
+    {
+      "id": "p3",
+      "type": "text",
+      "x": 770,
+      "y": 120,
+      "width": 310,
+      "height": 160,
+      "text": "양자화·변환\n\n대상 backend 연산 변환\n\npacking·커널 연결",
+      "color": "4"
+    },
+    {
+      "id": "q1",
+      "type": "text",
+      "x": 30,
+      "y": 430,
+      "width": 310,
+      "height": 160,
+      "text": "QAT: 사전학습 모델\n\n학습·검증 데이터\n\nfake quantization 삽입",
+      "color": "4"
+    },
+    {
+      "id": "q2",
+      "type": "text",
+      "x": 400,
+      "y": 430,
+      "width": 310,
+      "height": 160,
+      "text": "학습 / fine-tuning\n\nforward: 양자화 모사\n\nbackward: STE 근사",
+      "color": "4"
+    },
+    {
+      "id": "q3",
+      "type": "text",
+      "x": 770,
+      "y": 430,
+      "width": 310,
+      "height": 160,
+      "text": "내보내기·변환\n\n학습된 범위 반영\n\n정수 커널·fallback 확인",
+      "color": "4"
+    },
+    {
+      "id": "v",
+      "type": "text",
+      "x": 1170,
+      "y": 270,
+      "width": 340,
+      "height": 180,
+      "text": "공통: 실제 장치 평가\n\n품질·TTFT·토큰 지연\n\npeak RAM·전력·발열\n\n미달 시 설정 재선택",
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "fromNode": "p1",
+      "fromSide": "right",
+      "toNode": "p2",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e1",
+      "fromNode": "p2",
+      "fromSide": "right",
+      "toNode": "p3",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e2",
+      "fromNode": "q1",
+      "fromSide": "right",
+      "toNode": "q2",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e3",
+      "fromNode": "q2",
+      "fromSide": "right",
+      "toNode": "q3",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e4",
+      "fromNode": "p3",
+      "fromSide": "right",
+      "toNode": "v",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e5",
+      "fromNode": "q3",
+      "fromSide": "right",
+      "toNode": "v",
+      "toSide": "bottom",
+      "toEnd": "arrow"
+    }
+  ]
+}

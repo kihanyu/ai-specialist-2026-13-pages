@@ -2,10 +2,10 @@
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>수 표현과 선형 양자화의 원리 | On-device AI 교안</title><link rel="stylesheet" href="textbook.css">
 <script>if(window.self!==window.top)document.documentElement.classList.add('embedded');window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$']] },options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-</head><body><a class="skip" href="#content">본문으로 건너뛰기</a><div class="document-shell"><aside class="document-toc"><details open><summary>이 문서의 목차</summary><nav aria-label="문서 내부 목차"><a class="level-2" href="#한눈에-보는-linear--nonlinear-양자화-가지치기-지도">한눈에 보는 Linear / Nonlinear 양자화 가지치기 지도</a><a class="level-2" href="#31-학습-목표와-선수-개념">3.1 학습 목표와 선수 개념</a><a class="level-2" href="#32-양자화는-무엇을-줄이는가--p2425">3.2 양자화는 무엇을 줄이는가 — p.24–25</a><a class="level-2" href="#33-수-표현-범위와-정밀도를-분리해-이해하기--p26">3.3 수 표현: 범위와 정밀도를 분리해 이해하기 — p.26</a><a class="level-2" href="#34-microscaling과-fp4--p2728">3.4 Microscaling과 FP4 — p.27–28</a><a class="level-3" href="#341-mxfp4-작은-원소와-공유-scale">3.4.1 MXFP4: 작은 원소와 공유 scale</a><a class="level-3" href="#342-nvfp4-더-작은-블록과-두-단계-scale">3.4.2 NVFP4: 더 작은 블록과 두 단계 scale</a><a class="level-2" href="#35-양자화-설계-선택-지도--p29">3.5 양자화 설계 선택 지도 — p.29</a><a class="level-2" href="#36-균일비균일-양자화--p30">3.6 균일·비균일 양자화 — p.30</a><a class="level-2" href="#37-scalezero-pointclipping과-복원--p3134">3.7 Scale·zero point·clipping과 복원 — p.31–34</a><a class="level-3" href="#371-먼저-완전한-양자화-식을-정의하기">3.7.1 먼저 완전한 양자화 식을 정의하기</a><a class="level-3" href="#372-정수-패턴과-실수를-혼동하지-않기">3.7.2 정수 패턴과 실수를 혼동하지 않기</a><a class="level-3" href="#373-비대칭-범위에서-파라미터-구하기">3.7.3 비대칭 범위에서 파라미터 구하기</a><a class="level-3" href="#374-비대칭-예제와-원본의-반올림-주의">3.7.4 비대칭 예제와 원본의 반올림 주의</a><a class="level-2" href="#38-양자화된-행렬곱과-대칭비대칭--p3537">3.8 양자화된 행렬곱과 대칭·비대칭 — p.35–37</a><a class="level-3" href="#381-정수-곱셈을-해도-누적은-넓은-비트가-필요하다">3.8.1 정수 곱셈을 해도 누적은 넓은 비트가 필요하다</a><a class="level-3" href="#382-대칭과-비대칭의-선택">3.8.2 대칭과 비대칭의 선택</a><a class="level-2" href="#39-qdq와-fusion-비트-수가-속도를-보장하지-않는-이유--p38">3.9 Q/DQ와 fusion: 비트 수가 속도를 보장하지 않는 이유 — p.38</a><a class="level-2" href="#310-장-요약과-흔한-오해">3.10 장 요약과 흔한 오해</a><a class="level-2" href="#311-복습-질문과-해설">3.11 복습 질문과 해설</a><a class="level-2" href="#312-집필-자체-점검">3.12 집필 자체 점검</a></nav></details></aside><main class="document-main" id="content"><nav class="document-nav" aria-label="상위 이동"><a href="../../../index.html" target="_top">전체 과정</a><a href="index.html#ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html" target="_top">On-device AI 강의 목차</a><a href="../../ODAI-1/ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.md" target="_blank" rel="noopener">Markdown 원문</a></nav><h1 id="3장-수-표현과-선형-양자화의-원리">3장. 수 표현과 선형 양자화의 원리</h1>
+</head><body><a class="skip" href="#content">본문으로 건너뛰기</a><div class="document-shell"><aside class="document-toc"><details open><summary>이 문서의 목차</summary><nav aria-label="문서 내부 목차"><a class="level-2" href="#한눈에-보는-linear--nonlinear-양자화-가지치기-지도">한눈에 보는 Linear / Nonlinear 양자화 가지치기 지도</a><a class="level-2" href="#31-학습-목표와-선수-개념">3.1 학습 목표와 선수 개념</a><a class="level-2" href="#32-양자화는-무엇을-줄이는가--p2425">3.2 양자화는 무엇을 줄이는가 — p.24–25</a><a class="level-2" href="#33-수-표현-범위와-정밀도를-분리해-이해하기--p26">3.3 수 표현: 범위와 정밀도를 분리해 이해하기 — p.26</a><a class="level-2" href="#34-microscaling과-fp4--p2728">3.4 Microscaling과 FP4 — p.27–28</a><a class="level-3" href="#341-mxfp4-작은-원소와-공유-scale">3.4.1 MXFP4: 작은 원소와 공유 scale</a><a class="level-3" href="#342-nvfp4-더-작은-블록과-두-단계-scale">3.4.2 NVFP4: 더 작은 블록과 두 단계 scale</a><a class="level-2" href="#35-양자화-설계-선택-지도--p29">3.5 양자화 설계 선택 지도 — p.29</a><a class="level-2" href="#36-균일비균일-양자화--p30">3.6 균일·비균일 양자화 — p.30</a><a class="level-2" href="#37-scalezero-pointclipping과-복원--p3134">3.7 Scale·zero point·clipping과 복원 — p.31–34</a><a class="level-3" href="#371-먼저-완전한-양자화-식을-정의하기">3.7.1 먼저 완전한 양자화 식을 정의하기</a><a class="level-3" href="#372-정수-패턴과-실수를-혼동하지-않기">3.7.2 정수 패턴과 실수를 혼동하지 않기</a><a class="level-3" href="#373-비대칭-범위에서-파라미터-구하기">3.7.3 비대칭 범위에서 파라미터 구하기</a><a class="level-3" href="#374-비대칭-예제와-원본의-반올림-주의">3.7.4 비대칭 예제와 원본의 반올림 주의</a><a class="level-2" href="#38-양자화된-행렬곱과-대칭비대칭--p3537">3.8 양자화된 행렬곱과 대칭·비대칭 — p.35–37</a><a class="level-3" href="#381-정수-곱셈을-해도-누적은-넓은-비트가-필요하다">3.8.1 정수 곱셈을 해도 누적은 넓은 비트가 필요하다</a><a class="level-3" href="#382-대칭과-비대칭의-선택">3.8.2 대칭과 비대칭의 선택</a><a class="level-2" href="#39-qdq와-fusion-비트-수가-속도를-보장하지-않는-이유--p38">3.9 Q/DQ와 fusion: 비트 수가 속도를 보장하지 않는 이유 — p.38</a><a class="level-2" href="#310-장-요약과-흔한-오해">3.10 장 요약과 흔한 오해</a><a class="level-2" href="#311-복습-질문과-해설">3.11 복습 질문과 해설</a><a class="level-2" href="#312-집필-자체-점검">3.12 집필 자체 점검</a></nav></details></aside><main class="document-main" id="content"><nav class="document-nav" aria-label="상위 이동"><a href="../../../index.html" target="_top">전체 과정</a><a href="index.html#ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html" target="_top">On-device AI 강의 목차</a><a href="../ODAI-1/ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.md" target="_blank" rel="noopener">Markdown 원문</a></nav><h1 id="3장-수-표현과-선형-양자화의-원리">3장. 수 표현과 선형 양자화의 원리</h1>
 <h2 id="한눈에-보는-linear--nonlinear-양자화-가지치기-지도">한눈에 보는 Linear / Nonlinear 양자화 가지치기 지도</h2>
-<p><img alt="Linear와 Nonlinear 양자화 기법의 가지치기 분류도" src="../../assets/ODAI-1/quantization-taxonomy.png"/></p>
-<p><a href="../../assets/ODAI-1/quantization-taxonomy.canvas" rel="noopener" target="_blank">편집 가능한 Canvas 열기</a> · <a href="../../assets/ODAI-1/quantization-taxonomy.svg" rel="noopener" target="_blank">확대용 SVG</a></p>
+<p><img alt="Linear와 Nonlinear 양자화 기법의 가지치기 분류도" src="../assets/ODAI-1/quantization-taxonomy.png"/></p>
+<p><a href="../assets/ODAI-1/quantization-taxonomy.canvas" rel="noopener" target="_blank">편집 가능한 Canvas 열기</a> · <a href="../assets/ODAI-1/quantization-taxonomy.svg" rel="noopener" target="_blank">확대용 SVG</a></p>
 <p><strong>분류 기준:</strong> 이 그림의 Linear는 공유 scale 안에서 대표값 간격이 일정한 <strong>uniform/affine 양자화</strong>, Nonlinear는 대표값 간격이 달라지는 <strong>non-uniform 양자화</strong>를 뜻한다. 신경망의 비선형 활성함수 분류와는 다르다. 아래 지도는 강의에서 다룬 대표 기법을 정리한 것이며 모든 양자화 방법을 망라한 목록은 아니다.</p>
 <table>
 <thead>
@@ -57,18 +57,18 @@
 <p>이 장을 마치면 비트 수를 줄일 때 무엇이 손실되는지 설명하고, scale과 zero point를 직접 계산해 양자화·복원할 수 있어야 한다. 또한 “4비트 모델”의 파일 크기와 실제 정수 연산의 속도가 서로 다른 문제임을 구별할 수 있어야 한다.</p>
 <p>선수 개념은 1장의 <strong>가중치(weight: 학습으로 정해지는 모델 계수)</strong>, <strong>활성값(activation: 입력에 따라 달라지는 중간 계산값)</strong>, <strong>메모리 대역폭</strong>, 2장의 **실행 커널(kernel: 장치에서 특정 연산을 수행하는 구현)**이다. 행렬곱은 여러 곱셈 결과를 더하는 내적의 모음으로 이해하면 된다.</p>
 <h2 id="32-양자화는-무엇을-줄이는가--p2425">3.2 양자화는 무엇을 줄이는가 — p.24–25</h2>
-<p><img alt="p.24 양자화 장 도입" src="../../assets/ODAI-1/p024-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p024-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.24 양자화 장 도입" src="../assets/ODAI-1/p024-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p024-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>p.24 읽는 포인트:</strong> 이 페이지는 장 구분 페이지다. 아래 압축 지도에서 같은 모델 구조를 두고 숫자 표현을 바꾸는 양자화의 위치를 확인한다. 연결 자체를 제거하는 pruning과 구분한다.</p>
-<p><img alt="p.25 양자화 수준과 분포" src="../../assets/ODAI-1/p025-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p025-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.25 양자화 수준과 분포" src="../assets/ODAI-1/p025-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p025-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>강의 해설:</strong> Quantization(양자화)은 연속적이거나 매우 촘촘한 실수 표현을 <strong>더 적은 수의 대표값</strong>으로 대응시키는 과정이다. b비트는 최대 <code>2^b</code>개의 비트 패턴을 구별할 수 있다. INT8은 256개, 4비트는 16개 패턴이다. 부동소수점 형식은 특수값·중복된 0 등으로 인해 모든 패턴이 서로 다른 유한 실수를 뜻하지는 않는다.</p>
 <p>그림에서 원래 분포의 값들이 몇 개의 수직선으로 모이는 모습을 본다. 값이 많고 대표값이 적을수록 여러 실수가 같은 값으로 표현된다. 따라서 보통 <strong>저장량과 메모리 전송량을 줄이는 대신 복원 오차</strong>가 생긴다. 적절한 커널과 장치가 있으면 저정밀 연산의 처리량도 높일 수 있다.</p>
 <p><strong>교육용 보충:</strong> 가중치가 N개이고 각각 b비트라면 순수 가중치 payload는 <code>N×b/8</code>바이트다. 예를 들어 10억 개의 FP16 가중치는 2 GB, INT4 payload는 0.5 GB다(여기서 GB는 <code>10^9</code>바이트). 실제 파일에는 scale, zero point, codebook, 텐서 정렬·헤더 등이 붙는다. 실행 중에는 KV cache와 작업 버퍼도 추가된다.</p>
 <p><strong>정정·주의:</strong> 원문의 <code>FP32 → FP16 → INT8 → INT4 → INT2 → Binary</code>는 비트 축소 방향을 보여주는 예다. 모든 모델을 이 순서대로 변환해야 하거나, 각 단계가 같은 비용·정확도를 갖는다는 뜻은 아니다. FP16은 부동소수점이고 INT8은 보통 scale을 따로 갖는 정수 표현이다.</p>
 <h2 id="33-수-표현-범위와-정밀도를-분리해-이해하기--p26">3.3 수 표현: 범위와 정밀도를 분리해 이해하기 — p.26</h2>
-<p><img alt="p.26 수치 형식 비교" src="../../assets/ODAI-1/p026-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p026-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.26 수치 형식 비교" src="../assets/ODAI-1/p026-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p026-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>p.26 읽는 포인트:</strong> 왼쪽의 지수부·가수부 비트 수와 오른쪽의 표현 간격을 함께 본다. 비트 수가 같아도 작은 값과 큰 값을 얼마나 넓게 표현하는지, 특정 크기 주변을 얼마나 촘촘히 표현하는지는 다르다.</p>
 <table>
 <thead>
@@ -150,14 +150,14 @@
 <p><strong>교육용 보충:</strong> 부동소수점은 크기가 커질수록 인접 표현값의 절대 간격이 커진다. 선형 정수 양자화는 하나의 scale을 공유하는 구간에서 실수 간격이 일정하다. 따라서 FP8·FP4를 “작은 INT8·INT4”로 읽으면 안 된다.</p>
 <h2 id="34-microscaling과-fp4--p2728">3.4 Microscaling과 FP4 — p.27–28</h2>
 <h3 id="341-mxfp4-작은-원소와-공유-scale">3.4.1 MXFP4: 작은 원소와 공유 scale</h3>
-<p><img alt="p.27 Microscaling" src="../../assets/ODAI-1/p027-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p027-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.27 Microscaling" src="../assets/ODAI-1/p027-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p027-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>강의 해설:</strong> Microscaling(MX)은 작은 블록의 여러 원소가 하나의 scale을 공유하도록 하는 표현 방식이다. **Block(블록)**은 같은 scale로 해석할 원소 묶음이다. MXFP4는 32개 원소마다 8비트 E8M0 scale을 공유하고, 각 원소는 E2M1 FP4로 저장한다. E2M1은 지수 2비트·가수 1비트에 부호 1비트를 더한 4비트 형식이다.</p>
 <p><strong>p.27 읽는 포인트:</strong> 표의 양의 대표값은 <code>0, 0.5, 1, 1.5, 2, 3, 4, 6</code>이다. 부호를 붙이면 음수도 표현한다. 모든 간격이 같지 않다. 블록 scale을 곱하면 이 작은 수 집합이 블록의 실제 크기에 맞춰진다.</p>
 <p><strong>정정·주의:</strong> 원문의 <code>2^K</code>는 K를 실제 지수로 해석할 때의 개념식이다. 저장된 E8M0 코드가 k라면 유한 scale은 <code>2^(k−127)</code>이다. 127의 **exponent bias(지수 편향)**를 빼야 한다. FP4에서도 지수 비트가 0인 경우는 일반 정규수 식을 그대로 쓰지 않고 <strong>subnormal(비정규수)</strong> 규칙을 사용하므로 0과 0.5가 표현된다. <a href="https://www.opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf" rel="noopener" target="_blank">OCP MX 공식 규격</a></p>
 <h3 id="342-nvfp4-더-작은-블록과-두-단계-scale">3.4.2 NVFP4: 더 작은 블록과 두 단계 scale</h3>
-<p><img alt="p.28 NVFP4와 MXFP4 비교" src="../../assets/ODAI-1/p028-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p028-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.28 NVFP4와 MXFP4 비교" src="../assets/ODAI-1/p028-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p028-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>p.28 읽는 포인트:</strong> 원소의 E2M1 형식이 같아도 scale 형식과 블록 크기가 다르다. NVFP4는 블록당 16개 원소에 FP8 E4M3 scale을 붙이고, 텐서 전체 FP32 scale을 추가한다. 복원은 <code>원소 FP4값 × 블록 scale × 전체 scale</code>로 이해한다. <a href="https://docs.nvidia.com/deeplearning/transformer-engine/features/low_precision_training/nvfp4/nvfp4.html" rel="noopener" target="_blank">NVIDIA NVFP4 공식 설명</a></p>
 <table>
 <thead>
@@ -208,8 +208,8 @@
 <p><strong>교육용 보충 — 검산:</strong> N=1,024개라면 MXFP4는 <code>1,024×4 + 32×8 = 4,352비트 = 544바이트</code>다. NVFP4는 <code>1,024×4 + 64×8 + 32 = 4,640비트 = 580바이트</code>, 즉 원소당 4.53125비트다. 블록이 꽉 차며 추가 padding·헤더가 없다는 가정이다.</p>
 <p><strong>정정·주의:</strong> NVFP4를 MXFP4의 단순한 상위 버전으로만 이해하기보다 서로 다른 scale 설계로 구분한다. 더 작은 블록·세밀한 scale은 오차를 줄이는 데 도움이 될 수 있지만 metadata가 늘고, 장치 지원에 따라 성능이 달라진다. 특정 장치에서의 실제 지원은 배포 시점에 확인해야 한다.</p>
 <h2 id="35-양자화-설계-선택-지도--p29">3.5 양자화 설계 선택 지도 — p.29</h2>
-<p><img alt="p.29 LLM 양자화 설계 선택 지도" src="../../assets/ODAI-1/p029-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p029-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.29 LLM 양자화 설계 선택 지도" src="../assets/ODAI-1/p029-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p029-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p>이 페이지는 이미지로 된 종합 지도다. 글을 한 줄씩 외우기보다 <strong>서로 독립적인 선택축</strong>을 구별한다. 예를 들어 “4비트”는 비트 수만 정할 뿐, 어떤 텐서를 양자화하는지와 scale을 공유하는 범위를 정하지 않는다.</p>
 <table>
 <thead>
@@ -269,10 +269,10 @@
 </table>
 <p><strong>교육용 보충:</strong> <code>W4A16</code>은 가중치(weight) 4비트, 활성값(activation) 16비트라는 표기다. codebook/VQ는 대표값을 정하는 표현 방식이며, 그 자체가 scale 공유 범위인 granularity를 뜻하지 않는다. group-wise codebook처럼 두 축을 조합할 수 있다.</p>
 <p>이 지도의 실무 흐름은 <strong>배포 상황·병목 확인 → 대상 텐서 결정 → 장치가 지원하는 형식과 granularity 선택 → 오차 복구 → 실제 커널로 검증</strong>이다. 통합 문서의 Canvas에서 이 흐름을 다시 확인한다. 원문의 decode·prefill 병목 표시는 대표적인 경향이며 batch와 문맥 길이에 따라 달라진다.</p>
-<p>관련 절차는 <a href="../../assets/ODAI-1/quantization-flow.canvas" rel="noopener" target="_blank">양자화 흐름 Canvas</a>와 <a href="../../assets/ODAI-1/quantization-flow.svg" rel="noopener" target="_blank">미리보기</a>에서도 확인할 수 있다.</p>
+<p>관련 절차는 <a href="../assets/ODAI-1/quantization-flow.canvas" rel="noopener" target="_blank">양자화 흐름 Canvas</a>와 <a href="../assets/ODAI-1/quantization-flow.svg" rel="noopener" target="_blank">미리보기</a>에서도 확인할 수 있다.</p>
 <h2 id="36-균일비균일-양자화--p30">3.6 균일·비균일 양자화 — p.30</h2>
-<p><img alt="p.30 균일·비균일 양자화" src="../../assets/ODAI-1/p030-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p030-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.30 균일·비균일 양자화" src="../assets/ODAI-1/p030-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p030-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>p.30 읽는 포인트:</strong> 아래 분포에서 대표값을 일정 간격으로 둘 때와 값이 많이 몰린 곳에 촘촘하게 둘 때를 비교한다. 오른쪽 log 그림은 크기가 커질수록 간격이 커지는 예다.</p>
 <table>
 <thead>
@@ -314,8 +314,8 @@
 <p><strong>정정·주의:</strong> 슬라이드의 VGG-16 정확도 손실 수치는 인용 연구의 설정에서 나온 비교다. 모든 4비트 선형 양자화가 같은 정확도 손실을 낸다는 규칙으로 쓰지 않는다. 비균일 방식도 모델 분포와 커널이 맞아야 유리하다.</p>
 <h2 id="37-scalezero-pointclipping과-복원--p3134">3.7 Scale·zero point·clipping과 복원 — p.31–34</h2>
 <h3 id="371-먼저-완전한-양자화-식을-정의하기">3.7.1 먼저 완전한 양자화 식을 정의하기</h3>
-<p><img alt="p.31 선형 양자화와 수치 예제" src="../../assets/ODAI-1/p031-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p031-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.31 선형 양자화와 수치 예제" src="../assets/ODAI-1/p031-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p031-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p>원본의 핵심을 clipping까지 포함해 쓰면 다음과 같다.</p>
 <div class="math">$$
 q=\operatorname{clip}\left(\operatorname{round}(r/S)+Z,\ q_{\min},q_{\max}\right),\qquad
@@ -366,12 +366,12 @@ $$</div>
 <p>**Quantization error(양자화 오차)**를 <code>e=r̃−r</code>로 정의한다. clipping이 없고 nearest rounding이면 보통 절댓값 오차는 <code>S/2</code> 이하다. 범위를 넘어 잘린 값에는 이 보장이 없다. 역양자화는 원래 정보를 되찾는 역함수가 아니라 저장된 코드를 근사 실수로 해석하는 과정이다.</p>
 <p><strong>p.31 검산:</strong> <code>max|r|=3.2</code>, 대칭 INT8 범위 −127~127, <code>Z=0</code>이면 <code>S=3.2/127≈0.02519685</code>다. <code>r=0.1</code>은 <code>q=round(3.96875)=4</code>, <code>r̃≈0.10078740</code>, <code>e≈0.00078740</code>이다. 원본의 0.1008·0.0008은 이를 반올림한 수치다.</p>
 <h3 id="372-정수-패턴과-실수를-혼동하지-않기">3.7.2 정수 패턴과 실수를 혼동하지 않기</h3>
-<p><img alt="p.32 정수 코드와 실수 해석" src="../../assets/ODAI-1/p032-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p032-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.32 정수 코드와 실수 해석" src="../assets/ODAI-1/p032-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p032-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>p.32 읽는 포인트:</strong> 같은 이진 코드가 곧 원래 실수는 아니다. 정수 행렬에서 zero point를 빼고 scale을 곱하는 두 단계를 추적한다. scale과 zero point가 다르면 같은 정수 q도 서로 다른 실수로 복원된다.</p>
 <h3 id="373-비대칭-범위에서-파라미터-구하기">3.7.3 비대칭 범위에서 파라미터 구하기</h3>
-<p><img alt="p.33 scale과 zero point 유도" src="../../assets/ODAI-1/p033-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p033-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.33 scale과 zero point 유도" src="../assets/ODAI-1/p033-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p033-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p>실수 범위의 최솟값 r_min, 최댓값 r_max를 정수 범위에 대응시키는 기본 식은 다음과 같다.</p>
 <div class="math">$$
 S=\frac{r_{\max}-r_{\min}}{q_{\max}-q_{\min}},\qquad
@@ -379,8 +379,8 @@ Z=\operatorname{clip}\left(\operatorname{round}\left(q_{\min}-\frac{r_{\min}}S\r
 $$</div>
 <p><strong>p.33 읽는 포인트:</strong> 양 끝점을 빼서 zero point를 소거하면 scale 식이 나온다. 이후 한쪽 끝점 식을 사용해 Z를 구한다. Z를 정수로 반올림하기 때문에 두 실수 끝점이 모두 정확히 표현되지는 않을 수 있다. 일반적인 구현에서는 범위에 0을 포함시키며, r_min=r_max인 상수 텐서는 S가 0이 되지 않도록 별도 처리한다.</p>
 <h3 id="374-비대칭-예제와-원본의-반올림-주의">3.7.4 비대칭 예제와 원본의 반올림 주의</h3>
-<p><img alt="p.34 비대칭 INT8 수치 예제" src="../../assets/ODAI-1/p034-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p034-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.34 비대칭 INT8 수치 예제" src="../assets/ODAI-1/p034-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p034-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>강의 해설:</strong> <code>r_min=−7.59</code>, <code>r_max=10.8</code>, signed INT8 코드 범위 <code>−128~127</code>, 입력 <code>r=5.47</code>의 예다. 작은 중간값을 너무 일찍 반올림하면 최종 결과가 달라질 수 있으므로 두 계산을 구분한다.</p>
 <table>
 <thead>
@@ -421,8 +421,8 @@ $$</div>
 <p><strong>정정·주의:</strong> 5.472는 슬라이드에서 표시한 근사 scale 0.072를 그대로 사용했을 때의 값이다. 정확한 비율 S를 쓴 계산의 결과라고 소개하면 안 된다. 양자화 구현은 표시용 소수 자릿수보다 높은 정밀도의 scale을 저장할 수 있다.</p>
 <h2 id="38-양자화된-행렬곱과-대칭비대칭--p3537">3.8 양자화된 행렬곱과 대칭·비대칭 — p.35–37</h2>
 <h3 id="381-정수-곱셈을-해도-누적은-넓은-비트가-필요하다">3.8.1 정수 곱셈을 해도 누적은 넓은 비트가 필요하다</h3>
-<p><img alt="p.35 선형 양자화 행렬곱" src="../../assets/ODAI-1/p035-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p035-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.35 선형 양자화 행렬곱" src="../assets/ODAI-1/p035-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p035-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>교육용 보충 — 차원을 명시한 식:</strong> 이 절은 열 방향 입력 표기 <code>Y=WX</code>를 사용한다. <code>W∈R^(m×k)</code>는 가중치, <code>X∈R^(k×n)</code>는 n개 입력, <code>Y∈R^(m×n)</code>는 출력이다. 각 텐서가 하나의 scale과 zero point를 공유한다고 가정한다. i는 출력 행, j는 입력 열, t는 내적의 합산 축이다.</p>
 <div class="math">$$
 q_{Y,ij}=\operatorname{clip}\left(\operatorname{round}\left[
@@ -441,8 +441,8 @@ $$</div>
 <p><strong>정정·주의:</strong> 슬라이드의 축약된 <code>+Z_W Z_X</code> 항을 내적 전체에 적용하면 합산 길이 k가 필요하다. 가중치 쪽 합과 일부 보정은 미리 구할 수 있지만, 입력이 달라지면 입력 의존 항은 달라진다. 고정소수점 multiplier와 shift로 재양자화 배율을 근사할 수 있다. 이 배율이 항상 0~1이라는 수학적 보장은 없으므로 커널의 실제 지원 범위를 확인해야 한다.</p>
 <p><strong>검산 예제:</strong> <code>q_W=[2,4]</code>, <code>q_X=[3,1]</code>, <code>Z_W=Z_X=0</code>, <code>S_W=0.5</code>, <code>S_X=0.25</code>이면 정수 내적은 10이고 실수 출력은 <code>10×0.5×0.25=1.25</code>다. <code>S_Y=0.125</code>, <code>Z_Y=0</code>이면 출력 코드는 10이다. 원래 실수 벡터 <code>[1,2]</code>와 <code>[0.75,0.25]</code>의 내적도 1.25다.</p>
 <h3 id="382-대칭과-비대칭의-선택">3.8.2 대칭과 비대칭의 선택</h3>
-<p><img alt="p.36 대칭·비대칭 비교" src="../../assets/ODAI-1/p036-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p036-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.36 대칭·비대칭 비교" src="../assets/ODAI-1/p036-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p036-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>p.36 읽는 포인트:</strong> 비대칭은 실수 범위를 정수 범위에 밀어 넣고, 대칭은 0을 중심으로 양쪽을 배치한다. 양수로 치우친 분포에서는 대칭 표현의 음수 쪽 코드가 덜 쓰일 수 있다.</p>
 <table>
 <thead>
@@ -481,12 +481,12 @@ $$</div>
 </tbody>
 </table>
 <p><strong>교육용 보충:</strong> signed INT8의 실제 코드 범위는 −128~127로 한쪽에 코드가 하나 더 있다. 대칭 구현은 −127~127을 써서 −128을 쓰지 않기도 한다. INT4도 −8~7 중 −7~7을 쓸 수 있다. “대칭”이라는 이름만 보고 코드 범위·반올림 정책을 추정하지 말고 확인한다.</p>
-<p><img alt="p.37 대칭 양자화 수치 예제" src="../../assets/ODAI-1/p037-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p037-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.37 대칭 양자화 수치 예제" src="../assets/ODAI-1/p037-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p037-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>p.37 검산:</strong> 앞 예의 <code>max|r|=10.8</code>을 사용하면 <code>S=10.8/127≈0.08503937</code>, <code>q=round(5.47/S)=64</code>, <code>r̃≈5.44251969</code>이고 오차는 약 −0.02748031이다. 원본의 5.44는 scale을 0.085로 먼저 근사한 값이다. 앞의 단일 값에서 비대칭이 오차가 작았다고 해서 전체 분포·모든 입력에서도 항상 우수한 것은 아니다.</p>
 <h2 id="39-qdq와-fusion-비트-수가-속도를-보장하지-않는-이유--p38">3.9 Q/DQ와 fusion: 비트 수가 속도를 보장하지 않는 이유 — p.38</h2>
-<p><img alt="p.38 양자화·역양자화 오버헤드" src="../../assets/ODAI-1/p038-figure.png"/></p>
-<p><a href="../../assets/ODAI-1/p038-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
+<p><img alt="p.38 양자화·역양자화 오버헤드" src="../assets/ODAI-1/p038-figure.png"/></p>
+<p><a href="../assets/ODAI-1/p038-crop.png" rel="noopener" target="_blank">원본 전체 내용 Crop</a></p>
 <p><strong>강의 해설:</strong> Q는 실수를 정수 코드로 바꾸는 quantize, DQ는 정수 코드를 계산 가능한 실수로 해석하는 dequantize다. 모든 연산이 저정밀 커널로 실행되지 않으면, FP16 영역과 정수 영역 사이에서 변환·메모리 쓰기·다시 읽기가 반복될 수 있다.</p>
 <p><strong>p.38 읽는 포인트:</strong> LayerNorm·Softmax 같은 연산이 FP16에 남아 있는 예에서 어느 지점에 Q/DQ가 들어가는지 본다. 아래 <strong>fusion(연산 융합)</strong> 그림은 여러 단계를 한 커널 안에서 처리해 중간 텐서 저장과 실행 호출을 줄이는 방법이다.</p>
 <table>
