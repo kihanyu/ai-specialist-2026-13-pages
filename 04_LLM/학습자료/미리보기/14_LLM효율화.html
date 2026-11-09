@@ -1,0 +1,257 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>14. LLM 효율화 — 무엇을 다시 계산하고 무엇을 저장할까</title><link rel="stylesheet" href="toc.css"><style>body{font:17px/1.8 "Malgun Gothic",sans-serif;color:#17283b;background:#f3f6fa;margin:0}main{max-width:1000px;margin:auto;background:white;padding:36px}h1,h2,h3{line-height:1.4}h2{margin-top:2.4em;border-bottom:2px solid #dce6f1}a{color:#165eaa}img,svg{max-width:100%;height:auto}table{border-collapse:collapse;display:block;overflow:auto;font-size:15px}td,th{padding:10px;border:1px solid #bccbdc;vertical-align:top}th{background:#eaf1fa}pre{overflow:auto;background:#eef2f7;padding:18px}code{font-family:Consolas,monospace}details{padding:14px;background:#f1f6fc;margin:16px 0}blockquote{border-left:4px solid #739bd1;padding-left:16px}@media(max-width:600px){main{padding:16px}body{font-size:16px}}p,li,a{overflow-wrap:anywhere}figure{margin:20px 0}figcaption{font-size:14px;color:#40566b}</style><body><aside class="toc-sidebar"><nav aria-label="이 문서의 목차"><p class="toc-label">이 문서의 목차</p><ul><li class="toc-title"><a href="#14-llm-효율화-무엇을-다시-계산하고-무엇을-저장할까">14. LLM 효율화 — 무엇을 다시 계산하고 무엇을 저장할까</a></li><li class="toc-section"><a href="#1-kv-cache-과거-토큰의-k와-v는-다시-만들지-않는다">1. KV cache: 과거 토큰의 K와 V는 다시 만들지 않는다</a></li><li class="toc-subsection"><a href="#작은-메모리-계산">작은 메모리 계산</a></li><li class="toc-section"><a href="#2-gqa-query는-여러-개-저장할-kv는-그룹별로">2. GQA: query는 여러 개, 저장할 K·V는 그룹별로</a></li><li class="toc-section"><a href="#3-mla-kv의-공통-저차원-표현을-저장한다">3. MLA: K·V의 공통 저차원 표현을 저장한다</a></li><li class="toc-section"><a href="#4-문맥을-제한하거나-상태로-압축하는-방법">4. 문맥을 제한하거나 상태로 압축하는 방법</a></li><li class="toc-subsection"><a href="#sliding-window-attention">Sliding window attention</a></li><li class="toc-subsection"><a href="#gated-deltanet-토큰-목록-대신-갱신되는-기억-상태">Gated DeltaNet: 토큰 목록 대신 갱신되는 기억 상태</a></li><li class="toc-section"><a href="#5-flashattention-결과의-수학은-유지하고-데이터-이동-줄이기">5. FlashAttention: 결과의 수학은 유지하고 데이터 이동 줄이기</a></li><li class="toc-subsection"><a href="#online-softmax를-직접-따라가기">Online softmax를 직접 따라가기</a></li><li class="toc-section"><a href="#6-레이어-설계와-multi-token-prediction">6. 레이어 설계와 multi-token prediction</a></li><li class="toc-section"><a href="#7-turboquant-저장-비트-수와-내적-오차를-함께-관리">7. TurboQuant: 저장 비트 수와 내적 오차를 함께 관리</a></li><li class="toc-section"><a href="#8-같은-축에서-비교하고-조합하기">8. 같은 축에서 비교하고 조합하기</a></li><li class="toc-section"><a href="#9-스스로-확인하기">9. 스스로 확인하기</a></li></ul></nav></aside><main><nav><a href="00_학습안내.html">학습 안내</a> · <a href="../14_LLM효율화.md">Markdown 원문</a></nav><h1 id="14-llm-효율화-무엇을-다시-계산하고-무엇을-저장할까">14. LLM 효율화 — 무엇을 다시 계산하고 무엇을 저장할까</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">이전: 추론 모델</a> · <a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=240">원문 PDF 240~280쪽</a></p>
+<p>LLM의 속도는 연산 횟수뿐 아니라 <strong>저장한 데이터를 GPU 안팎에서 옮기는 비용</strong>에 좌우된다. 이 장은 같은 모델을 더 효율적으로 실행하는 방법과, 저장·계산 구조 자체를 바꾸는 방법을 나누어 설명한다. 효율화 기법의 이름을 외우기보다 ‘어떤 중복이나 병목을 줄였는가’를 답할 수 있어야 한다.</p>
+<p>선행 지식은 Q·K·V, causal mask, head, GPT의 <code>[B,T,C]</code> 흐름이다. 막히면 <a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a>에서 Attention과 GPT 입출력으로 돌아간다. 처음에는 1~3절과 5절, 복습은 마지막 선택 표와 문제를 사용한다. 4·6절은 구조 변형, 7절은 양자화 보충이다. 교안의 제품·모델 사례는 해당 시점의 사례이며 현재 지원 기능 목록을 제공하는 문서는 아니다.</p>
+<table>
+<thead>
+<tr>
+<th>배울 수 있는 일</th>
+<th>확인할 결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KV cache가 줄이는 계산과 늘리는 저장을 구별</td>
+<td>캐시 바이트 직접 계산</td>
+</tr>
+<tr>
+<td>GQA·MLA·window·FlashAttention의 축을 구별</td>
+<td>서로 결합 가능한 방법 설명</td>
+</tr>
+<tr>
+<td>online softmax의 누적 상태를 추적</td>
+<td>두 토큰의 중간값 검산</td>
+</tr>
+<tr>
+<td>recurrent state와 full attention 차이 설명</td>
+<td>길이 증가 시 저장 대상 예측</td>
+</tr>
+<tr>
+<td>양자화의 이득과 오차를 구별</td>
+<td>메타데이터 포함 메모리와 오차 조건 설명</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-kv-cache-과거-토큰의-k와-v는-다시-만들지-않는다">1. KV cache: 과거 토큰의 K와 V는 다시 만들지 않는다</h2>
+<p><strong>Prefill</strong>은 입력 prompt의 토큰을 한꺼번에 처리하는 단계다. <strong>Decode</strong>는 이전 출력까지 문맥에 넣고 다음 토큰을 한 개씩 생성하는 단계다. causal 모델에서는 미래에 새 토큰을 붙여도 과거 위치가 볼 수 있는 문맥은 변하지 않는다. 따라서 각 층의 과거 K·V를 저장해 다음 decode에서 재사용할 수 있다.</p>
+<p>캐시가 없으면 <code>A B</code>로 다음 토큰 C를 만들고, 다시 <code>A B C</code>를 모델에 넣으며 A·B의 표현도 계산한다. 캐시가 있으면 A·B의 K·V를 보존하고 C의 Q·K·V를 새로 만든다. C의 Q는 저장된 A·B와 새 C의 K 전체에 점수를 내고 V를 합친다. <strong>과거를 읽는 attention까지 사라지는 것은 아니다.</strong> 통상 Q는 과거 토큰의 값을 이후 query로 재사용할 필요가 없어 K·V처럼 모두 보존하지 않는다.</p>
+<p>아래 그림을 왼쪽에서 오른쪽으로 읽으며 새로 만드는 값과 계속 보존하는 값을 구별한다.</p>
+<p><img src="../assets/14_kv.svg" alt="prefill에서 A B의 K V를 저장하고 decode에서 C의 Q K V만 새로 만들되 A B C의 K V 전체를 조회하는 흐름" /></p>
+<p><a href="../assets/14_kv.png">SVG가 표시되지 않으면 PNG로 보기</a></p>
+<p>캐시의 장점은 반복되는 과거 계산을 줄인다는 것이다. 대신 생성 길이에 따라 캐시가 커지고, 매 decode마다 이를 읽는 메모리 대역폭이 병목이 될 수 있다. prompt·모델 가중치·위치 처리 등 조건이 달라지면 기존 캐시를 무조건 재사용할 수 없다.</p>
+<h3 id="작은-메모리-계산">작은 메모리 계산</h3>
+<p>동일 길이 배치를 가정하고 <code>B=배치 수</code>, <code>L=층 수</code>, <code>T=저장 토큰 수</code>, <code>Hkv=KV head 수</code>, <code>dh=head 폭</code>, <code>s=원소당 바이트</code>라 하자.</p>
+<p><code>KV bytes = 2 × B × L × T × Hkv × dh × s</code></p>
+<p>2는 K와 V 두 개를 뜻한다. 예제는 <code>B=1,L=2,T=4,Hkv=4,dh=8,s=2</code>이다.</p>
+<pre><code class="language-text">한 토큰·한 층: 2×4×8 = 64개 원소
+4토큰·2층: 64×4×2 = 512개 원소
+2바이트 저장: 512×2 = 1,024 bytes
+T=8로 두 배면 2,048 bytes
+</code></pre>
+<p>가중치·활성값·임시 버퍼·페이지 관리 메타데이터를 제외한 <strong>교육용 KV 데이터만의 계산</strong>이다. 실제 전체 GPU 메모리를 뜻하지 않는다. <code>MiB=2^20 bytes</code>, <code>MB=10^6 bytes</code>도 구별한다.</p>
+<h2 id="2-gqa-query는-여러-개-저장할-kv는-그룹별로">2. GQA: query는 여러 개, 저장할 K·V는 그룹별로</h2>
+<p>MHA는 query head마다 대응 K·V head를 둔다. **Grouped-query attention(GQA)**는 여러 query head가 하나의 K·V head를 공유한다. query head 수 Hq는 유지하면서 Hkv를 줄이는 구조다. Hkv=1인 끝점은 MQA라고 부른다. 단순 캐시 삭제 설정이 아니라 모델의 투영·학습 구조와 연결되므로 임의의 MHA 모델에서 K·V head를 버리면 같은 결과가 보장되지 않는다. <a href="https://arxiv.org/abs/2305.13245">GQA 원 논문</a></p>
+<table>
+<thead>
+<tr>
+<th>같은 Hq=4일 때</th>
+<th>Hkv</th>
+<th>query와 KV 연결</th>
+<th>위 예제의 캐시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MHA</td>
+<td>4</td>
+<td>Q0→KV0, Q1→KV1, Q2→KV2, Q3→KV3</td>
+<td>1,024 bytes</td>
+</tr>
+<tr>
+<td>GQA</td>
+<td>2</td>
+<td>Q0·Q1→KV0, Q2·Q3→KV1</td>
+<td>512 bytes</td>
+</tr>
+<tr>
+<td>MQA</td>
+<td>1</td>
+<td>모든 Q→KV0</td>
+<td>256 bytes</td>
+</tr>
+</tbody>
+</table>
+<p>위 비율은 B·L·T·dh·dtype가 같다는 조건의 저장량이다. 품질이나 생성 속도가 정확히 같은 비율로 바뀐다는 뜻은 아니다. 그룹이 줄면 공유가 강해져 저장은 줄지만 표현 및 학습 조건을 평가해야 한다.</p>
+<h2 id="3-mla-kv의-공통-저차원-표현을-저장한다">3. MLA: K·V의 공통 저차원 표현을 저장한다</h2>
+<p>**Multi-head latent attention(MLA)**은 K·V를 만드는 데 필요한 작은 공유 latent, 즉 압축된 중간 표현을 캐시에 둔다. 여러 query가 K·V를 공유하는 GQA와는 압축 방식이 다르다. 여기서는 원문 247~248쪽처럼 위치 성분을 생략한 선형 부분부터 설명한다.</p>
+<p>행벡터 배치 X의 모양을 <code>[T,C]</code>, 공유 latent Z를 <code>[T,r]</code>라 하자. <code>Z=X Wdown</code>, <code>K=Z UK</code>, <code>V=Z UV</code>이다. UK는 <code>[r,dk]</code>, UV는 <code>[r,dv]</code>이다. 작은 r은 저장을 줄이지만 정보 병목이 될 수 있다.</p>
+<pre><code class="language-text">점수: Q Kᵀ = Q (Z UK)ᵀ = (Q UKᵀ) Zᵀ
+출력: A V = A (Z UV) = (A Z) UV
+</code></pre>
+<p>Q가 <code>[1,dk]</code>이면 <code>Q UKᵀ</code>는 <code>[1,r]</code>, Zᵀ는 <code>[r,T]</code>이므로 점수는 <code>[1,T]</code>이다. 전체 K를 복원하지 않고 작은 latent 공간에서 점수를 구할 수 있다. V도 먼저 latent 가중합을 만든 다음 UV를 적용할 수 있다. 출력 투영과 UV를 결합하는 것도 선형 연산의 결합법칙을 활용한다.</p>
+<p>교육용 숫자로 <code>Z=[[1,2],[3,4]]</code>, <code>UK=[[1],[2]]</code>, <code>Q=[[2]]</code>라 하자. 직접 K는 <code>[[5],[11]]</code>, 점수는 <code>[10,22]</code>다. 재배열하면 <code>Q UKᵀ=[2,4]</code>, <code>[2,4] Zᵀ=[10,22]</code>로 같다. 이는 <strong>선형 부분이 같은 계산임</strong>을 보일 뿐, 실제 모든 연산 비용이 항상 줄어든다는 증명은 아니다.</p>
+<blockquote>
+<p><strong>원문 조건 보충:</strong> 실제 DeepSeek MLA에는 RoPE를 위한 분리된 위치 key 성분도 있어 ‘latent만 저장한다’는 도식은 전체 캐시를 단순화했다. latent 폭에 추가 위치 성분 등을 포함해 비교해야 한다. 원문 249쪽의 ‘4 MB/500 KB/70 KB’, ‘57배’, ‘6배’는 비교 모델 구성·층수·정밀도·측정 조건이 충분히 적혀 있지 않아 일반 성능 수치로 사용하지 않는다. 구조와 상세 조건은 <a href="https://arxiv.org/html/2412.19437v2#S2.SS1.SSS1">DeepSeek-V3 §2.1.1</a>을 참고한다.</p>
+</blockquote>
+<h2 id="4-문맥을-제한하거나-상태로-압축하는-방법">4. 문맥을 제한하거나 상태로 압축하는 방법</h2>
+<h3 id="sliding-window-attention">Sliding window attention</h3>
+<p>전체 과거 대신 현재 위치에서 정해진 범위만 본다. window 크기 W를 <strong>현재 위치를 포함한 참조 토큰 수</strong>라고 정의하면, 위치 t가 보는 위치는 <code>max(0,t-W+1)…t</code>이다. T=8, t=7, W=3이면 5·6·7만 본다. 로컬 캐시를 오래된 위치부터 제거하는 구현에서는 해당 층의 저장 길이를 W 근처로 제한할 수 있다.</p>
+<p>장점은 참조 범위와 비용을 제한한다는 것이고, 한계는 창 밖 토큰을 그 층에서 직접 볼 수 없다는 것이다. 여러 층이나 전역 attention과의 혼합으로 정보가 전달될 수 있지만 정확한 장거리 검색이 자동 보장되지는 않는다. window가 다른 기법의 대체재인지는 목적을 따져야 한다. GQA는 head 공유, window는 참조 위치 제한이므로 함께 쓸 수 있다.</p>
+<h3 id="gated-deltanet-토큰-목록-대신-갱신되는-기억-상태">Gated DeltaNet: 토큰 목록 대신 갱신되는 기억 상태</h3>
+<p>Full attention은 과거 K·V 목록에서 직접 정보를 읽는다. Gated DeltaNet 계열은 크기가 정해진 행렬 상태 S를 매 토큰 갱신해 과거 정보를 압축한다. 다음은 열벡터 k·v를 사용하는 <strong>핵심 갱신식의 교육용 표현</strong>이다.</p>
+<pre><code class="language-text">기존 기억 감쇠: Sbar = α Sprev
+현재 key로 예측: vhat = Sbar k
+오차: e = v - vhat
+기억 수정: Snew = Sbar + β e kᵀ
+읽기: o = Snew q
+</code></pre>
+<p>α는 과거 기억을 얼마나 남길지, β는 현재 key에 대응하는 새 정보를 얼마나 반영할지 조절한다. 출력 gate는 읽어 낸 정보 중 무엇을 다음 층에 전달할지 조절한다. k가 단위 길이라면 β=1일 때 해당 key 방향의 예측 오차를 한 번에 수정하는 직관을 얻을 수 있다. 실제 블록의 정규화·convolution·출력 gate 등은 위 핵심식 밖에 있다. <a href="https://arxiv.org/html/2412.06464v1#S3">Gated Delta Networks §3</a></p>
+<p>스칼라 장난감 예로 Sprev=2, α=0.5, k=1, v=3, β=0.25라 하자. Sbar=1, vhat=1, e=2이므로 Snew=1+0.25×2=1.5다. β=0이면 새 정보가 반영되지 않고 감쇠된 1만 남는다. 이는 실제 모델의 품질 측정이 아니라 gate 역할을 보이는 축소 예시다.</p>
+<p>상태 크기를 고정하면 길이가 늘어도 해당 recurrent 상태는 선형 캐시처럼 계속 커지지 않는다. 대신 과거를 개별 토큰 형태로 모두 보존하지 않아 검색 능력에 손실이 생길 수 있다. full attention을 일부 층에 섞는 hybrid는 압축과 직접 참조를 조합한다. 전체 모델에는 full-attention 층의 캐시가 남을 수 있다.</p>
+<blockquote>
+<p><strong>원문 정정:</strong> 255쪽의 ‘앞뒤 1~2개 토큰을 섞는다’는 표현을 causal 생성에서 미래 토큰 참조로 해석하면 안 된다. causal short convolution은 현재와 과거의 허용된 위치만 사용한다. 254쪽의 Qwen·Kimi 제품 사례는 이 장에서 현재 구현을 확인한 목록으로 사용하지 않는다.</p>
+</blockquote>
+<h2 id="5-flashattention-결과의-수학은-유지하고-데이터-이동-줄이기">5. FlashAttention: 결과의 수학은 유지하고 데이터 이동 줄이기</h2>
+<p>HBM은 GPU의 큰 주 메모리, SRAM은 칩 안의 작은 고속 저장 공간이다. 일반적인 attention을 단순 구현하면 <code>[T,T]</code> 점수와 확률을 HBM에 기록했다가 다시 읽는 일이 많다. <strong>FlashAttention은 Q·K·V를 작은 타일로 나누고 softmax의 누적 상태를 유지해 큰 중간 행렬의 저장·재읽기를 줄인다.</strong> 기본 full attention의 토큰 쌍 계산 자체는 남는다. 따라서 FlashAttention을 선형 attention이라고 부르면 안 된다. <a href="https://arxiv.org/abs/2205.14135">FlashAttention 원 논문</a></p>
+<p>아래 그림의 위 경로는 큰 중간 행렬을 HBM에 쓰는 단순 구현, 아래 경로는 타일과 누적 상태로 출력까지 이어 가는 방식이다. 화살표는 데이터 이동을 뜻한다.</p>
+<p><img src="../assets/14_flash.svg" alt="단순 attention은 점수와 확률의 큰 중간 행렬을 HBM에 기록하고 FlashAttention은 타일과 누적 softmax 상태를 SRAM에 유지해 출력을 누적하는 비교" /></p>
+<p><a href="../assets/14_flash.png">SVG가 표시되지 않으면 PNG로 보기</a></p>
+<p>두 경로의 목표는 같은 <code>softmax(QKᵀ/√dh)V</code>다. 부동소수점 연산 순서에 따른 작은 수치 차이는 있을 수 있다. 원문 261쪽의 ‘2~3배’는 특정 조건의 성능 주장으로 읽고 GPU·길이·dtype·구현을 고정하지 않은 보편 배수로 사용하지 않는다. 265쪽의 메모리 접근 ‘32번’도 작은 도식의 접근 단위에 의존한다.</p>
+<h3 id="online-softmax를-직접-따라가기">Online softmax를 직접 따라가기</h3>
+<p>한 query에 대한 점수를 순서대로 <code>xj</code>, value를 <code>vj</code>라 하자. 누적 최댓값 m, 정규화 분모 l, 가중합 분자 u를 유지한다.</p>
+<pre><code class="language-text">초기: m=-∞, l=0, u=0
+새 점수 x와 value v 도착:
+ mnew = max(m,x)
+ lnew = exp(m-mnew) l + exp(x-mnew)
+ unew = exp(m-mnew) u + exp(x-mnew) v
+최종: o = u/l
+</code></pre>
+<p>점수 <code>[0,ln 3]</code>, value <code>[2,6]</code>를 차례로 넣자. 점수에는 이미 scale·mask가 적용되어 있다고 가정한다.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>m</th>
+<th>l</th>
+<th>u</th>
+<th>u/l</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>첫 토큰 x=0,v=2</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>둘째 x=ln3,v=6</td>
+<td>ln3</td>
+<td>(1/3)×1+1=4/3</td>
+<td>(1/3)×2+6=20/3</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>한 번에 계산한 softmax는 <code>[1/4,3/4]</code>이고 <code>1/4×2+3/4×6=5</code>로 같다. 두 번째 단계에서 최댓값 기준이 바뀌어 이전 분모·분자에 1/3을 곱하는 과정이 핵심이다. 실제 커널은 토큰 하나씩이 아니라 타일 단위로 이 원리를 확장한다. 모든 위치가 mask되어 유효 key가 없는 경우에는 <code>-∞-(-∞)</code> 등의 처리가 필요하므로 위 장난감 루프를 그대로 production 코드로 쓰지 않는다.</p>
+<h2 id="6-레이어-설계와-multi-token-prediction">6. 레이어 설계와 multi-token prediction</h2>
+<p>원문 252쪽의 Pre-Norm은 정규화를 하위 모듈 <strong>앞</strong>에 두는 구조다. 예를 들어 <code>y=x+Attention(Norm(x))</code>이다. Post-Norm은 <code>y=Norm(x+Attention(x))</code>다. 위치는 학습 안정성·최종 정규화·초기화와 연결되므로 두 식이 같은 함수라고 볼 수 없다. 원문 253쪽의 ‘넓으면 안정적, 깊으면 유연한 사고’는 설계 직관이며 고정 예산에서의 일반 성능 법칙으로 사용하지 않는다. 폭·깊이 비교에는 파라미터 수, 학습량, 데이터, 실행 환경을 함께 고정·기록해야 한다.</p>
+<p>**Multi-token prediction(MTP)**은 한 위치의 표현으로 다음 토큰만이 아니라 여러 미래 토큰을 예측하는 보조 학습 목표를 둔다. 원문 260쪽의 독립 head 예에서 입력 prefix가 A B이면 head1의 정답은 C, head2는 D, head3은 E다. 여러 head의 CE를 결합해 공유 본체가 여러 미래 위치에 유용한 특징을 학습하게 한다. <a href="https://arxiv.org/abs/2404.19737">독립 head MTP 원 논문</a></p>
+<p>교안의 단순형처럼 추론 시 보조 head를 제거하고 일반 next-token 생성만 할 수도 있다. 다만 이것이 유일한 방식은 아니다. 보조 예측을 draft로 사용하는 speculative decoding 같은 설계도 있다. 여러 토큰의 후보를 냈다고 조건부 의존성을 무시하고 검증 없이 모두 확정해도 된다는 뜻은 아니다. 보조 head 추가가 학습 비용이나 품질을 항상 개선한다는 보장도 없다.</p>
+<h2 id="7-turboquant-저장-비트-수와-내적-오차를-함께-관리">7. TurboQuant: 저장 비트 수와 내적 오차를 함께 관리</h2>
+<p>가중치 양자화와 KV cache 양자화는 저장 대상이 다르다. KV는 입력과 생성 과정에서 계속 생기는 활성값이므로 온라인 압축의 비용과 품질을 따져야 한다. 원문 274~280쪽은 TurboQuant를 회전·양자화·잔차 보정 흐름으로 소개한다.</p>
+<pre><code class="language-text">벡터 x → 길이와 방향 분리 → 공유 무작위 직교 회전
+       → 좌표별 저비트 코드 저장 → 필요 시 근사 내적/복원
+                               ↘ 잔차에 대한 QJL 보정 정보
+</code></pre>
+<p>직교 회전 R은 <code>RᵀR=I</code>여서 <strong>회전 자체는 길이와 내적을 보존</strong>한다. 큰 성분이 특정 좌표에 몰려 있던 벡터를 여러 좌표로 분산시키면 정해진 코드북을 활용하기 쉬워진다. 단위 방향의 회전된 좌표는 유한 차원에서는 구면 유래 분포를 따르며, 고차원에서 적절히 스케일한 좌표가 정규분포에 가까워진다는 직관을 쓴다. ‘모든 벡터가 정확한 정규분포로 변한다’는 뜻은 아니다.</p>
+<p>예를 들어 원소당 3bit 코드만 세면 8구간 중 하나를 저장하고, 8차원 벡터는 24bit=3bytes다. FP16의 같은 벡터는 16bytes다. 하지만 norm, 코드북 또는 공유 설정, 정렬·packing, 잔차 보정 정보가 추가된다. <strong>실제 압축률을 16/3으로 바로 확정할 수 없다.</strong> 0벡터는 방향 정규화를 바로 적용할 수 없으므로 별도 처리가 필요하다.</p>
+<p>TurboQuant 원 논문은 MSE를 줄이는 양자화와 내적 오차를 다루는 구성을 구별하며, 후자에서 잔차에 대한 1bit QJL을 활용한다. QJL의 부호만 보고 일반적인 원래 벡터를 정확히 복원할 수는 없다. 필요한 scale·확률적 추정식 등 전체 정의가 있어야 한다. <a href="https://arxiv.org/html/2504.19874v1">TurboQuant 원 논문 §2~3</a></p>
+<blockquote>
+<p><strong>원문 보충·미확인:</strong> 279쪽 코드의 <code>QJL_decode</code>는 정의되지 않은 설명용 의사 코드다. 이를 실행 가능한 복원 함수로 제시하지 않는다. ‘QJL은 양자화가 아님’은 저비트 부호 sketch로 내적 오차를 보정한다는 역할 설명으로 제한하며, 논문은 QJL을 1bit inner-product quantization으로 설명한다. 원문 280쪽의 ‘softmax 때문에 QJL이 품질을 떨어뜨린다’는 결과는 대상 구현·데이터·설정이 없어 보편 결론으로 확인되지 않았다. 이 자료는 해당 성능 주장을 재현했다고 표시하지 않는다.</p>
+</blockquote>
+<p>정밀도가 낮아지면 캐시가 작아져 같은 장치에서 더 긴 문맥이나 큰 배치를 담을 가능성이 있다. 곧바로 전체 시스템 메모리 수요가 줄었다거나 모든 생성이 빨라졌다고 결론내릴 수는 없다. 역양자화·packing 비용, 커널 지원, 실제 병목과 품질을 함께 측정해야 한다.</p>
+<h2 id="8-같은-축에서-비교하고-조합하기">8. 같은 축에서 비교하고 조합하기</h2>
+<table>
+<thead>
+<tr>
+<th>방법</th>
+<th>줄이는 대상</th>
+<th>그대로 남거나 바뀌는 조건</th>
+<th>선택 상황</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KV cache</td>
+<td>과거 토큰 표현 재계산</td>
+<td>과거 KV 저장·조회 증가</td>
+<td>causal decode 중복 계산이 큼</td>
+</tr>
+<tr>
+<td>GQA</td>
+<td>KV head 수</td>
+<td>모델 구조·품질 검토 필요</td>
+<td>지원 모델에서 KV 저장·대역폭 부담</td>
+</tr>
+<tr>
+<td>MLA</td>
+<td>KV 표현의 저장 폭</td>
+<td>latent·위치 성분·재배열 조건</td>
+<td>MLA로 설계된 모델 실행</td>
+</tr>
+<tr>
+<td>Sliding window</td>
+<td>직접 참조 위치 수</td>
+<td>창 밖 직접 접근 제한</td>
+<td>근거리 문맥으로 충분하거나 hybrid</td>
+</tr>
+<tr>
+<td>Gated DeltaNet</td>
+<td>과거 토큰 목록 저장</td>
+<td>고정 상태로 압축, 검색 손실 가능</td>
+<td>recurrent/hybrid 모델 설계</td>
+</tr>
+<tr>
+<td>FlashAttention</td>
+<td>큰 중간 행렬의 HBM 이동</td>
+<td>full attention의 쌍별 계산 유지</td>
+<td>지원 환경의 full attention 병목</td>
+</tr>
+<tr>
+<td>MTP</td>
+<td>학습 신호·예측 전략 개선 시도</td>
+<td>보조 목표·검증 비용 필요</td>
+<td>학습 설계 또는 draft 생성</td>
+</tr>
+<tr>
+<td>KV 양자화</td>
+<td>캐시 원소당 저장 비트</td>
+<td>근사 오차·변환 비용</td>
+<td>캐시 메모리/대역폭 병목</td>
+</tr>
+</tbody>
+</table>
+<p>GQA와 FlashAttention, KV cache와 양자화는 축이 달라 결합할 수 있다. 다만 실제 구현이 조합을 지원하는지는 별도 확인 사항이다. 어떤 방법이든 속도는 prefill latency, token당 decode latency, throughput, peak memory를 구분하고 같은 모델·정밀도·입력/출력 길이·배치·장치로 비교한다. 이 문서의 숫자는 실측 성능 데이터가 아니다.</p>
+<h2 id="9-스스로-확인하기">9. 스스로 확인하기</h2>
+<ol>
+<li>1절 설정에서 B만 3으로 바꾸면 MHA와 Hkv=2인 GQA 캐시는 각각 몇 bytes인가?</li>
+<li>KV cache가 있으면 새 토큰은 과거 K를 읽지 않아도 되는가?</li>
+<li>FlashAttention의 softmax 상태에서 이전 누적값을 재스케일하지 않으면 무엇이 틀리는가?</li>
+<li>window W=3의 로컬 attention과 GQA를 함께 쓸 수 있는 이유는?</li>
+<li>Gated DeltaNet의 교육용 예에서 β=1이면 Snew는 얼마인가? 과거 토큰 전부가 그대로 보존되는가?</li>
+<li>3bit 양자화라는 말만으로 전체 GPU 메모리가 FP16 대비 3/16로 줄었다고 말할 수 있는가?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>B에 비례하므로 3,072bytes와 1,536bytes다. 1·2절의 저장량 식을 다시 쓴다.</li>
+<li>아니다. 새 Q와 과거 K의 점수, 과거 V 가중합이 필요하다. 1절 흐름도로 돌아간다.</li>
+<li>최댓값 기준이 달라져 이전 항과 새 항의 기준이 어긋난다. 5절에서 두 번째 단계의 1/3을 확인한다.</li>
+<li>window는 위치 범위, GQA는 head 공유를 바꾼다. 2·4절을 비교한다.</li>
+<li>Snew=1+1×(3-1)=3이다. 상태는 압축된 기억이므로 모든 토큰을 개별 보존하는 것은 아니다. 4절로 돌아간다.</li>
+<li>아니다. norm·보정·packing 등의 비용과 가중치·활성값 등 다른 메모리가 남는다. 7절을 본다.</li>
+</ol>
+</details>
+<p>마지막으로 ‘계산을 다시 하지 않기’, ‘저장 형태 줄이기’, ‘참조 범위 바꾸기’, ‘동일 계산의 이동 줄이기’에 각 기법을 연결한다. 원 논문 확인일은 2026-11-09이며 실제 GPU 성능 실험과 독자 이해도 평가는 수행하지 않았다.</p>
+</main></body></html>

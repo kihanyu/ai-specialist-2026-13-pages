@@ -1,0 +1,156 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>LLM 모델의 이해와 확장 — 개정 학습자료</title><link rel="stylesheet" href="toc.css"><style>body{font:17px/1.8 "Malgun Gothic",sans-serif;color:#17283b;background:#f3f6fa;margin:0}main{max-width:1000px;margin:auto;background:white;padding:36px}h1,h2,h3{line-height:1.4}h2{margin-top:2.4em;border-bottom:2px solid #dce6f1}a{color:#165eaa}img,svg{max-width:100%;height:auto}table{border-collapse:collapse;display:block;overflow:auto;font-size:15px}td,th{padding:10px;border:1px solid #bccbdc;vertical-align:top}th{background:#eaf1fa}pre{overflow:auto;background:#eef2f7;padding:18px}code{font-family:Consolas,monospace}details{padding:14px;background:#f1f6fc;margin:16px 0}blockquote{border-left:4px solid #739bd1;padding-left:16px}@media(max-width:600px){main{padding:16px}body{font-size:16px}}p,li,a{overflow-wrap:anywhere}figure{margin:20px 0}figcaption{font-size:14px;color:#40566b}</style><body><aside class="toc-sidebar"><nav aria-label="이 문서의 목차"><p class="toc-label">이 문서의 목차</p><ul><li class="toc-title"><a href="#llm-모델의-이해와-확장-개정-학습자료">LLM 모델의 이해와 확장 — 개정 학습자료</a></li><li class="toc-section"><a href="#어디서-시작할까">어디서 시작할까</a></li><li class="toc-section"><a href="#전체-관계를-먼저-보기">전체 관계를 먼저 보기</a></li><li class="toc-section"><a href="#강의-목차와-학습-목표">강의 목차와 학습 목표</a></li><li class="toc-section"><a href="#계산에-사용하는-공통-기호">계산에 사용하는 공통 기호</a></li><li class="toc-section"><a href="#원문시각화와-확인-범위">원문·시각화와 확인 범위</a></li></ul></nav></aside><main><nav><a href="00_학습안내.html">학습 안내</a> · <a href="../00_학습안내.md">Markdown 원문</a></nav><h1 id="llm-모델의-이해와-확장-개정-학습자료">LLM 모델의 이해와 확장 — 개정 학습자료</h1>
+<p>LLM은 문장을 토큰으로 바꾸고, 앞 문맥을 이용해 다음 토큰의 점수를 계산하는 모델입니다. 학습은 그 예측이 정답이나 선호에 가까워지도록 가중치를 바꾸는 과정입니다. 이 자료는 <strong>입력 표현 → 문맥 계산 → 예측 → 학습 → 활용과 효율화</strong>를 연결해 설명합니다.</p>
+<p>원본은 <a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf">app_sp_slides_20261013.pdf</a> 1~280쪽, 제목은 「LLM 모델의 이해와 확장」입니다. 파일명의 날짜는 2026-10-13이며 별도 작성일은 확정하지 않습니다. 아래 쪽수는 인쇄 번호가 아닌 <strong>PDF 파일상의 1-based 페이지 순서</strong>입니다. 개정일은 2026-11-09입니다.</p>
+<p>독자는 Python의 변수·리스트와 간단한 배열을 읽을 수 있다고 가정합니다. 벡터·확률·미분은 02장에서 설명합니다. 최신 제품 소식이나 공식 시험 출제 순위를 외우기 위한 자료가 아니라, 계산과 선택의 이유를 설명하기 위한 전체 교안 재구성입니다.</p>
+<p><a href="../../README.md">전체 폴더 안내</a> · <a href="../../../04_LLM_%EC%8B%A4%EC%8A%B5/README.md">원 실습</a> · <a href="../%EB%AF%B8%EB%A6%AC%EB%B3%B4%EA%B8%B0/00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">브라우저 미리보기</a></p>
+<h2 id="어디서-시작할까">어디서 시작할까</h2>
+<p>처음 배우면 아래 01~14 순서로 읽습니다. 각 장의 도입과 핵심 본문을 읽고, 작은 계산을 직접 따라 한 뒤, 해설을 접어 둔 채 확인 질문에 답하세요. 심화 수식과 변형은 기본 동작을 설명할 수 있게 된 뒤 읽어도 됩니다.</p>
+<p>복습할 때는 막힌 질문으로 이동합니다. 입력·정답 정렬은 04, Attention 계산은 05, 모델 전체 흐름은 06~08, 손실과 가중치 갱신은 10, 학습 목적과 방법 비교는 11~13, 시간·메모리 문제는 14입니다. 이 폴더의 주제별 Markdown이 <strong>개정판의 기준 본문</strong>입니다. HTML은 같은 본문을 읽는 미리보기입니다. 원 실습은 <a href="../../../04_LLM_%EC%8B%A4%EC%8A%B5/README.md">실습 안내</a>에서 찾습니다.</p>
+<h2 id="전체-관계를-먼저-보기">전체 관계를 먼저 보기</h2>
+<p>아래 지도는 왼쪽에서 오른쪽으로 권장 학습 순서를 보여줍니다. 각 칸의 번호를 아래 목차에서 찾으세요. 모든 칸이 하나의 실행 파이프라인을 뜻하는 것은 아닙니다.</p>
+<p><img src="../assets/00_%ED%95%99%EC%8A%B5%EC%A7%80%EB%8F%84.svg" alt="14개 강의 주제를 배경과 표현, 예측하는 모델, 학습과 활용의 세 묶음으로 나눈 학습 지도" /></p>
+<p>입력의 토큰 ID와 토큰 벡터는 다릅니다. 모델의 순전파는 현재 가중치로 출력을 계산하고, 학습은 손실을 이용해 그 가중치를 갱신합니다. 효율화는 같은 계산을 더 적은 메모리 이동으로 수행하거나, 참조 구조·정밀도 등 계산 조건을 바꿉니다. 이 세 차이를 각 장의 구체적인 예로 확인하는 것이 전체 학습의 목표입니다.</p>
+<h2 id="강의-목차와-학습-목표">강의 목차와 학습 목표</h2>
+<table>
+<thead>
+<tr>
+<th>번호</th>
+<th>강의 주제 / 기준 본문</th>
+<th>PDF 범위</th>
+<th>학습 후 할 일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">AI 모델의 역사</a></td>
+<td>3~30</td>
+<td>문제와 설계 선택을 연결한다</td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">AI 기본 수학</a></td>
+<td>31~66</td>
+<td>내적·softmax·CE·갱신을 계산한다</td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">언어 모델의 발전</a></td>
+<td>67~77</td>
+<td>순차 상태와 Attention, 구조와 목표를 구별한다</td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">언어 모델: 입력</a></td>
+<td>78~101</td>
+<td>ID·정답 창·임베딩·위치를 추적한다</td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">Attention 이해</a></td>
+<td>102~124</td>
+<td>scale·mask·softmax·가중합을 계산한다</td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="06_GPT_%EB%AA%A8%EB%8D%B8_%EC%9D%B4%ED%95%B4.html">GPT 모델 이해</a></td>
+<td>103·117·120~123과 통합</td>
+<td>문맥 벡터가 어휘 점수로 이어지는 흐름을 설명한다</td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">GPT Layer들</a></td>
+<td>125~143</td>
+<td>정규화 축·FFN·두 잔차 경로를 설명한다</td>
+</tr>
+<tr>
+<td>08</td>
+<td><a href="08_GPT_%EB%AA%A8%EB%8D%B8%EC%9E%85%EC%B6%9C%EB%A0%A5.html">GPT 모델 입출력</a></td>
+<td>144~149</td>
+<td>shape와 생성·샘플링을 추적한다</td>
+</tr>
+<tr>
+<td>09</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">지식의 저장</a></td>
+<td>150~157</td>
+<td>가중치·활성값·잠재 표현을 구별한다</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">모델 학습</a></td>
+<td>158~175</td>
+<td>손실·기울기·갱신 및 데이터 분리를 설명한다</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">Fine-tuning</a></td>
+<td>176~194</td>
+<td>분류와 LoRA·QLoRA의 서로 다른 축을 설명한다</td>
+</tr>
+<tr>
+<td>12</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">지시 미세 튜닝</a></td>
+<td>195~215</td>
+<td>SFT 마스크와 선호 손실을 계산한다</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">추론 모델</a></td>
+<td>216~239</td>
+<td>보상·advantage·clip·KL을 연결한다</td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">LLM 효율화</a></td>
+<td>240~280</td>
+<td>계산·캐시·참조·I/O 병목을 구분한다</td>
+</tr>
+</tbody>
+</table>
+<p>원본 목차의 06 「GPT 모델 이해」에는 독립된 구분 슬라이드가 없어 05와 원문 범위가 겹칩니다. 05는 Attention 계산, 06은 GPT 전체 구조 연결을 담당합니다. 11은 분류·LoRA·QLoRA를, 12는 지시 미세튜닝과 그 뒤의 선호 최적화를 함께 다룹니다. 14의 세부 기법은 같은 문제를 해결하는 배타적 후보가 아니라, 서로 다른 비용을 줄이며 조합할 수 있는 방법입니다.</p>
+<h2 id="계산에-사용하는-공통-기호">계산에 사용하는 공통 기호</h2>
+<table>
+<thead>
+<tr>
+<th>기호</th>
+<th>뜻</th>
+<th>주의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B</td>
+<td>배치에 함께 넣는 예제 수</td>
+<td>토큰 길이와 다름</td>
+</tr>
+<tr>
+<td>T</td>
+<td>현재 시퀀스의 토큰 길이</td>
+<td>temperature와 혼동하지 않도록 해당 절의 정의 확인</td>
+</tr>
+<tr>
+<td>C 또는 d</td>
+<td>토큰 표현의 은닉 폭</td>
+<td>장별 수식의 정의를 우선 확인</td>
+</tr>
+<tr>
+<td>h, dh</td>
+<td>head 수, head 하나의 폭</td>
+<td>기본형은 C=h×dh</td>
+</tr>
+<tr>
+<td>V</td>
+<td>tokenizer 어휘 크기</td>
+<td>현재 입력 토큰 수 T와 다름</td>
+</tr>
+</tbody>
+</table>
+<p>가장 먼저 자료 없이 <code>정수 ID [B,T] → 벡터 [B,T,C] → 문맥 계산 [B,T,C] → 어휘 점수 [B,T,V]</code>를 설명해 보세요. 이어서 생성은 마지막 유효 위치의 점수로 다음 ID를 고르고, 학습은 위치별 정답과 손실을 계산한다는 차이를 설명합니다. 막히는 단계에 해당하는 장으로 돌아가면 됩니다.</p>
+<h2 id="원문시각화와-확인-범위">원문·시각화와 확인 범위</h2>
+<ul>
+<li>원문 위치는 각 장의 PDF 링크와 <a href="16_%EC%9B%90%EB%AC%B8%EB%8C%80%EC%9D%91%EA%B3%BC_%ED%99%95%EC%9D%B8%EB%B2%94%EC%9C%84.html">페이지 대응표</a>에서 찾습니다. 표지·목차와 실습 안내 페이지도 처리 범위를 기록합니다.</li>
+<li><a href="15_%EC%8B%9C%EA%B0%81%ED%99%94_%EC%95%88%EB%82%B4.html">시각화 안내</a>에서 도표와 조작 가능한 계산 자료를 찾습니다. 모든 핵심 설명은 본문 텍스트와 정적 도표로도 읽을 수 있습니다.</li>
+<li>계산·렌더 확인 범위와 남은 확인 사항은 <a href="16_%EC%9B%90%EB%AC%B8%EB%8C%80%EC%9D%91%EA%B3%BC_%ED%99%95%EC%9D%B8%EB%B2%94%EC%9C%84.html">원문 대응과 확인 범위</a>에 정리했습니다. 실제 독자의 학습 효과와 수행하지 않은 원 실습 실행을 완료로 판정하지 않습니다.</li>
+<li>본문·도표·읽기용 HTML을 제공합니다. 본문을 수정하면 해당 도표와 HTML의 설명도 함께 확인하세요.</li>
+</ul>
+</main></body></html>

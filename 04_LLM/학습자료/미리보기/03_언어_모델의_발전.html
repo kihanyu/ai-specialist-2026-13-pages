@@ -1,0 +1,64 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>03. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</title><link rel="stylesheet" href="toc.css"><style>body{font:17px/1.8 "Malgun Gothic",sans-serif;color:#17283b;background:#f3f6fa;margin:0}main{max-width:1000px;margin:auto;background:white;padding:36px}h1,h2,h3{line-height:1.4}h2{margin-top:2.4em;border-bottom:2px solid #dce6f1}a{color:#165eaa}img,svg{max-width:100%;height:auto}table{border-collapse:collapse;display:block;overflow:auto;font-size:15px}td,th{padding:10px;border:1px solid #bccbdc;vertical-align:top}th{background:#eaf1fa}pre{overflow:auto;background:#eef2f7;padding:18px}code{font-family:Consolas,monospace}details{padding:14px;background:#f1f6fc;margin:16px 0}blockquote{border-left:4px solid #739bd1;padding-left:16px}@media(max-width:600px){main{padding:16px}body{font-size:16px}}p,li,a{overflow-wrap:anywhere}figure{margin:20px 0}figcaption{font-size:14px;color:#40566b}</style><body><aside class="toc-sidebar"><nav aria-label="이 문서의 목차"><p class="toc-label">이 문서의 목차</p><ul><li class="toc-title"><a href="#03-언어-모델의-발전-문맥을-어디에-담고-어떻게-전달할까">03. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li class="toc-section"><a href="#1-규칙에서-학습된-표현으로">1. 규칙에서 학습된 표현으로</a></li><li class="toc-section"><a href="#2-rnn이-문맥을-기억하는-방법과-한계">2. RNN이 문맥을 기억하는 방법과 한계</a></li><li class="toc-section"><a href="#3-transformer는-어떤-의존성을-바꾸나">3. Transformer는 어떤 의존성을 바꾸나</a></li><li class="toc-section"><a href="#4-bertgptt5-구조와-과제를-같은-표에서-구별하기">4. BERT·GPT·T5: 구조와 과제를 같은 표에서 구별하기</a></li><li class="toc-section"><a href="#5-확인-질문">5. 확인 질문</a></li></ul></nav></aside><main><nav><a href="00_학습안내.html">학습 안내</a> · <a href="../03_언어_모델의_발전.md">Markdown 원문</a></nav><h1 id="03-언어-모델의-발전-문맥을-어디에-담고-어떻게-전달할까">03. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">전체 학습 안내</a> · <a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">이전: 기본 수학</a> · <a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">다음: 입력</a> · <a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=67">PDF 67~77쪽</a></p>
+<p>언어모델은 문맥을 바탕으로 토큰의 확률을 예측하는 모델입니다. 이 단원은 <strong>RNN의 순차 상태 전달과 Transformer의 Attention을 비교하고, Encoder·Decoder·학습 목표를 분리해 설명하는 것</strong>이 목표입니다. 먼저 ‘벡터는 숫자 목록’이라는 점만 알면 읽을 수 있습니다. 내적이 낯설면 <a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html#1-%EB%B2%A1%ED%84%B0%EC%99%80-%ED%96%89%EB%A0%AC-%EB%AC%B4%EC%97%87%EC%9D%84-%EB%B9%84%EA%B5%90%ED%95%98%EA%B3%A0-%EB%AC%B4%EC%97%87%EC%9D%84-%EB%B0%94%EA%BE%B8%EB%82%98">수학 1절</a>로 돌아가세요.</p>
+<h2 id="1-규칙에서-학습된-표현으로">1. 규칙에서 학습된 표현으로</h2>
+<p>68쪽의 규칙 기반 번역은 형태소·구문을 분석하고, 사람이 정한 변환 규칙으로 어순을 배열합니다. 예외 규칙의 설계와 유지에 비용이 듭니다. 학습 기반 모델은 데이터에서 표현과 변환을 학습하지만 데이터 편향과 보지 못한 입력의 오류가 생깁니다. ‘학습한다’는 말이 규칙이나 검증이 필요 없다는 뜻은 아닙니다.</p>
+<p>Encoder는 입력을 다른 처리에 사용할 표현으로 바꾸는 부분이고, Decoder는 그 표현 또는 앞선 출력 문맥을 사용해 결과를 만드는 부분입니다. 이 이름은 <strong>역할</strong>입니다. Encoder가 텍스트만 받거나 Decoder가 항상 별도 Encoder를 필요로 하는 것은 아닙니다.</p>
+<h2 id="2-rnn이-문맥을-기억하는-방법과-한계">2. RNN이 문맥을 기억하는 방법과 한계</h2>
+<p>RNN(Recurrent Neural Network)은 이전 상태 <code>h_(t-1)</code>와 현재 입력 <code>x_t</code>로 새 상태 <code>h_t=f(h_(t-1),x_t)</code>를 계산합니다. 상태는 지금까지 읽은 정보의 요약입니다. 길이가 다른 입력에도 같은 계산을 반복할 수 있지만, 시점 t를 계산하려면 t-1이 필요합니다. 긴 경로로 기울기를 전달하는 학습도 어려워집니다.</p>
+<p>의존성만 보는 교육용 덧셈 RNN <code>h_t=h_(t-1)+x_t</code>, <code>h₀=0</code>, 입력 <code>[2,5,1]</code>이면 상태는 <code>2→7→8</code>입니다. 두 번째 입력을 6으로 바꾸면 상태는 <code>2→8→9</code>입니다. 단, 덧셈은 순서가 바뀌어도 최종 합이 같으므로 이 예시가 실제 언어 RNN의 표현 능력을 보여주는 것은 아닙니다. 실제 학습된 비선형 갱신은 순서에 민감할 수 있습니다.</p>
+<p>RNN Attention은 한 최종 요약 벡터에만 의존하지 않고 필요한 입력 위치의 상태를 골라 섞게 합니다. ‘앞 정보를 선택해서 참조할 수 있다’는 장점이 생기지만, 기반 RNN의 순차 상태 계산 자체가 사라지지는 않습니다.</p>
+<h2 id="3-transformer는-어떤-의존성을-바꾸나">3. Transformer는 어떤 의존성을 바꾸나</h2>
+<p>Transformer는 같은 층에서 토큰들이 서로 참고할 관계를 Attention으로 계산합니다. FFN(Feed-Forward Network)은 각 위치의 벡터를 비선형 변환합니다. Attention이 위치 간 정보를 섞는 역할이라면 FFN은 각 위치의 특징을 가공합니다.</p>
+<p>훈련에서는 정답 시퀀스가 이미 있으므로 모든 위치의 계산을 행렬 연산으로 묶을 수 있습니다. GPT에서는 미래 정답을 훔쳐보지 않도록 causal mask가 필요합니다. 반면 생성할 때는 아직 다음 토큰을 모르므로, 한 토큰을 선택해 문맥에 추가한 뒤 다시 계산합니다. <strong>학습 위치의 병렬 계산과 생성 토큰의 순차성은 동시에 성립합니다.</strong> 병렬화가 모든 길이·장치에서 자동으로 빠르다는 뜻도 아닙니다.</p>
+<p>다음 비교도에서는 RNN의 <strong>상태 의존</strong>, Transformer 학습의 <strong>위치 계산</strong>, 생성의 <strong>새 토큰 의존</strong>을 서로 구별하세요. 각 행의 화살표는 그 행 안의 계산 의존성을 뜻합니다.</p>
+<p><img src="../assets/03_architecture.svg" alt="RNN의 순차 상태와 Transformer의 병렬 학습 위치 계산을 비교하고 자기회귀 생성은 순차 반복함을 보여주는 도표" /></p>
+<p>따라서 ‘Transformer는 병렬’이라는 한 문장만으로 생성 절차까지 설명할 수 없습니다. 다음 토큰이 이전 선택에 의존하는지 질문하면 두 경우를 나눌 수 있습니다.</p>
+<h2 id="4-bertgptt5-구조와-과제를-같은-표에서-구별하기">4. BERT·GPT·T5: 구조와 과제를 같은 표에서 구별하기</h2>
+<table>
+<thead>
+<tr>
+<th>대표 구성</th>
+<th>입력 문맥을 보는 방식</th>
+<th>대표 사전학습 과제</th>
+<th>자연스러운 사용 예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BERT형 Encoder</td>
+<td>입력 안에서 양쪽 문맥 참조</td>
+<td>가린 토큰 예측(MLM)</td>
+<td>문장 표현·분류·검색 표현</td>
+</tr>
+<tr>
+<td>GPT형 Decoder-only</td>
+<td>해당 위치까지의 앞 문맥 참조</td>
+<td>다음 토큰 예측</td>
+<td>이어쓰기·자기회귀 생성</td>
+</tr>
+<tr>
+<td>T5형 Encoder–Decoder</td>
+<td>Encoder는 입력을 읽고 Decoder는 앞 출력과 입력 표현 참조</td>
+<td>손상된 연속 구간 복원</td>
+<td>입력 텍스트를 출력 텍스트로 변환</td>
+</tr>
+</tbody>
+</table>
+<p>교안 75쪽은 BERT와 T5를 빈칸 복원 계열로 묶습니다. <strong>보충 구분:</strong> T5의 대표 목적은 span corruption이며 BERT와 구조·출력 방식이 같은 것은 아닙니다. T5의 Decoder는 복원할 문자열을 순차 생성합니다. <a href="https://jmlr.org/papers/volume21/20-074/20-074.pdf">T5 원 논문, 3.3~3.5절</a>.</p>
+<p>이 표는 가능한 작업의 제한 목록이 아닙니다. 모델을 목적에 맞게 미세튜닝할 수 있습니다. ‘양방향이므로 더 우수’처럼 서로 다른 학습 조건의 모델을 한 순위로 매기지 않습니다.</p>
+<h2 id="5-확인-질문">5. 확인 질문</h2>
+<ol>
+<li>Transformer로 학습했으니 100개 새 토큰도 언제나 한 번에 생성할 수 있나요?</li>
+<li>RNN에 Attention을 붙이면 RNN 상태 계산의 순차 의존도 없어지나요?</li>
+<li>빈칸 복원을 학습했다는 이유로 BERT와 T5의 구조가 같다고 말할 수 있나요?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>일반 자기회귀 생성에서는 앞에서 선택한 토큰이 다음 입력이므로 순차 반복합니다. 3절.</li>
+<li>참조할 정보 통로가 늘어나도 기반 상태 갱신은 순차적입니다. 2절.</li>
+<li>아닙니다. Encoder-only와 Encoder–Decoder의 차이가 있고 T5는 복원 문자열을 Decoder로 만듭니다. 4절.</li>
+</ol>
+</details>
+<p><strong>다음 연결:</strong> 어떤 구조든 먼저 문자열을 숫자 ID와 벡터로 바꿔야 합니다. 다음 단원에서 입력·정답이 만들어지는 경로를 추적합니다.</p>
+</main></body></html>

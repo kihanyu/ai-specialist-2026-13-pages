@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2080" height="1230" viewBox="0 0 2080 1230">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#375c85"/></marker></defs>
+<rect width="100%" height="100%" fill="#f6f8fc"/><text x="35" y="50" font-family="Malgun Gothic,sans-serif" font-size="28" fill="#10243e">고급 LLM 기법 — 추론 양자화 수단과 미세조정 목적을 구분</text>
+<path d="M1010.0,250 L810.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1010.0,250 L1780.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M810.0,520 L210.0,670" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M810.0,520 L580.0,670" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M810.0,520 L950.0,670" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M810.0,520 L1320.0,670" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1780.0,520 L1780.0,670" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="760" y="100" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="776" y="140" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">고급 LLM 기법의 개념 지도</text>
+<text x="776" y="175" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">기법의 주된 수단과 목적을 구분</text>
+<text x="776" y="210" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">비트·대상·커널 선택은 함께 검토</text>
+<rect x="310" y="370" width="1000" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="326" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">추론 양자화 — 아래는 주된 오차 제어 수단별 묶음</text>
+<text x="326" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">가중치·활성값·KV 중 실제 대상과 비트 수는 기법별로 다름</text>
+<text x="326" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">LLM.int8 / SmoothQuant / 회전 / GPTQ / AWQ</text>
+<rect x="1530" y="370" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1546" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">업무 미세조정 — 학습 메모리 절약</text>
+<text x="1546" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">추론 가속 기법과 목적을 구별</text>
+<text x="1546" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">QLoRA</text>
+<rect x="40" y="670" width="340" height="250" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="710" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">고정밀 경로로 분리</text>
+<text x="56" y="745" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">LLM.int8()</text>
+<text x="56" y="780" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">일반 feature: INT8 경로</text>
+<text x="56" y="815" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">outlier: 고정밀 경로</text>
+<text x="56" y="850" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 6.3절</text>
+<rect x="410" y="670" width="340" height="250" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="426" y="710" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Scaling으로 오차 완화</text>
+<text x="426" y="745" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">SmoothQuant: W/A 난도 이전</text>
+<text x="426" y="780" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">AWQ: 중요 weight 채널 보호</text>
+<text x="426" y="815" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">같은 상쇄식, 다른 목표</text>
+<text x="426" y="850" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 6.4, 6.7절</text>
+<rect x="780" y="670" width="340" height="250" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="796" y="710" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">회전으로 outlier 분산</text>
+<text x="796" y="745" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">QuaRot: 회전 변환 활용</text>
+<text x="796" y="780" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">SpinQuant: 회전 행렬 학습</text>
+<text x="796" y="815" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">구조에 맞춰 삽입·상쇄</text>
+<text x="796" y="850" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 6.5절</text>
+<rect x="1150" y="670" width="340" height="250" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1166" y="710" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">재구성과 오차 보상</text>
+<text x="1166" y="745" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">GPTQ</text>
+<text x="1166" y="780" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">국소 출력 재구성 목적</text>
+<text x="1166" y="815" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">근사 2차 정보로 보정</text>
+<text x="1166" y="850" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 6.6절</text>
+<rect x="1530" y="670" width="500" height="250" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1546" y="710" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">QLoRA: 고정한 저비트 base + LoRA 학습</text>
+<text x="1546" y="745" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">NF4: 기반 가중치의 대표 저장 표현</text>
+<text x="1546" y="780" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Double quant: scale 상수 추가 양자화</text>
+<text x="1546" y="815" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Paged optimizer: 메모리 급증 관리</text>
+<text x="1546" y="850" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">저장 dtype·계산 dtype·학습 대상 구분</text>
+<text x="1546" y="885" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 6.8절</text>
+<rect x="40" y="1030" width="1990" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="1070" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">읽는 법: 주된 설명 수단을 기준으로 묶은 학습 지도이며 서로 배타적인 분류나 성능 순위가 아니다. 기법을 조합할 수도 있다.</text>
+<text x="56" y="1105" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">W/A/KV는 대상 텐서의 축, W4A16 등의 표기는 정밀도 축이다. 위 알고리즘 이름만으로 모든 실행 조건이 정해지지는 않는다.</text>
+<text x="56" y="1140" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">llama.cpp의 Q4·K·IQ·TQ·FP4는 저장·실행 형식의 분류이며 이 알고리즘들과 별도 축이다. 6.9절에서 확인한다.</text>
+</svg>

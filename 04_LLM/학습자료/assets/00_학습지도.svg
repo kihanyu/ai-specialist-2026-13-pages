@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="640" viewBox="0 0 1120 640" role="img" aria-labelledby="title desc">
+<title id="title">LLM 14개 주제 학습 지도</title><desc id="desc">왼쪽 배경과 표현, 가운데 GPT 계산, 오른쪽 학습과 활용 순으로 읽는다. 번호는 원본 강의 목차와 같다. 학습 순서를 나타내며 모든 항목이 단일 데이터 파이프라인이라는 뜻은 아니다.</desc>
+<rect width="1120" height="640" fill="#f4f7fb"/>
+<g font-family="Malgun Gothic, sans-serif" fill="#17283b">
+<text x="32" y="45" font-size="26" font-weight="700">문장 표현 → 다음 토큰 예측 → 학습과 활용</text>
+<text x="32" y="77" font-size="16">번호는 강의 목차 · 좌→우는 권장 학습 순서 · 실제 데이터 흐름은 각 주제에서 확인</text>
+<rect x="30" y="110" width="335" height="460" rx="14" fill="white" stroke="#8397ae"/>
+<text x="48" y="150" font-size="22" font-weight="700">1. 배경과 표현</text>
+<text x="48" y="184" font-size="16">문장을 계산 가능한 입력으로 바꾸기</text>
+<rect x="45" y="211" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="55" y="242" font-size="17">01 역사: 문제와 설계의 변화</text>
+<rect x="45" y="276" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="55" y="307" font-size="17">02 수학: 내적·확률·손실</text>
+<rect x="45" y="341" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="55" y="372" font-size="17">03 발전: RNN에서 Transformer로</text>
+<rect x="45" y="406" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="55" y="437" font-size="17">04 입력: 토큰 → ID → 벡터</text>
+<rect x="395" y="110" width="335" height="460" rx="14" fill="white" stroke="#8397ae"/>
+<text x="413" y="150" font-size="22" font-weight="700">2. 예측하는 모델</text>
+<text x="413" y="184" font-size="16">문맥을 섞어 다음 토큰 점수 만들기</text>
+<rect x="410" y="211" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="420" y="242" font-size="17">05 Attention: 참조 비중과 가중합</text>
+<rect x="410" y="276" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="420" y="307" font-size="17">06 GPT 이해: 전체 계산 연결</text>
+<rect x="410" y="341" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="420" y="372" font-size="17">07 Layer: 정규화·FFN·잔차</text>
+<rect x="410" y="406" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="420" y="437" font-size="17">08 입출력: logits → 다음 ID</text>
+<rect x="410" y="471" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="420" y="502" font-size="17">09 지식: 파라미터와 활성값</text>
+<rect x="760" y="110" width="335" height="460" rx="14" fill="white" stroke="#8397ae"/>
+<text x="778" y="150" font-size="22" font-weight="700">3. 학습과 활용</text>
+<text x="778" y="184" font-size="16">오차·선호로 바꾸고 추론 비용 줄이기</text>
+<rect x="775" y="211" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="785" y="242" font-size="17">10 학습: loss → 기울기 → 갱신</text>
+<rect x="775" y="276" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="785" y="307" font-size="17">11 Fine-tuning: 분류·LoRA</text>
+<rect x="775" y="341" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="785" y="372" font-size="17">12 지시: SFT·PPO·DPO</text>
+<rect x="775" y="406" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="785" y="437" font-size="17">13 추론: 보상·GRPO</text>
+<rect x="775" y="471" width="305" height="50" rx="6" fill="#eaf1fa"/>
+<text x="785" y="502" font-size="17">14 효율화: 계산·메모리·I/O</text>
+<text x="32" y="610" font-size="17">복습 질문: 입력을 바꾸는 일, 파라미터를 바꾸는 일, 추론 비용을 줄이는 일을 구분할 수 있는가?</text>
+</g></svg>

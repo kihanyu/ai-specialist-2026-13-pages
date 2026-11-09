@@ -1,0 +1,134 @@
+{
+  "nodes": [
+    {
+      "id": "root",
+      "type": "text",
+      "x": 620,
+      "y": 100,
+      "width": 500,
+      "height": 150,
+      "text": "온디바이스 AI 실행 구성\n\n모델 + 실행 소프트웨어 + 하드웨어\n\n각 가지를 함께 맞춰야 실행 가능",
+      "color": "4"
+    },
+    {
+      "id": "model",
+      "type": "text",
+      "x": 40,
+      "y": 370,
+      "width": 500,
+      "height": 150,
+      "text": "1. 모델 — 무엇을 계산하는가?\n\n과제 품질과 자원 요구를 결정\n\n관련: 2.2–2.3절",
+      "color": "4"
+    },
+    {
+      "id": "software",
+      "type": "text",
+      "x": 620,
+      "y": 370,
+      "width": 500,
+      "height": 150,
+      "text": "2. 실행 소프트웨어 — 어떻게 실행하는가?\n\n모델 준비·변환·연산 호출을 담당\n\n관련: 2.4–2.6, 2.8절",
+      "color": "4"
+    },
+    {
+      "id": "hardware",
+      "type": "text",
+      "x": 1200,
+      "y": 370,
+      "width": 500,
+      "height": 150,
+      "text": "3. 하드웨어 — 어디에서 실행하는가?\n\n연산·메모리·전력 제약을 제공\n\n관련: 2.7–2.8절",
+      "color": "4"
+    },
+    {
+      "id": "m",
+      "type": "text",
+      "x": 40,
+      "y": 650,
+      "width": 500,
+      "height": 240,
+      "text": "소형 모델: 과제에 맞는 크기 선택\n\n모델 압축 수단의 예\n\n양자화 / pruning / 저랭크 분해\n\n지식 증류 / 파라미터 공유\n\n여러 압축 수단을 함께 적용 가능",
+      "color": "4"
+    },
+    {
+      "id": "s",
+      "type": "text",
+      "x": 620,
+      "y": 650,
+      "width": 500,
+      "height": 240,
+      "text": "실행 체계 예: llama.cpp / ExecuTorch\n\n개발 측: export·compiler·SDK\n\n장치 측: runtime·backend·driver\n\nGGUF: 파일 형식 / GGML: 연산 라이브러리\n\nHailo 스택: 개발·실행 환경 사례",
+      "color": "4"
+    },
+    {
+      "id": "h",
+      "type": "text",
+      "x": 1200,
+      "y": 650,
+      "width": 500,
+      "height": 240,
+      "text": "연산 장치 예: CPU / GPU / NPU\n\n내부 메모리와 외부 메모리의 협력\n\n커널·자료형·대역폭·전력 지원 확인\n\nPIM: 메모리 내부·근처 연산 접근\n\nPIM은 CPU/GPU/NPU와 다른 설계 관점",
+      "color": "4"
+    },
+    {
+      "id": "note",
+      "type": "text",
+      "x": 40,
+      "y": 990,
+      "width": 1660,
+      "height": 150,
+      "text": "읽는 법: 화살표는 구성·예시 관계이며 실행 순서가 아니다. 각 목록은 대표 예이며 서로 배타적인 선택지가 아니다.\n\n모델 파일이 작아도 backend가 연산·shape·양자화 형식을 지원하지 않으면 원하는 가속기를 쓰지 못할 수 있다.\n\n실제 준비·실행 순서는 본문의 export·compile·runtime 설명과 기존 흐름도를 함께 읽는다.",
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "model",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e1",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "software",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e2",
+      "fromNode": "root",
+      "fromSide": "bottom",
+      "toNode": "hardware",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e3",
+      "fromNode": "model",
+      "fromSide": "bottom",
+      "toNode": "m",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e4",
+      "fromNode": "software",
+      "fromSide": "bottom",
+      "toNode": "s",
+      "toSide": "top",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e5",
+      "fromNode": "hardware",
+      "fromSide": "bottom",
+      "toNode": "h",
+      "toSide": "top",
+      "toEnd": "arrow"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="650" viewBox="0 0 800 650" role="img" aria-labelledby="title desc">
+<title id="title">LoRA는 기반 경로와 작은 수정 경로를 더한다</title><desc id="desc">교육용 예시. 위에서 아래로 읽으며 각 단계의 값과 조건을 확인한다.</desc>
+<rect width="800" height="650" fill="#f8fafc"/>
+<style>text{font-family:Malgun Gothic,Noto Sans KR,sans-serif;fill:#172554}.title{font-size:23px;font-weight:700}.main{font-size:21px;font-weight:700}.sub{font-size:18px}</style>
+<text x="36" y="46" class="title">LoRA는 기반 경로와 작은 수정 경로를 더한다</text>
+<rect x="35" y="75" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="108" class="main">1. 열벡터 x · [6,1]</text>
+<text x="55" y="139" class="sub">기반 W · [4,6] 는 동결</text>
+<line x1="45" y1="171" x2="755" y2="171" stroke="#64748b" stroke-dasharray="6 5"/>
+<rect x="35" y="181" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="214" class="main">2. 기반 경로: W x</text>
+<text x="55" y="245" class="sub">출력 [4,1] · 기반 수 24개</text>
+<line x1="45" y1="277" x2="755" y2="277" stroke="#64748b" stroke-dasharray="6 5"/>
+<rect x="35" y="287" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="320" class="main">3. 수정 경로: A x → B(Ax)</text>
+<text x="55" y="351" class="sub">A [1,6] · B [4,1] · rank=1</text>
+<line x1="45" y1="383" x2="755" y2="383" stroke="#64748b" stroke-dasharray="6 5"/>
+<rect x="35" y="393" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="426" class="main">4. 출력: Wx + sBAx</text>
+<text x="55" y="457" class="sub">학습 수 6+4=10개</text>
+<line x1="45" y1="489" x2="755" y2="489" stroke="#64748b" stroke-dasharray="6 5"/>
+<rect x="35" y="499" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="532" class="main">5. 초기 A 랜덤 · B=0</text>
+<text x="55" y="563" class="sub">수정분 0 · 첫 B gradient는 가능</text>
+<text x="36" y="628" class="sub">교육용 재구성 · 측정 성능·실제 모델 실행 결과가 아님</text></svg>

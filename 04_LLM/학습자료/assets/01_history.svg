@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="700" viewBox="0 0 960 700" role="img" aria-labelledby="title desc"><title id="title">모델의 발전: 문제에서 설계 선택으로</title><desc id="desc">위에서 아래로 읽는 네 단계 추적도. 모든 값은 교육용이며 실제 성능 측정이 아니다.</desc><rect width="960" height="700" fill="#f8fafc"/><style>text{font-family:Malgun Gothic,Arial,sans-serif;fill:#142536} .title{font-size:27px;font-weight:700} .main{font-size:25px;font-weight:600} .sub{font-size:22px} .note{font-size:19px;fill:#40566b}</style>
+<text x="38" y="47" class="title">모델의 발전: 문제에서 설계 선택으로</text>
+<rect x="38" y="77" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="77" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="109" class="sub">깊은 모델을 학습하기 어렵다</text>
+<text x="65" y="147" class="main">잔차 연결: 입력 + 변화량</text>
+<text x="65" y="182" class="note">입력 2 + 변화량 0.3 = 출력 2.3</text>
+<rect x="38" y="225" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="225" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="257" class="sub">단어 ID로는 관계를 계산하기 어렵다</text>
+<text x="65" y="295" class="main">임베딩: ID → 실수 벡터</text>
+<text x="65" y="330" class="note">번호의 크기와 의미의 유사도는 다르다</text>
+<rect x="38" y="373" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="373" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="405" class="sub">순차 처리의 경로가 길다</text>
+<text x="65" y="443" class="main">Attention: 위치끼리 정보 전달</text>
+<text x="65" y="478" class="note">학습 병렬화와 생성 순차성은 구별</text>
+<rect x="38" y="521" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="521" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="553" class="sub">생성 결과를 어떻게 해석할까</text>
+<text x="65" y="591" class="main">학습 목표와 평가 조건 확인</text>
+<text x="65" y="626" class="note">연대 순서가 모든 상황의 우열은 아니다</text>
+<text x="38" y="686" class="note">읽는 방향: 위 → 아래 · 관계는 각 행의 설명과 화살표로 구분</text></svg>

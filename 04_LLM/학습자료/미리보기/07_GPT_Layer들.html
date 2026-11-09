@@ -1,0 +1,105 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>07. GPT Layer들 — 문맥을 섞고 특징을 가공하는 블록</title><link rel="stylesheet" href="toc.css"><style>body{font:17px/1.8 "Malgun Gothic",sans-serif;color:#17283b;background:#f3f6fa;margin:0}main{max-width:1000px;margin:auto;background:white;padding:36px}h1,h2,h3{line-height:1.4}h2{margin-top:2.4em;border-bottom:2px solid #dce6f1}a{color:#165eaa}img,svg{max-width:100%;height:auto}table{border-collapse:collapse;display:block;overflow:auto;font-size:15px}td,th{padding:10px;border:1px solid #bccbdc;vertical-align:top}th{background:#eaf1fa}pre{overflow:auto;background:#eef2f7;padding:18px}code{font-family:Consolas,monospace}details{padding:14px;background:#f1f6fc;margin:16px 0}blockquote{border-left:4px solid #739bd1;padding-left:16px}@media(max-width:600px){main{padding:16px}body{font-size:16px}}p,li,a{overflow-wrap:anywhere}figure{margin:20px 0}figcaption{font-size:14px;color:#40566b}</style><body><aside class="toc-sidebar"><nav aria-label="이 문서의 목차"><p class="toc-label">이 문서의 목차</p><ul><li class="toc-title"><a href="#07-gpt-layer들-문맥을-섞고-특징을-가공하는-블록">07. GPT Layer들 — 문맥을 섞고 특징을 가공하는 블록</a></li><li class="toc-section"><a href="#시각적으로-확인할-핵심">시각적으로 확인할 핵심</a></li><li class="toc-section"><a href="#1-두-번-더하는-이유">1. 두 번 더하는 이유</a></li><li class="toc-section"><a href="#2-layernorm-한-토큰의-c개-특징을-정리한다">2. LayerNorm: 한 토큰의 C개 특징을 정리한다</a></li><li class="toc-section"><a href="#3-ffn과-활성화-선형층-사이에서-무엇이-달라지나">3. FFN과 활성화: 선형층 사이에서 무엇이 달라지나</a></li><li class="toc-section"><a href="#4-dropout은-학습과-평가에서-다르다">4. Dropout은 학습과 평가에서 다르다</a></li><li class="toc-section"><a href="#5-보충-transformer가-다른-분야로-넘어갈-때">5. 보충: Transformer가 다른 분야로 넘어갈 때</a></li><li class="toc-section"><a href="#6-이해-확인">6. 이해 확인</a></li></ul></nav></aside><main><nav><a href="00_학습안내.html">학습 안내</a> · <a href="../07_GPT_Layer들.md">Markdown 원문</a></nav><h1 id="07-gpt-layer들-문맥을-섞고-특징을-가공하는-블록">07. GPT Layer들 — 문맥을 섞고 특징을 가공하는 블록</h1>
+<p>GPT 블록은 <strong>Attention으로 위치 사이의 정보를 섞고, FFN으로 각 위치의 특징을 가공</strong>한다. 정규화와 잔차 연결은 이 연산을 깊게 쌓을 때 학습을 돕는다. 이름을 외우기보다 어떤 값이 보존되고 어떤 값이 바뀌는지 추적하자.</p>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">전체 학습 경로</a> · <a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=125">원문 PDF 125~143쪽</a></p>
+<p>필요한 배경은 토큰별 벡터와 행렬곱, causal Attention이다. Attention이 낯설면 <a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장 Attention 설명</a>으로 돌아간다. 이 장을 마치면 정규화의 축을 계산하고, 두 잔차 경로의 입력을 구별하며, 기본 FFN과 게이트 FFN을 비교할 수 있어야 한다. 기본 학습은 1~4절, 다른 분야 응용은 보충이다.</p>
+<h2 id="시각적으로-확인할-핵심">시각적으로 확인할 핵심</h2>
+<p>순서: X → 첫 분기 → U → 둘째 분기 → Y. 두 덧셈의 기준을 찾으세요.</p>
+<p><img src="../assets/07_%ED%95%B5%EC%8B%AC%EA%B4%80%EA%B3%84.svg" alt="두 잔차는 서로 다른 입력을 보존한다: X · [B,T,C] 첫 잔차의 기준; Norm → Attention 위치 사이 정보를 섞음; U = X + Attention 결과 두 번째 잔차의 기준; Norm → FFN 위치별 특징 가공; Y = U + FFN 결과 폭 C를 보존" /></p>
+<p>두 번째 잔차가 보존하는 값은 X가 아니라 U다. 모든 단계의 외부 폭은 C다.</p>
+<h2 id="1-두-번-더하는-이유">1. 두 번 더하는 이유</h2>
+<p>설명용 Pre-Norm 블록은 다음처럼 계산한다. X는 <code>[B,T,C]</code>, B는 문장 수, T는 위치 수, C는 토큰 표현의 폭이다.</p>
+<pre><code class="language-text">U = X + Dropout(Attention(LayerNorm1(X)))
+Y = U + Dropout(FFN(LayerNorm2(U)))
+</code></pre>
+<p>Attention은 각 위치가 읽을 문맥 정보를 만들고, FFN은 그 정보를 특징별로 변환한다. 잔차 연결은 분기 입력을 출력에 그대로 더하는 경로다. FFN 앞 잔차는 이미 Attention 결과를 더한 U를 보존한다. 두 번째에도 X를 더하면 위 식과 다른 모델이 된다. 덧셈하려면 분기 출력의 폭도 C여야 한다. 변화량을 학습한다는 해석은 유용하지만 변화가 항상 작다는 수학적 보장은 없다.</p>
+<h2 id="2-layernorm-한-토큰의-c개-특징을-정리한다">2. LayerNorm: 한 토큰의 C개 특징을 정리한다</h2>
+<p>LayerNorm은 한 토큰 벡터 안에서 평균과 분산을 계산한다. 배치나 시간 위치를 함께 평균내지 않는다. 각 특징의 정규화 값에 학습 가능한 scale γ와 shift β를 적용한다.</p>
+<figure><img src="../assets/math_07_01.svg" alt="\mu=\frac1C\sum_i x_i,\quad v=\frac1C\sum_i(x_i-\mu)^2,\quad y_i=\gamma_i\frac{x_i-\mu}{\sqrt{v+\epsilon}}+\beta_i."><figcaption>수식의 기호와 계산은 인접한 본문에서 확인합니다.</figcaption></figure>
+<p>설명용 입력 x=(1,3), γ=(1,1), β=(0,0), ε는 무시할 만큼 작다고 놓자. 평균은 2, 편차는 (-1,1), 분산은 <code>(1+1)/2=1</code>, 표준편차는 1이므로 출력은 약 (-1,1)이다. γ=(2,1), β=(0,3)이면 (-2,4)로 바뀐다. 따라서 최종 출력이 항상 평균 0, 분산 1인 것은 아니다. ε는 상수 벡터처럼 분산 0일 때도 나눗셈을 가능하게 한다. 교안 129쪽의 ‘분산을 나눔’은 <strong>분산에 ε를 더한 값의 제곱근으로 나눔</strong>으로 읽어야 한다. <a href="https://arxiv.org/abs/1607.06450">Layer Normalization 원논문</a></p>
+<p>RMSNorm은 평균을 빼지 않고 <code>sqrt(mean(x²)+ε)</code>로 나눈 뒤 scale을 곱한다. 같은 (1,3)의 RMS는 √5≈2.236, scale=1 출력은 약 (0.447,1.342)이다. 평균 0을 강제하지 않는다. BatchNorm은 배치 등의 축에서 통계를 얻으므로 ‘정규화’라는 공통 이름만으로 서로 교체해서 설명할 수 없다. <a href="https://arxiv.org/abs/1910.07467">RMSNorm 원논문</a></p>
+<h2 id="3-ffn과-활성화-선형층-사이에서-무엇이-달라지나">3. FFN과 활성화: 선형층 사이에서 무엇이 달라지나</h2>
+<p>기본 FFN은 각 위치에 같은 가중치를 적용한다. <code>C → 4C → C</code>에서 내부 폭을 늘리고 GELU 같은 비선형 함수를 통과시킨다. 위치마다 별도로 계산하므로 FFN 자체가 다른 위치의 값을 직접 읽지는 않는다. 비선형 함수가 없으면 두 선형변환은 하나의 선형변환으로 합칠 수 있어 표현에 제약이 생긴다.</p>
+<table>
+<thead>
+<tr>
+<th>함수</th>
+<th>계산·특징</th>
+<th>주의점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sigmoid</td>
+<td><code>1/(1+exp(-x))</code>, 출력 0~1</td>
+<td>큰 절댓값에서 기울기가 작아질 수 있음</td>
+</tr>
+<tr>
+<td>ReLU</td>
+<td><code>max(0,x)</code></td>
+<td>음수 구간 기울기 0, 일부 뉴런이 계속 비활성화될 수 있음</td>
+</tr>
+<tr>
+<td>GELU</td>
+<td><code>x Φ(x)</code>, Φ는 표준정규 누적분포</td>
+<td>음수를 전부 0으로 만들지는 않음</td>
+</tr>
+<tr>
+<td>Swish/SiLU</td>
+<td>β=1이면 <code>x sigmoid(x)</code></td>
+<td>자기 값으로 통과량을 조절하는 부드러운 함수</td>
+</tr>
+</tbody>
+</table>
+<p>GLU는 입력으로부터 값 경로 v와 게이트 경로 g를 별도로 투영하고 <code>sigmoid(g) ⊙ v</code>를 계산한다. ⊙는 같은 위치 원소끼리의 곱이다. 예를 들어 g=(0,0), v=(2,-4)이면 게이트=(0.5,0.5), 결과=(1,-2)다. SwiGLU는 게이트 함수를 SiLU로 바꾼다. 출력 투영을 포함하면 <code>down(SiLU(g) ⊙ v)</code>이며 마지막 폭은 다시 C다. SiLU 게이트는 sigmoid 자체와 달리 값이 0~1에 갇히지 않는다. FFN 확장 폭과 게이트 채택 여부는 모델 설계에 따라 다르다.</p>
+<h2 id="4-dropout은-학습과-평가에서-다르다">4. Dropout은 학습과 평가에서 다르다</h2>
+<p>Dropout은 학습 중 일부 활성값을 확률 p로 0으로 만든다. inverted dropout에서는 살아남은 값에 <code>1/(1-p)</code>를 곱해 기댓값을 맞춘다. 입력 (2,4), p=0.5에서 첫 값만 살아남은 한 사례는 (4,0)이다. 평가 때는 보통 항등연산이다. Attention 확률 뒤에 적용할 수도 있지만 그 위치로만 제한되지 않는다. 확률 뒤 Dropout을 통과한 한 번의 표본은 행합 1을 보장하지 않는다. 사용 여부와 비율은 학습 조건에 따른 선택이므로 교안 127쪽의 사용 빈도를 모든 LLM의 규칙으로 확대하지 않는다.</p>
+<h2 id="5-보충-transformer가-다른-분야로-넘어갈-때">5. 보충: Transformer가 다른 분야로 넘어갈 때</h2>
+<table>
+<thead>
+<tr>
+<th>예</th>
+<th>토큰 또는 표현</th>
+<th>이 교안에서 볼 공통점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ViT</td>
+<td>이미지 패치</td>
+<td>패치 사이 관계를 Attention으로 처리</td>
+</tr>
+<tr>
+<td>Whisper</td>
+<td>음성 표현과 텍스트</td>
+<td>Encoder가 음성을 읽고 Decoder가 텍스트 생성</td>
+</tr>
+<tr>
+<td>AlphaFold</td>
+<td>단백질 관련 표현</td>
+<td>잔기 사이 관계를 모델링하는 구성요소 활용</td>
+</tr>
+<tr>
+<td>시계열</td>
+<td>연속값 패치 또는 이산 구간</td>
+<td>시간적 관계를 표현하고 예측</td>
+</tr>
+</tbody>
+</table>
+<p>모든 시계열 모델이 반드시 실수를 토큰 ID로 양자화하는 것은 아니다. ‘관계를 학습한다’는 공통 원리와 실제 입력·목표·구조의 차이를 함께 보자.</p>
+<h2 id="6-이해-확인">6. 이해 확인</h2>
+<ol>
+<li><code>[2,5,12]</code>에서 일반적인 LayerNorm은 어느 축으로 평균을 내는가?</li>
+<li>두 번째 잔차에 X를 더하면 왜 기본 식과 다른가?</li>
+<li>C=12일 때 기본 FFN의 중간 폭과 최종 폭은? 게이트가 0.5, 값이 -6이면 GLU 결과는?</li>
+<li>x=(4,4)를 LayerNorm에 넣으면 ε가 왜 필요한가? 평가 시 Dropout의 출력은?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>마지막 12개 특징 축이다. 문장·위치는 각각 독립적으로 정규화한다. 2절로 돌아간다.</li>
+<li>U에는 Attention 수정분이 이미 포함되어 있다. X를 쓰면 그 상태의 보존 경로가 달라진다. 1절의 두 식을 다시 쓴다.</li>
+<li>48과 12, <code>0.5×(-6)=-3</code>. 3절의 경로를 확인한다.</li>
+<li>분산 0으로 나누는 것을 막는다. scale/shift 전 정규화 값은 0이다. 평가 Dropout은 입력을 그대로 돌려준다. 2·4절로 돌아간다.</li>
+</ol>
+</details>
+<p>다음 <a href="08_GPT_%EB%AA%A8%EB%8D%B8%EC%9E%85%EC%B6%9C%EB%A0%A5.html">08장</a>에서는 이 블록을 거친 벡터가 어휘 점수로 변하는 마지막 단계를 연결한다.</p>
+</main></body></html>

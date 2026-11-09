@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1560" height="650" viewBox="0 0 1560 650">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#375c85"/></marker></defs>
+<rect width="100%" height="100%" fill="#f6f8fc"/><text x="35" y="50" font-family="Malgun Gothic,sans-serif" font-size="28" fill="#10243e">PTQ / QAT 처리 흐름: 둘 다 실제 장치 검증이 필요</text>
+<path d="M340,200.0 L400,200.0" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M710,200.0 L770,200.0" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M340,510.0 L400,510.0" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M710,510.0 L770,510.0" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1080,200.0 L1340.0,270" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1080,510.0 L1340.0,450" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="30" y="120" width="310" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="46" y="160" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">PTQ: 사전학습 모델</text>
+<text x="46" y="195" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">대표 calibration 데이터</text>
+<text x="46" y="230" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">목표 비트·범위 선택</text>
+<rect x="400" y="120" width="310" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="416" y="160" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">오프라인 보정</text>
+<text x="416" y="195" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">clipping / scale 탐색</text>
+<text x="416" y="230" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">rounding·가중치 보정</text>
+<rect x="770" y="120" width="310" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="786" y="160" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">양자화·변환</text>
+<text x="786" y="195" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">대상 backend 연산 변환</text>
+<text x="786" y="230" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">packing·커널 연결</text>
+<rect x="30" y="430" width="310" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="46" y="470" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">QAT: 사전학습 모델</text>
+<text x="46" y="505" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">학습·검증 데이터</text>
+<text x="46" y="540" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">fake quantization 삽입</text>
+<rect x="400" y="430" width="310" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="416" y="470" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">학습 / fine-tuning</text>
+<text x="416" y="505" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">forward: 양자화 모사</text>
+<text x="416" y="540" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">backward: STE 근사</text>
+<rect x="770" y="430" width="310" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="786" y="470" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">내보내기·변환</text>
+<text x="786" y="505" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">학습된 범위 반영</text>
+<text x="786" y="540" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">정수 커널·fallback 확인</text>
+<rect x="1170" y="270" width="340" height="180" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1186" y="310" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">공통: 실제 장치 평가</text>
+<text x="1186" y="345" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">품질·TTFT·토큰 지연</text>
+<text x="1186" y="380" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">peak RAM·전력·발열</text>
+<text x="1186" y="415" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">미달 시 설정 재선택</text>
+</svg>

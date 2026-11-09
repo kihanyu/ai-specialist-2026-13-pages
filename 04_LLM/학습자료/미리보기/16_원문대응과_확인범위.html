@@ -1,0 +1,1705 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>원문 대응과 확인 범위</title><link rel="stylesheet" href="toc.css"><style>body{font:17px/1.8 "Malgun Gothic",sans-serif;color:#17283b;background:#f3f6fa;margin:0}main{max-width:1000px;margin:auto;background:white;padding:36px}h1,h2,h3{line-height:1.4}h2{margin-top:2.4em;border-bottom:2px solid #dce6f1}a{color:#165eaa}img,svg{max-width:100%;height:auto}table{border-collapse:collapse;display:block;overflow:auto;font-size:15px}td,th{padding:10px;border:1px solid #bccbdc;vertical-align:top}th{background:#eaf1fa}pre{overflow:auto;background:#eef2f7;padding:18px}code{font-family:Consolas,monospace}details{padding:14px;background:#f1f6fc;margin:16px 0}blockquote{border-left:4px solid #739bd1;padding-left:16px}@media(max-width:600px){main{padding:16px}body{font-size:16px}}p,li,a{overflow-wrap:anywhere}figure{margin:20px 0}figcaption{font-size:14px;color:#40566b}</style><body><aside class="toc-sidebar"><nav aria-label="이 문서의 목차"><p class="toc-label">이 문서의 목차</p><ul><li class="toc-title"><a href="#원문-대응과-확인-범위">원문 대응과 확인 범위</a></li><li class="toc-section"><a href="#페이지별-대응">페이지별 대응</a></li></ul></nav></aside><main><nav><a href="00_학습안내.html">학습 안내</a> · <a href="../16_원문대응과_확인범위.md">Markdown 원문</a></nav><h1 id="원문-대응과-확인-범위">원문 대응과 확인 범위</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">전체 학습 안내</a></p>
+<p>검토 기준일은 2026-11-09입니다. 대상은 강의 PDF 1~280쪽이며, 본문 순서는 강의 목차 14개 주제를 따릅니다. 교육용 계산과 실제 모델 실행 결과를 구분합니다.</p>
+<ul>
+<li>내적·Attention·역전파·CE/PPL·SFT/DPO·GRPO clip·KV 저장량·online softmax 예제를 자체 검산했습니다.</li>
+<li>표·이미지·수식은 제공 HTML을 Microsoft Edge로 렌더하여 확인했습니다. 실제 독자의 이해도와 모든 Markdown 앱의 표시를 검증한 것은 아닙니다.</li>
+<li>원 실습 노트북 전체 실행, GPU 성능 측정, 원문 동영상·강사 발언 복원은 수행하지 않았습니다.</li>
+<li>원문 49쪽 역전파 산술, 109쪽 자기참조 우선 단정, 146~147쪽 출력 축, 188쪽 LoRA 초기화, 236쪽 clip 기울기의 조건 등은 해당 장에서 원문 표현과 보완 설명을 구분했습니다.</li>
+<li>최신 제품 지원 목록·출시 현황을 제공하는 자료가 아닙니다. 원문에 비교 조건이 부족한 성능 배수와 품질 주장은 보편 사실로 확정하지 않았습니다.</li>
+</ul>
+<h2 id="페이지별-대응">페이지별 대응</h2>
+<p>PDF 파일 순서(1-based) 기준입니다. 원문의 페이지 제목은 텍스트 추출의 첫 줄을 탐색 단서로 사용하며, 그림과 수식의 의미를 제목만으로 검증한 표가 아닙니다. 세부 처리·정정·미확인은 각 장의 보충·정정 문단에서 설명합니다. 14~30쪽은 사회·전망 토론으로 통합하며 최신 사실을 재확정하지 않습니다. 원문 동영상의 재생 내용·강사의 구두 설명은 복원 범위 밖입니다.</p>
+<table>
+<thead>
+<tr>
+<th>PDF 쪽</th>
+<th>원문 탐색 제목</th>
+<th>기준 본문</th>
+<th>처리</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=1">1</a></td>
+<td>LLM 모델의 이해와 확장</td>
+<td><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a></td>
+<td>표지·공식 목차를 학습 구조로 반영</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=2">2</a></td>
+<td>강의 목차</td>
+<td><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a></td>
+<td>표지·공식 목차를 학습 구조로 반영</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=3">3</a></td>
+<td>AI 모델의 역사</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=4">4</a></td>
+<td>AI 모델 구분</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=5">5</a></td>
+<td>Deep Learning 모델의 역사</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=6">6</a></td>
+<td>AlexNet</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=7">7</a></td>
+<td>ResNet</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=8">8</a></td>
+<td>Word2Vec</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=9">9</a></td>
+<td>Alphago</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=10">10</a></td>
+<td>Transformers</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=11">11</a></td>
+<td>GAN과 Diffusion</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=12">12</a></td>
+<td>GPT: 규모의 시대</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=13">13</a></td>
+<td>AlphaFold</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=14">14</a></td>
+<td>AI의 미래</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=15">15</a></td>
+<td>AI의 호황</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=16">16</a></td>
+<td>빅테크의 AI 투자 계획</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=17">17</a></td>
+<td>World 모델과 Physical AI</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=18">18</a></td>
+<td>Humanoid의 발전</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=19">19</a></td>
+<td>배움</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=20">20</a></td>
+<td>배움 — 2026 수능</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=21">21</a></td>
+<td>AI가 수학 문제를 증명</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=22">22</a></td>
+<td>24년간 연구한 문제가 풀렸다는 소식에 대한 감회</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=23">23</a></td>
+<td>노동의 가치와 해방</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=24">24</a></td>
+<td>산업의 파괴</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=25">25</a></td>
+<td>전쟁과 AI</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=26">26</a></td>
+<td>의식과 자유의지</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=27">27</a></td>
+<td>새로운 지적인 존재</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=28">28</a></td>
+<td>Alphago 이후</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=29">29</a></td>
+<td>Alphago 이후</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=30">30</a></td>
+<td>Alphago 이후</td>
+<td><a href="01_AI_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EC%97%AD%EC%82%AC.html">01장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=31">31</a></td>
+<td>AI 기본 수학</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=32">32</a></td>
+<td>백터: 덧셈</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=33">33</a></td>
+<td>백터: 내적(Dot product)</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=34">34</a></td>
+<td>백터: 내적(Dot product)</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=35">35</a></td>
+<td>백터: Cosine similarity</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=36">36</a></td>
+<td>백터: 내적(Dot product)</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=37">37</a></td>
+<td>행렬</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=38">38</a></td>
+<td>행렬: 2차원 회전 (Rotation Matrix)</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=39">39</a></td>
+<td>선형함수</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=40">40</a></td>
+<td>경사하강법</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=41">41</a></td>
+<td>활성화함수</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=42">42</a></td>
+<td>활성화함수</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=43">43</a></td>
+<td>지수함수 로그함수</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=44">44</a></td>
+<td>Softmax와 Sigmoid</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=45">45</a></td>
+<td>Softmax와 Sigmoid</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=46">46</a></td>
+<td>신경망 학습</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=47">47</a></td>
+<td>Feedforward, Loss 계산</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=48">48</a></td>
+<td>Backpropagation</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=49">49</a></td>
+<td>Backpropagation: 가중치</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=50">50</a></td>
+<td>Backpropagation: 가중치</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=51">51</a></td>
+<td>Backpropagation: 가중치</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=52">52</a></td>
+<td>Loss 계산 (역전파 1회 후)</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=53">53</a></td>
+<td>경사하강법(Gradient Descent)</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=54">54</a></td>
+<td>KL Divergence, Cross Entropy</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=55">55</a></td>
+<td>Cross Entropy</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=56">56</a></td>
+<td>Cross Entropy</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=57">57</a></td>
+<td>Cross Entropy</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=58">58</a></td>
+<td>Cross Entropy</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=59">59</a></td>
+<td>KL-Divergence</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=60">60</a></td>
+<td>Perplexity (혼란도)</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=61">61</a></td>
+<td>Perplexity가 &quot;평균 후보 개수&quot;인 이유</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=62">62</a></td>
+<td>조건부확률: 조건이 기준 집합을 바꾼다</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=63">63</a></td>
+<td>베이즈 정리 (Bayes’ Theorem)</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=64">64</a></td>
+<td>베이즈 정리: 직관적인 예시</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=65">65</a></td>
+<td>베이즈 정리: 수학적 계산 과정</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=66">66</a></td>
+<td>베이즈 정리와 LLM 관계</td>
+<td><a href="02_AI_%EA%B8%B0%EB%B3%B8_%EC%88%98%ED%95%99.html">02장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=67">67</a></td>
+<td>언어 모델의 발전</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=68">68</a></td>
+<td>규칙기반 번역</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=69">69</a></td>
+<td>언어모델: Encoders, Decoders</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=70">70</a></td>
+<td>언어모델: RNN</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=71">71</a></td>
+<td>언어모델: RNN Attention</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=72">72</a></td>
+<td>언어모델: Transformer 비교</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=73">73</a></td>
+<td>언어모델: Transformer 구조</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=74">74</a></td>
+<td>언어모델:BERT, GPT, T5</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=75">75</a></td>
+<td>언어모델: BERT, GPT</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=76">76</a></td>
+<td>언어 모델 비교</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=77">77</a></td>
+<td>언어 모델: GPT</td>
+<td><a href="03_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8%EC%9D%98_%EB%B0%9C%EC%A0%84.html">03장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=78">78</a></td>
+<td>언어 모델: 입력</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=79">79</a></td>
+<td>모델 학습</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=80">80</a></td>
+<td>데이터 입력: 전처리</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=81">81</a></td>
+<td>데이터 입력: Tokenizer</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=82">82</a></td>
+<td>데이터 입력: Embedding</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=83">83</a></td>
+<td>데이터입력: 벡터 공간</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=84">84</a></td>
+<td>백터 공간 실습</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=85">85</a></td>
+<td>데이터입력: BPE Tokenizer</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=86">86</a></td>
+<td>데이터입력: Wordpiece Tokenizer</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=87">87</a></td>
+<td>데이터입력: Unigram Tokenizer</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=88">88</a></td>
+<td>데이터 입력 – Tokenizer</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=89">89</a></td>
+<td>위치 인코딩</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=90">90</a></td>
+<td>절대 위치 인코딩</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=91">91</a></td>
+<td>Sinusoidal Positional Encoding</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=92">92</a></td>
+<td>상대 위치 인코딩</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=93">93</a></td>
+<td>ROPE</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=94">94</a></td>
+<td>ROPE</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=95">95</a></td>
+<td>Text 생성</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=96">96</a></td>
+<td>Token화</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=97">97</a></td>
+<td>Special Token</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=98">98</a></td>
+<td>Special Token</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=99">99</a></td>
+<td>데이터셋</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=100">100</a></td>
+<td>Token 임베딩</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=101">101</a></td>
+<td>실습</td>
+<td><a href="04_%EC%96%B8%EC%96%B4_%EB%AA%A8%EB%8D%B8_%EC%9E%85%EB%A0%A5.html">04장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=102">102</a></td>
+<td>Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=103">103</a></td>
+<td>GPT: Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a> · <a href="06_GPT_%EB%AA%A8%EB%8D%B8_%EC%9D%B4%ED%95%B4.html">06장</a></td>
+<td>계산(05)과 전체 구조 연결(06)로 역할 분리</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=104">104</a></td>
+<td>GPT: Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=105">105</a></td>
+<td>GPT: Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=106">106</a></td>
+<td>GPT: Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=107">107</a></td>
+<td>Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=108">108</a></td>
+<td>Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=109">109</a></td>
+<td>Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=110">110</a></td>
+<td>Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=111">111</a></td>
+<td>Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=112">112</a></td>
+<td>Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=113">113</a></td>
+<td>Attention Score</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=114">114</a></td>
+<td>Attention Map</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=115">115</a></td>
+<td>Scale</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=116">116</a></td>
+<td>전체 흐름</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=117">117</a></td>
+<td>Attention 의미</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a> · <a href="06_GPT_%EB%AA%A8%EB%8D%B8_%EC%9D%B4%ED%95%B4.html">06장</a></td>
+<td>계산(05)과 전체 구조 연결(06)로 역할 분리</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=118">118</a></td>
+<td>Softmax</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=119">119</a></td>
+<td>Masking</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=120">120</a></td>
+<td>Multi-head Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a> · <a href="06_GPT_%EB%AA%A8%EB%8D%B8_%EC%9D%B4%ED%95%B4.html">06장</a></td>
+<td>계산(05)과 전체 구조 연결(06)로 역할 분리</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=121">121</a></td>
+<td>Multi-head Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a> · <a href="06_GPT_%EB%AA%A8%EB%8D%B8_%EC%9D%B4%ED%95%B4.html">06장</a></td>
+<td>계산(05)과 전체 구조 연결(06)로 역할 분리</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=122">122</a></td>
+<td>Multi-head Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a> · <a href="06_GPT_%EB%AA%A8%EB%8D%B8_%EC%9D%B4%ED%95%B4.html">06장</a></td>
+<td>계산(05)과 전체 구조 연결(06)로 역할 분리</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=123">123</a></td>
+<td>Multi-head Attention</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a> · <a href="06_GPT_%EB%AA%A8%EB%8D%B8_%EC%9D%B4%ED%95%B4.html">06장</a></td>
+<td>계산(05)과 전체 구조 연결(06)로 역할 분리</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=124">124</a></td>
+<td>실습</td>
+<td><a href="05_Attention_%EC%9D%B4%ED%95%B4.html">05장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=125">125</a></td>
+<td>GPT Layer들</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=126">126</a></td>
+<td>GPT: Layer들</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=127">127</a></td>
+<td>Dropout</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=128">128</a></td>
+<td>정규화</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=129">129</a></td>
+<td>정규화: Layer Normalization</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=130">130</a></td>
+<td>정규화: Normalization</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=131">131</a></td>
+<td>정규화: RMS Normalization</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=132">132</a></td>
+<td>Feed Forward Network</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=133">133</a></td>
+<td>활성화 함수: Sigmoid</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=134">134</a></td>
+<td>활성화 함수: ReLU</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=135">135</a></td>
+<td>GELU</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=136">136</a></td>
+<td>Swish: 부드러운 Self-Gating</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=137">137</a></td>
+<td>GLU: Gate × Value</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=138">138</a></td>
+<td>SwiGLU: Swish + GLU</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=139">139</a></td>
+<td>Residual connection</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=140">140</a></td>
+<td>Vision Transformer</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=141">141</a></td>
+<td>Whisper</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=142">142</a></td>
+<td>AlphaFold</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=143">143</a></td>
+<td>Time Series Prediction</td>
+<td><a href="07_GPT_Layer%EB%93%A4.html">07장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=144">144</a></td>
+<td>GPT 모델 입출력</td>
+<td><a href="08_GPT_%EB%AA%A8%EB%8D%B8%EC%9E%85%EC%B6%9C%EB%A0%A5.html">08장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=145">145</a></td>
+<td>GPT 모델 입출력</td>
+<td><a href="08_GPT_%EB%AA%A8%EB%8D%B8%EC%9E%85%EC%B6%9C%EB%A0%A5.html">08장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=146">146</a></td>
+<td>GPT 모델 입출력</td>
+<td><a href="08_GPT_%EB%AA%A8%EB%8D%B8%EC%9E%85%EC%B6%9C%EB%A0%A5.html">08장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=147">147</a></td>
+<td>Output Token 생성 과정</td>
+<td><a href="08_GPT_%EB%AA%A8%EB%8D%B8%EC%9E%85%EC%B6%9C%EB%A0%A5.html">08장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=148">148</a></td>
+<td>Temperature(T)</td>
+<td><a href="08_GPT_%EB%AA%A8%EB%8D%B8%EC%9E%85%EC%B6%9C%EB%A0%A5.html">08장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=149">149</a></td>
+<td>Top-K 샘플링</td>
+<td><a href="08_GPT_%EB%AA%A8%EB%8D%B8%EC%9E%85%EC%B6%9C%EB%A0%A5.html">08장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=150">150</a></td>
+<td>지식의 저장</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">09장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=151">151</a></td>
+<td>FFN 지식의 저장</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">09장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=152">152</a></td>
+<td>FFN 지식의 저장</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">09장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=153">153</a></td>
+<td>FFN 지식의 저장</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">09장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=154">154</a></td>
+<td>FFN 지식의 저장</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">09장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=155">155</a></td>
+<td>Latent Space</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">09장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=156">156</a></td>
+<td>Expansion Layer</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">09장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=157">157</a></td>
+<td>실습</td>
+<td><a href="09_%EC%A7%80%EC%8B%9D%EC%9D%98_%EC%A0%80%EC%9E%A5.html">09장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=158">158</a></td>
+<td>모델 학습</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=159">159</a></td>
+<td>학습과정</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=160">160</a></td>
+<td>Dataset</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=161">161</a></td>
+<td>Validation Dataset</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=162">162</a></td>
+<td>학습과정</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=163">163</a></td>
+<td>비용함수-수치예측(MSE)</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=164">164</a></td>
+<td>비용함수-Binary 분류(Cross Entropy)</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=165">165</a></td>
+<td>비용함수-분류(Cross Entropy)</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=166">166</a></td>
+<td>비용함수-분류(Cross Entropy)</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=167">167</a></td>
+<td>비용함수-계산 과정</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=168">168</a></td>
+<td>경사하강법(Gradient Descent)</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=169">169</a></td>
+<td>LOCAL MINIMUM</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=170">170</a></td>
+<td>Adam Optimizer</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=171">171</a></td>
+<td>Adam Optimizer</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=172">172</a></td>
+<td>Epoch, Step, Batch Size</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=173">173</a></td>
+<td>Batch Size</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=174">174</a></td>
+<td>Inference vs Traing</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=175">175</a></td>
+<td>실습</td>
+<td><a href="10_%EB%AA%A8%EB%8D%B8_%ED%95%99%EC%8A%B5.html">10장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=176">176</a></td>
+<td>Fine-tuning</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=177">177</a></td>
+<td>분류 미세 튜닝</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=178">178</a></td>
+<td>분류 미세 튜닝</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=179">179</a></td>
+<td>분류 미세 튜닝</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=180">180</a></td>
+<td>분류 미세 튜닝</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=181">181</a></td>
+<td>분류 미세 튜닝</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=182">182</a></td>
+<td>실습</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=183">183</a></td>
+<td>LoRA</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=184">184</a></td>
+<td>Full Fine-tuning vs PEFT</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=185">185</a></td>
+<td>LoRA</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=186">186</a></td>
+<td>LoRA</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=187">187</a></td>
+<td>LoRA</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=188">188</a></td>
+<td>LoRA: 초기화</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=189">189</a></td>
+<td>QLoRA</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=190">190</a></td>
+<td>QLoRA</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=191">191</a></td>
+<td>QLoRA</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=192">192</a></td>
+<td>QLoRA</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=193">193</a></td>
+<td>BF16</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=194">194</a></td>
+<td>실습</td>
+<td><a href="11_Fine_tuning%EA%B3%BC_LoRA_QLoRA.html">11장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=195">195</a></td>
+<td>지시 미세 튜닝</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=196">196</a></td>
+<td>지시 미세 튜닝</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=197">197</a></td>
+<td>지시 미세 튜닝: Prompt Fomat</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=198">198</a></td>
+<td>지시 미세 튜닝: 데이터 생성 과정</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=199">199</a></td>
+<td>지시 미세 튜닝: Prompt 적용</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=200">200</a></td>
+<td>지시 미세 튜닝: Padding(Input)</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=201">201</a></td>
+<td>지시 미세 튜닝: Padding(Target)</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=202">202</a></td>
+<td>지시 미세 튜닝: Masking(Target)</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=203">203</a></td>
+<td>지시 미세 튜닝: Masking(Instruction)</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=204">204</a></td>
+<td>실습</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=205">205</a></td>
+<td>RLHF or DPO</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=206">206</a></td>
+<td>PPO</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=207">207</a></td>
+<td>PPO: Reward Model</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=208">208</a></td>
+<td>DPO</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=209">209</a></td>
+<td>Bradley-Terry Model</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=210">210</a></td>
+<td>Bradley-Terry Model</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=211">211</a></td>
+<td>KL Divergence</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=212">212</a></td>
+<td>KL Divergence</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=213">213</a></td>
+<td>DPO: Loss 함수</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=214">214</a></td>
+<td>Dataset구조</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=215">215</a></td>
+<td>실습</td>
+<td><a href="12_%EC%A7%80%EC%8B%9C%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D%EA%B3%BC_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5.html">12장</a></td>
+<td>실습 안내로 반영; 전체 원 실습 실행 미실시</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=216">216</a></td>
+<td>추론 모델</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=217">217</a></td>
+<td>추론과정</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=218">218</a></td>
+<td>모델 추론</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=219">219</a></td>
+<td>모델에게 가르치는 방법</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=220">220</a></td>
+<td>모델에게 가르치는 방법</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=221">221</a></td>
+<td>GRPO Loss</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=222">222</a></td>
+<td>모든 Response에 대한 Score</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=223">223</a></td>
+<td>모든 Step에 대한 Score</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=224">224</a></td>
+<td>점수화</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=225">225</a></td>
+<td>점수화</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=226">226</a></td>
+<td>점수화</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=227">227</a></td>
+<td>확률 계산</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=228">228</a></td>
+<td>확률 계산</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=229">229</a></td>
+<td>확률 계산</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=230">230</a></td>
+<td>확률 계산</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=231">231</a></td>
+<td>확률 계산</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=232">232</a></td>
+<td>Clip</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=233">233</a></td>
+<td>Clip</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=234">234</a></td>
+<td>Clip</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=235">235</a></td>
+<td>Clip</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=236">236</a></td>
+<td>클리핑 범위를 벗어나면 그래디언트가 0이 된다</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=237">237</a></td>
+<td>미분해서 확인하기</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=238">238</a></td>
+<td>KL</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=239">239</a></td>
+<td>KL: 값이 너무 달라지지 않게</td>
+<td><a href="13_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8.html">13장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=240">240</a></td>
+<td>LLM 효율화</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=241">241</a></td>
+<td>KV Caching</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=242">242</a></td>
+<td>KV Caching</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=243">243</a></td>
+<td>KV Caching</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=244">244</a></td>
+<td>KV Caching</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=245">245</a></td>
+<td>GQA</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=246">246</a></td>
+<td>MLA</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=247">247</a></td>
+<td>MLA: Latent KV Cache</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=248">248</a></td>
+<td>MLA: 추가 Compute를 없애는 재배열</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=249">249</a></td>
+<td>MLA: KV Cache 크기 비교</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=250">250</a></td>
+<td>MLA</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=251">251</a></td>
+<td>Sliding window attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=252">252</a></td>
+<td>정규화 레이어 배치</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=253">253</a></td>
+<td>넓이를 키울 것인가? 깊이를 키울 것인가?</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=254">254</a></td>
+<td>Gated DeltaNet</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=255">255</a></td>
+<td>Gated DeltaNet</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=256">256</a></td>
+<td>Gated DeltaNet: 원리</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=257">257</a></td>
+<td>Gated DeltaNet: Decay Gate</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=258">258</a></td>
+<td>Gated DeltaNet</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=259">259</a></td>
+<td>Gated DeltaNet: 메모리 절약</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=260">260</a></td>
+<td>Multi-token Prediction</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=261">261</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=262">262</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=263">263</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=264">264</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=265">265</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=266">266</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=267">267</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=268">268</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=269">269</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=270">270</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=271">271</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=272">272</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=273">273</a></td>
+<td>Flash Attention</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=274">274</a></td>
+<td>TurboQuant</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=275">275</a></td>
+<td>TurboQuant</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=276">276</a></td>
+<td>TurboQuant</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=277">277</a></td>
+<td>TurboQuant</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=278">278</a></td>
+<td>TurboQuant</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=279">279</a></td>
+<td>TurboQuant</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+<tr>
+<td><a href="../../%EA%B5%90%EC%95%88/app_sp_slides_20261013.pdf#page=280">280</a></td>
+<td>TurboQuant</td>
+<td><a href="14_LLM%ED%9A%A8%EC%9C%A8%ED%99%94.html">14장</a></td>
+<td>주제별 본문으로 통합</td>
+</tr>
+</tbody>
+</table>
+</main></body></html>

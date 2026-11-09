@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1210" height="660" viewBox="0 0 1210 660">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#375c85"/></marker></defs>
+<rect width="100%" height="100%" fill="#f6f8fc"/><text x="35" y="50" font-family="Malgun Gothic,sans-serif" font-size="28" fill="#10243e">LLM 추론 흐름: Prefill에서 Decode로 (batch=1 예시)</text>
+<path d="M360,190.0 L440,190.0" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M760,190.0 L840,190.0" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1000.0,270 L1000.0,440" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M840,520.0 L760,520.0" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M440,520.0 L360,520.0" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="40" y="110" width="320" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="150" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Prefill: 입력 토큰들</text>
+<text x="56" y="185" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">프롬프트를 함께 처리</text>
+<text x="56" y="220" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">여러 토큰의 병렬 연산</text>
+<rect x="440" y="110" width="320" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="456" y="150" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">GEMM + Attention</text>
+<text x="456" y="185" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Q·K·V 계산</text>
+<text x="456" y="220" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">causal mask 적용</text>
+<rect x="840" y="110" width="320" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="856" y="150" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">KV cache 생성</text>
+<text x="856" y="185" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">레이어별 K·V 보관</text>
+<text x="856" y="220" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">첫 출력 토큰 선택</text>
+<rect x="840" y="440" width="320" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="856" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Decode: 새 토큰 1개</text>
+<text x="856" y="515" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">직전 출력 토큰 입력</text>
+<text x="856" y="550" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">순차 생성 단계</text>
+<rect x="440" y="440" width="320" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="456" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">가중치 읽기 + GEMV</text>
+<text x="456" y="515" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">새 Q·K·V 계산</text>
+<text x="456" y="550" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">KV cache 읽기·추가</text>
+<rect x="40" y="440" width="320" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Attention + 다음 토큰</text>
+<text x="56" y="515" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">과거 K·V 활용</text>
+<text x="56" y="550" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">종료까지 Decode 반복</text>
+</svg>

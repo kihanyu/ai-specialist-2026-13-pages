@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="700" viewBox="0 0 960 700" role="img" aria-labelledby="title desc"><title id="title">문맥 전달과 계산 순서: RNN과 Transformer</title><desc id="desc">위에서 아래로 읽는 네 단계 추적도. 모든 값은 교육용이며 실제 성능 측정이 아니다.</desc><rect width="960" height="700" fill="#f8fafc"/><style>text{font-family:Malgun Gothic,Arial,sans-serif;fill:#142536} .title{font-size:27px;font-weight:700} .main{font-size:25px;font-weight:600} .sub{font-size:22px} .note{font-size:19px;fill:#40566b}</style>
+<text x="38" y="47" class="title">문맥 전달과 계산 순서: RNN과 Transformer</text>
+<rect x="38" y="77" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="77" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="109" class="sub">RNN: 같은 층의 시점 의존</text>
+<text x="65" y="147" class="main">h₁ → h₂ → h₃</text>
+<text x="65" y="182" class="note">h₂를 계산하려면 h₁이 먼저 필요</text>
+<rect x="38" y="225" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="225" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="257" class="sub">Transformer: 학습 위치 계산</text>
+<text x="65" y="295" class="main">각 위치의 Q·K·V를 행렬로 계산</text>
+<text x="65" y="330" class="note">causal mask로 미래 정보 차단</text>
+<rect x="38" y="373" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="373" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="405" class="sub">자기회귀 생성: 새 토큰 의존</text>
+<text x="65" y="443" class="main">문맥 → 토큰 선택 → 새 문맥</text>
+<text x="65" y="478" class="note">선택한 결과가 다음 반복의 입력</text>
+<rect x="38" y="521" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="521" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="553" class="sub">구조와 목표는 구별</text>
+<text x="65" y="591" class="main">BERT / GPT / T5의 다른 구성</text>
+<text x="65" y="626" class="note">양방향·단방향만으로 우열을 정하지 않음</text>
+<text x="38" y="686" class="note">읽는 방향: 위 → 아래 · 관계는 각 행의 설명과 화살표로 구분</text></svg>
