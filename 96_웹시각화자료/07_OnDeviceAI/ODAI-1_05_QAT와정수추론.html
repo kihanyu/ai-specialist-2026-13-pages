@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>5. QAT와 정수 추론 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/ondevice-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">On-Device AI 전체 흐름</a></li><li><a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">1장. AI 연산과 성능·메모리 병목</a></li><li><a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">2장. 온디바이스 AI 실행 환경</a></li><li><a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">3장. 수 표현과 선형 양자화의 원리</a></li><li><a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">4장. 비균일 양자화와 PTQ 오차 제어</a></li><li><a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html" aria-current="page">5. QAT와 정수 추론</a></li><li><a href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html">6. 고급 LLM 양자화와 적용 판단</a></li><li><a href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html">부록 — 개념 사이의 연결과 종합 복습</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</a></li><li><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></li><li><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a></li><li><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></li><li><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></li><li><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</a></li><li><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></li><li><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a></li><li><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">8. 종합 복습: 조건에 맞는 수단을 선택하기</a></li><li><a href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html">LLM 양자화 실무 의사결정 가이드</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">On-Device AI</p><h1>5. QAT와 정수 추론</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>FP master·fake quant 순전파·STE 역전파를 분리해 추적한다.</li><li>작은 업데이트의 누적과 clipping 구간의 대체 gradient를 계산한다.</li><li>QAT와 실제 INT8 곱·INT32 누산·비선형 정수 근사·배포 커널을 구별한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="od-qat" id="lab-od-qat"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-51-학습-목표와-선수-개념">5.1 학습 목표와 선수 개념</a></li><li><a href="#sec-52-ptq로-부족할-때-qat를-선택한다-p5556">5.2 PTQ로 부족할 때 QAT를 선택한다 — p.55–56</a></li><li><a href="#sec-53-fake-quantization과-fp-master-weight-p57">5.3 Fake quantization과 FP master weight — p.57</a></li><li><a href="#sec-54-불연속-반올림을-통과하는-ste-p5859">5.4 불연속 반올림을 통과하는 STE — p.58–59</a></li><li><a href="#sec-55-qat-학습과-실제-정수-추론은-다르다-p6061">5.5 QAT 학습과 실제 정수 추론은 다르다 — p.60–61</a></li><li><a href="#sec-56-비선형-연산의-정수-근사-p62">5.6 비선형 연산의 정수 근사 — p.62</a></li><li><a href="#sec-57-장-요약과-복습">5.7 장 요약과 복습</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-5-qat와-정수-추론">5. QAT와 정수 추론</h1>
+<p>보정만으로 정확도를 유지하기 어렵다면, 양자화 오차를 경험하면서 모델을 다시 학습할 수 있다. 이 장은 모의 양자화와 고정밀 가중치의 역할을 나누고, 기울기를 전달하는 방법을 거쳐 실제 정수 추론으로 연결한다.</p>
+<p><strong>원본 범위: p.55–62.</strong> 앞 장의 PTQ가 이미 학습된 모델의 표현을 바꾸는 방법이었다면, 이 장은 모델이 양자화 오차에 적응하도록 학습하는 방법을 설명한다. 별도 표시가 없는 그림은 원본 강의자료의 본문 Crop이다. 수치 실험은 원본의 사례이며 모든 모델에서 재현되는 보장이 아니다.</p>
+<h2 id="sec-51-학습-목표와-선수-개념">5.1 학습 목표와 선수 개념</h2>
+<p>이 장을 마치면 fake quantization의 순전파와 STE의 역전파를 구별하고, 학습용 가중치와 배포용 가중치가 다른 이유를 설명할 수 있어야 한다. 또한 QAT를 수행한 사실만으로 모든 연산이 정수로 실행된다고 단정하지 않아야 한다.</p>
+<p>선수 개념은 3장의 scale·zero point·clipping, 4장의 calibration과 PTQ다. **Gradient(기울기)**는 파라미터를 조금 바꿀 때 손실이 변하는 정도이고, **backpropagation(역전파)**은 출력 손실에서 각 파라미터까지 연쇄법칙으로 기울기를 전달하는 계산이다. **Optimizer(최적화 알고리즘)**는 기울기를 이용해 파라미터를 갱신한다. **Fine-tuning(미세조정)**은 사전학습 가중치를 출발점으로 추가 학습하는 것이다.</p>
+<h2 id="sec-52-ptq로-부족할-때-qat를-선택한다-p5556">5.2 PTQ로 부족할 때 QAT를 선택한다 — p.55–56</h2>
+<p><img alt="p.55 QAT 장 구분과 핵심 질문" decoding="async" id="figure-1" loading="lazy" src="../resources/573d639df4da2aa8551a-p055-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/573d639df4da2aa8551a-p055-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/573d639df4da2aa8551a-p055-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.55 읽는 포인트:</strong> 이 페이지는 장 구분 페이지다. 핵심 질문은 “양자화된 모델의 성능을 어떻게 회복할 것인가?”다. 여기서 성능은 정확도와 실행 속도를 구분해 읽어야 한다. QAT의 직접적인 목적은 양자화 후 정확도 저하를 줄이는 것이며, 실행 속도는 최종 커널과 배포 환경에 달려 있다.</p>
+<p><img alt="p.56 PTQ와 QAT 처리 경로" decoding="async" id="figure-2" loading="lazy" src="../resources/7bfdd4b22fcab0b249f2-p056-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/7bfdd4b22fcab0b249f2-p056-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/7bfdd4b22fcab0b249f2-p056-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.56 읽는 포인트:</strong> 두 경로 모두 사전학습 모델에서 시작한다. PTQ 경로는 calibration 후 변환하고, QAT 경로는 양자화의 영향을 학습에 넣어 가중치를 조정한다. QAT를 모델 전체의 사전학습을 처음부터 반복하는 것으로 이해하지 않는다.</p>
+<p>**Quantization-Aware Training(QAT, 양자화 인지 학습)**은 학습 중 양자화·복원으로 생기는 오차를 모사해, 배포 시 저정밀 표현에 더 잘 맞는 파라미터를 얻는 방법이다. 반면 **Post-Training Quantization(PTQ, 학습 후 양자화)**는 보통 전체 모델의 일반적인 재학습 없이 통계 추정과 양자화·보정을 수행한다. PTQ 안에서도 AdaRound처럼 보정 목적의 최적화가 있을 수 있으므로 “PTQ는 계산이나 최적화를 전혀 하지 않는다”는 정의는 부정확하다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>비교축</th>
+<th>PTQ</th>
+<th>QAT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>모델의 출발점</td>
+<td>사전학습 모델</td>
+<td>사전학습 모델 또는 학습 중인 모델</td>
+</tr>
+<tr>
+<td>주요 작업</td>
+<td>calibration, 반올림·범위·스케일 선택, 필요 시 국소 보정</td>
+<td>양자화 오차를 모사한 forward와 gradient를 이용한 학습</td>
+</tr>
+<tr>
+<td>데이터</td>
+<td>대표 입력을 담은 작은 calibration 집합을 쓰는 경우가 많음</td>
+<td>학습 목적에 맞는 데이터·손실이 필요</td>
+</tr>
+<tr>
+<td>비용</td>
+<td>상대적으로 낮은 편</td>
+<td>학습 연산, activation, gradient, optimizer 상태 비용 추가</td>
+</tr>
+<tr>
+<td>유리한 상황</td>
+<td>빠른 변환, 학습 자원 부족, 목표 정확도 이미 충족</td>
+<td>낮은 비트 수 또는 민감한 모델에서 PTQ 정확도가 부족</td>
+</tr>
+<tr>
+<td>배포 속도</td>
+<td>실제 저정밀 커널·하드웨어 지원에 달림</td>
+<td>동일하게 커널·하드웨어 지원에 달림</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>교육용 판단 예시:</strong> INT8 PTQ가 목표 정확도를 만족하고 장치에서 빨라졌다면 QAT를 추가할 이유가 크지 않다. 반대로 작은 CNN에서 정확도가 크게 떨어지고 학습 데이터가 있다면 QAT를 검토한다. QAT가 항상 PTQ보다 좋다는 순위보다, 목표 정확도를 회복하는 데 필요한 비용을 비교한다.</p>
+<h2 id="sec-53-fake-quantization과-fp-master-weight-p57">5.3 Fake quantization과 FP master weight — p.57</h2>
+<p><strong>두 가중치의 역할:</strong> 고정밀 가중치 사본(A Full-Precision Copy of the Weights W)은 작은 학습 변화를 누적하는 기준이고, 그 사본을 양자화했다가 복원한 값은 순전파에서 오차를 경험하게 하는 값이다. 예를 들어 양자화 간격보다 작은 업데이트가 한 번에 코드를 바꾸지 못하더라도 고정밀 사본에 계속 누적되면 나중에 경계를 넘을 수 있다. 아래 그림의 두 경로를 이 역할에 맞춰 읽으면 된다.</p>
+<p><img alt="p.57 fake quantization과 학습용 고정밀 가중치" decoding="async" id="figure-3" loading="lazy" src="../resources/b4b31aa16e3eafcf462d-p057-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/b4b31aa16e3eafcf462d-p057-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/07ea50d2e738ba5dd94b-p057-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.57 읽는 포인트:</strong> 순전파는 양자화된 값을 모사하고, 역전파는 고정밀 가중치를 갱신한다. 그림의 full-precision weights와 discrete-valued weights가 서로 다른 역할임을 확인한다.</p>
+<p>**Fake quantization(모의 양자화)**은 정수 코드로 양자화한 뒤 다시 실수로 복원해, 일반적인 학습 연산 안에서 양자화 오차를 재현하는 것이다. 대표적인 affine fake quantizer는 다음과 같다.</p>
+<div class="math-raw math-display">$$
+q=\operatorname{clip}\left(\operatorname{round}(w/S)+Z,q_{\min},q_{\max}\right),\qquad
+\widetilde w=S(q-Z).
+$$</div><p>여기서 <span class="math-raw math-inline">$w$</span>는 학습용 실수 가중치, <span class="math-raw math-inline">$S&gt;0$</span>는 실수 단위/code의 scale, <span class="math-raw math-inline">$Z$</span>는 정수 zero point, <span class="math-raw math-inline">$q$</span>는 정수 코드, <span class="math-raw math-inline">$q_{\min},q_{\max}$</span>는 표현 가능한 코드 범위, <span class="math-raw math-inline">$\widetilde w$</span>는 복원된 학습용 순전파 값이다. clip은 범위를 벗어난 값을 끝값으로 제한한다. 가중치에 물리 단위가 없는 경우 이 값들도 무차원이다.</p>
+<p>**Master weight(기준 가중치)**는 작은 업데이트를 누적하기 위해 보존하는 고정밀 파라미터다. 강의의 전형적인 구성에서는 FP32 사본을 사용한다. 실무의 mixed-precision 학습에서는 파라미터·gradient·optimizer 상태별 dtype이 달라질 수 있다. 중요한 점은 8비트 정수 가중치만으로 작은 gradient를 직접 누적하지 않는다는 것이다.</p>
+<p><strong>검산 예시:</strong> <span class="math-raw math-inline">$S=0.1, Z=0$</span>, clipping이 발생하지 않는다고 하자. <span class="math-raw math-inline">$w=0.26$</span>은 <span class="math-raw math-inline">$q=3$</span>, <span class="math-raw math-inline">$\widetilde w=0.3$</span>이 된다. 작은 학습 업데이트가 0.01이면 master weight는 0.25가 된다. 그 즉시 정수 코드가 바뀌지 않더라도, 반복 갱신으로 양자화 경계를 넘을 수 있다. 매번 0.3에 업데이트 후 다시 반올림하면 작은 변화가 계속 사라질 수 있다. 경계값 0.25의 반올림 결과는 ties-to-even 등 반올림 규칙에 따라 달라지므로 예제의 요점은 경계 규칙보다 <strong>고정밀 누적의 필요성</strong>이다.</p>
+<h2 id="sec-54-불연속-반올림을-통과하는-ste-p5859">5.4 불연속 반올림을 통과하는 STE — p.58–59</h2>
+<p><strong>문제와 해결의 연결:</strong> 앞 절에서 순전파에 반올림을 넣었지만, 반올림은 계단형이라 그 기울기를 그대로 쓰면 대부분 구간에서 학습 신호가 막힌다. “양자화 함수가 미분 불가능하다(Quantization Function Is Nondifferentiable)”는 설명에는 경계의 불연속성과 구간 내부의 0인 기울기 문제가 함께 있다. 항등 함수(Identity)의 기울기를 빌려 신호를 통과시키는 것이 가장 단순한 STE의 아이디어다. 순전파 결과를 원래 실수값으로 되돌린다는 뜻은 아니다.</p>
+<p><img alt="p.58 반올림 함수의 기울기와 STE" decoding="async" id="figure-4" loading="lazy" src="../resources/6ae90d3f1b55c97a7445-p058-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/6ae90d3f1b55c97a7445-p058-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/438f9555e2e5f543c0b5-p058-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.58 읽는 포인트:</strong> 계단형 양자화 함수의 진짜 기울기와, 학습을 위해 대신 사용하는 기울기를 구분한다. 양자화 함수는 구간 내부에서 기울기가 0이고 경계에서는 일반적인 의미로 미분되지 않는다. 강의의 delta-spikes 표현은 이 불연속성을 직관적으로 보여주는 설명이지, 일반적인 backpropagation에서 그대로 사용하는 gradient가 아니다.</p>
+<p>**Straight-Through Estimator(STE, 직통 기울기 추정기)**는 순전파에는 반올림을 사용하면서 역전파에는 계산 가능한 대체 기울기를 쓰는 규칙이다. 가장 단순한 identity STE는 <span class="math-raw math-inline">$\partial\widetilde w/\partial w\approx1$</span>로 놓는다. clipping을 반영한 구현은 표현 구간 내부에서 1, 외부에서 0인 마스크를 사용하는 경우도 있다. 이 선택은 구현·학습법에 따라 다르다.</p>
+<div class="math-raw math-display">$$
+\frac{\partial\mathcal L}{\partial w}
+\approx\frac{\partial\mathcal L}{\partial\widetilde w},\qquad
+w\leftarrow w-\eta\frac{\partial\mathcal L}{\partial w}.
+$$</div><p><span class="math-raw math-inline">$\mathcal L$</span>은 학습 손실, <span class="math-raw math-inline">$\eta$</span>는 학습률, <span class="math-raw math-inline">$w$</span>는 master weight다. 이 식은 clipping 범위 내부의 identity STE를 가정한다. STE는 정확한 미분이나 불편추정량이라는 보장이 없다. 극저비트·binary처럼 양자화 오차가 큰 상황에서는 학습 안정성과 대체 기울기 선택을 더 신중히 검토해야 한다.</p>
+<p><img alt="p.59 forward와 backward가 만나는 QAT 구조" decoding="async" id="figure-5" loading="lazy" src="../resources/53641903aa79045d9432-p059-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-5" type="button">그림 확대</button><a href="../resources/53641903aa79045d9432-p059-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/53641903aa79045d9432-p059-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.59 읽는 포인트:</strong> 위쪽 forward는 master weight를 quantize한 값으로 손실을 계산하고, 아래쪽 backward는 그 손실의 신호를 master weight로 돌려보낸다. “역전파에서 양자화를 무시한다”는 것은 forward 오차까지 없애는 말이 아니다. forward는 양자화 오차를 그대로 반영한다.</p>
+<p><strong>교육용 연결:</strong> QAT의 학습 흐름은 <code>FP master → fake quant → forward·loss → STE backward → master update</code>다. 배포 흐름은 학습 완료 후 별도로 <code>최종 scale 확정 → 정수 코드 저장 → 지원 커널로 변환</code>을 거친다. <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/assets/ODAI-1/quantization-flow.canvas">양자화 학습·배포 Canvas</a>와 <a href="../resources/498e022acacf1b076141-quantization-flow.svg">미리보기</a>에서도 이 두 경로를 구분해 읽는다.</p>
+<h2 id="sec-55-qat-학습과-실제-정수-추론은-다르다-p6061">5.5 QAT 학습과 실제 정수 추론은 다르다 — p.60–61</h2>
+<p><img alt="p.60 학습 중 실수 업데이트와 INT8 추론" decoding="async" id="figure-6" loading="lazy" src="../resources/cac6d212bb0048887fd8-p060-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-6" type="button">그림 확대</button><a href="../resources/cac6d212bb0048887fd8-p060-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/8f03032352c1ca5178ee-p060-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.60 읽는 포인트:</strong> 학습 가중치 갱신이 32비트 부동소수점 연산이라는 표시와, 추론 시 integer arithmetic 경로를 함께 본다. 학습을 INT8로 모두 실행한다는 뜻이 아니다. 정수 추론에서 곱셈 입력이 INT8이어도 누산은 흔히 INT32를 사용한다.</p>
+<p>**Accumulator(누산기)**는 여러 곱의 합을 저장하는 값이다. 좁은 INT8 누산기는 쉽게 overflow하므로 더 넓은 표현을 쓴다. **Requantization(재양자화)**은 INT32 누산 결과를 다음 연산이 요구하는 scale과 비트 수로 다시 변환하는 단계다. **Integer-only inference(정수 전용 추론)**는 정해진 추론 경로를 정수·고정소수점 연산으로 구현한다는 뜻이며, 입력·출력 인터페이스의 표현까지 무조건 같다는 뜻은 아니다. QAT와 정수 연산을 함께 설계한 대표 사례가 <a href="https://arxiv.org/abs/1712.05877">Jacob 등의 원 논문</a>이다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>대표 표현</th>
+<th>확인할 사항</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QAT 파라미터 보존·갱신</td>
+<td>FP32 등 고정밀 master</td>
+<td>작은 업데이트가 누적되는가</td>
+</tr>
+<tr>
+<td>QAT 순전파</td>
+<td>실수 텐서에 fake quant 적용</td>
+<td>배포의 clipping·rounding과 일치하는가</td>
+</tr>
+<tr>
+<td>배포 가중치 저장</td>
+<td>INT8 코드와 scale·zero point</td>
+<td>메타데이터를 포함한 용량은 얼마인가</td>
+</tr>
+<tr>
+<td>정수 행렬곱</td>
+<td>INT8 곱, INT32 누산 등</td>
+<td>지원 커널, overflow, bias scale이 맞는가</td>
+</tr>
+<tr>
+<td>비선형·정규화</td>
+<td>정수 근사 또는 실수 fallback</td>
+<td>“전체 정수 실행”이 실제로 성립하는가</td>
+</tr>
+</tbody>
+</table></div>
+<p><img alt="p.61 모델별 PTQ와 QAT 정확도 사례" decoding="async" id="figure-7" loading="lazy" src="../resources/46ce4ee0af5828041ad2-p061-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-7" type="button">그림 확대</button><a href="../resources/46ce4ee0af5828041ad2-p061-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/cf859770000c6bc0c3a9-p061-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.61 읽는 포인트:</strong> 빨간 상자는 QAT 결과이며, MobileNet 계열에서 PTQ보다 회복되는 원본 실험 사례다. 예를 들어 MobileNetV2의 floating-point 71.9%와 QAT symmetric per-channel 71.1%의 차이는 **0.8 percentage point(%p)**다. 상대 오차 0.8%와 혼동하지 않는다. 원본 표는 배치·데이터 전처리·calibration 세부 설정을 모두 제공하지 않으므로, 숫자를 새 장치의 성능 보장으로 사용하면 안 된다. PTQ 0.1%도 해당 구성의 실패 사례이지 PTQ 일반의 성능이 아니다.</p>
+<h2 id="sec-56-비선형-연산의-정수-근사-p62">5.6 비선형 연산의 정수 근사 — p.62</h2>
+<p><strong>수 형식과 모델 이름을 구분하자.</strong> FP32(32-bit Floating Point, 32비트 부동소수점)와 FP16(16-bit Floating Point, 16비트 부동소수점)은 수를 저장하고 계산하는 형식이다. BERT(Bidirectional Encoder Representations from Transformers)는 양방향 문맥을 사용하는 모델 계열이다. 아래 I-BERT 사례는 그 모델 안의 비선형 연산까지 정수로 근사하는 방법이다. 1장의 자기회귀 생성과는 문맥 사용 방식이 다르지만, 행렬곱 외의 연산도 저정밀 실행을 설계해야 한다는 문제는 연결된다.</p>
+<p><img alt="p.62 I-BERT의 비선형 연산 정수 근사" decoding="async" id="figure-8" loading="lazy" src="../resources/b253b57d2b75146d5137-p062-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-8" type="button">그림 확대</button><a href="../resources/b253b57d2b75146d5137-p062-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/5e8afb74ecf1f32a9075-p062-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.62 읽는 포인트:</strong> 행렬곱을 INT8로 바꾼 뒤에도 GELU·Softmax·LayerNorm이 남는다. 그림은 이 연산들을 정수 연산으로 근사하는 I-BERT 사례다. 그래프의 곡선이 근접하다는 사실과 전체 모델의 정확도가 보장된다는 주장을 구분한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>용어</th>
+<th>정의와 역할</th>
+<th>정수화가 까다로운 이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GELU(Gaussian Error Linear Unit)</td>
+<td>입력의 크기에 따라 부드럽게 통과시키는 활성화 함수</td>
+<td>정규분포 함수와 곱을 그대로 정수 연산하기 어려움</td>
+</tr>
+<tr>
+<td>Softmax</td>
+<td>logits를 합이 1인 비음수 확률로 바꾸는 함수</td>
+<td>지수함수, 합, 나눗셈과 넓은 동적 범위를 다룸</td>
+</tr>
+<tr>
+<td>LayerNorm</td>
+<td>각 샘플의 정해진 feature 축을 평균·분산으로 정규화</td>
+<td>제곱근·나눗셈·scale 처리가 필요</td>
+</tr>
+<tr>
+<td>Polynomial approximation</td>
+<td>복잡한 함수를 저차 다항식으로 근사</td>
+<td>근사 구간 밖 오차와 고정소수점 overflow 관리 필요</td>
+</tr>
+<tr>
+<td>Fallback</td>
+<td>지원하지 않는 연산을 다른 dtype·backend로 실행</td>
+<td>변환·전송 비용과 혼합 정밀 경로가 생김</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>교육용 보충:</strong> Softmax는 먼저 입력 최댓값을 빼도 결과가 같다. 이 성질은 지수함수의 입력 범위를 제한해 근사와 안정성을 돕는다. 그러나 어떤 다항식이나 LUT만 끼우면 해결되는 것이 아니라, 정수 표현 범위·scale·반올림·누산을 함께 설계해야 한다. <a href="https://arxiv.org/abs/2101.01321">I-BERT 원 논문</a>은 BERT 계열에서 GELU·Softmax·LayerNorm의 정수 근사를 제시한다. 이것을 모든 LLM·NPU에 즉시 적용되는 범용 기능으로 읽지 않는다.</p>
+<h2 id="sec-57-장-요약과-복습">5.7 장 요약과 복습</h2>
+<p>QAT의 핵심은 <strong>양자화 오차가 있는 순전파</strong>와 <strong>학습 가능한 대체 기울기</strong>를 결합하는 데 있다. 고정밀 master weight로 작은 업데이트를 누적하고, 배포 단계에서 정수 코드·커널·비선형 연산 지원을 별도로 검증한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>흔한 오해</th>
+<th>바로잡기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QAT는 처음부터 모델 전체를 다시 학습한다</td>
+<td>사전학습 모델의 미세조정으로 수행할 수도 있다</td>
+</tr>
+<tr>
+<td>Fake quant는 실제 INT8 커널의 속도를 보여준다</td>
+<td>학습 오차를 모사하며 배포 속도와 별개다</td>
+</tr>
+<tr>
+<td>STE는 반올림의 정확한 미분이다</td>
+<td>학습을 위한 대체 gradient 규칙이다</td>
+</tr>
+<tr>
+<td>QAT가 끝나면 전 연산이 정수다</td>
+<td>비선형·정규화·backend fallback까지 확인해야 한다</td>
+</tr>
+</tbody>
+</table></div>
+<ol>
+<li><strong>왜 학습 중 정수 코드만 보존하지 않는가?</strong> 작은 gradient 업데이트가 양자화 간격보다 작으면 사라질 수 있다. master weight에서 누적해야 한다.</li>
+<li><strong>STE를 쓰면 forward도 반올림을 생략하는가?</strong> 아니다. forward는 반올림·clipping을 반영하고, backward만 대체 기울기를 사용한다.</li>
+<li><strong>INT8 QAT 모델이 FP16보다 느릴 수 있는 이유는?</strong> 저정밀 커널 부족, Q/DQ overhead, fallback, 작은 연산의 launch 비용 등이 실제 이득을 상쇄할 수 있다.</li>
+<li><strong>INT8 곱셈인데 INT32 누산을 쓰는 이유는?</strong> 여러 곱을 더할 때 표현 범위가 커져 overflow 위험이 있기 때문이다.</li>
+<li><strong>PTQ부터 시도하고 QAT를 판단하는 기준은?</strong> 목표 품질·실측 속도·메모리를 만족하는지 확인한 뒤, 학습 비용과 기대 회복량을 비교한다.</li>
+</ol>
+<p><strong>다음 장 연결:</strong> 대형 LLM에서는 전체 QAT의 자원 부담이 크다. 따라서 activation outlier를 완화하는 변환, calibration 기반 가중치 양자화, 양자화된 기저 모델 위의 소수 어댑터 학습 등 서로 다른 해법을 비교한다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-1/ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.md">5. QAT와 정수 추론 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html"><small>이전 장</small>4장. 비균일 양자화와 PTQ 오차 제어</a><a rel="next" href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html"><small>다음 장</small>6. 고급 LLM 양자화와 적용 판단</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

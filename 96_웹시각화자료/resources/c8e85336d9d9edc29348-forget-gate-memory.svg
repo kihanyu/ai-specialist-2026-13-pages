@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="303" viewBox="0 0 720 303" role="img" aria-labelledby="t d"><title id="t">망각 게이트와 입력 게이트의 역할을 구분한다</title><desc id="d">이전 기억 2의 80%를 망각 게이트가 유지해 1.6으로 만든다. 입력 게이트는 새 후보 0.4의 절반인 0.2를 추가한다. 새 셀 상태는 1.8이다.</desc>
+<rect x="1" y="1" width="718" height="301" rx="15" fill="#f8fafc" stroke="#bac9dc"/>
+<g font-family="Malgun Gothic, Noto Sans CJK KR, sans-serif" fill="#19334f">
+<text x="24" y="38" font-size="24" font-weight="700">망각은 남길 양, 입력은 새로 더할 양을 정한다</text>
+<text x="24" y="65" font-size="15">셀 상태의 성분 하나를 보는 예 · 숫자는 판매량 자체가 아닌 내부 기억이다.</text>
+<rect x="24" y="83" width="324" height="85" rx="10" fill="#e7efff" stroke="#bac9dc"/>
+<rect x="372" y="83" width="324" height="85" rx="10" fill="#e7f5ee" stroke="#bac9dc"/>
+<text x="40" y="111" font-size="18" font-weight="700">망각 게이트: 이전 기억 유지</text>
+<text x="40" y="138" font-size="17">이전 기억 2의 80% → 1.6</text>
+<text x="40" y="159" font-size="14">현재 입력과 이전 은닉 상태로 비율을 정함</text>
+<text x="388" y="111" font-size="18" font-weight="700">입력 게이트: 새 후보 반영</text>
+<text x="388" y="138" font-size="17">새 후보 0.4의 50% → 0.2</text>
+<text x="388" y="159" font-size="14">얼마를 더할지는 별도의 비율로 정함</text>
+<path d="M186 168V186H360M534 168V186H360V199" fill="none" stroke="#526980" stroke-width="2"/>
+<rect x="24" y="199" width="672" height="51" rx="10" fill="#fff0df" stroke="#bac9dc"/>
+<text x="40" y="231" font-size="18" font-weight="700">새 셀 상태: 남긴 1.6 + 새로 더한 0.2 = 1.8</text>
+<text x="24" y="281" font-size="15">유지 비율은 시점과 성분마다 달라질 수 있다. 원본 기록을 지우지는 않는다.</text>
+</g></svg>

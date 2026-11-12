@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1050" viewBox="0 0 1200 1050" role="img" aria-labelledby="title desc">
+<title id="title">후보 확보 → 순위 융합 → 정밀 재정렬 → 근거 선택</title>
+<desc id="desc">Dense와 BM25에서 각30개를 가져오며 중복10개인 경우 합집합은50개다. c60의 RRF 예시 뒤20쌍 재정렬, 근거4개 선택을 보여준다. 각 후보 개수와 RRF 상수는 서로 다르다.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#617184"/></marker></defs>
+<rect width="1200" height="100%" fill="white"/>
+<text x="40" y="55" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="34" font-weight="700" fill="#17324d" text-anchor="start">후보 확보 → 순위 융합 → 정밀 재정렬 → 근거 선택</text>
+<text x="40" y="97" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#617184" text-anchor="start">질문: ‘환불 신청은 어떻게 하나요?’ · 후보 수와 RRF 상수 c를 구분한다</text>
+<rect x="65" y="145" width="460" height="110" rx="12" fill="#edf5fc" stroke="#2266ab" stroke-width="2"/>
+<text x="295.0" y="183" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#2266ab" text-anchor="middle">Dense Top-30</text>
+<text x="295.0" y="222" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">의미 표현으로 후보 확보</text>
+<rect x="675" y="145" width="460" height="110" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="905.0" y="183" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">BM25 Top-30</text>
+<text x="905.0" y="222" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">정확한 단어로 후보 확보</text>
+<path d="M295,255 L295,312 L337,312" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M905,255 L905,312 L863,312" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="345" y="280" width="510" height="65" rx="12" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="600" y="322" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="400" fill="#17324d" text-anchor="middle">중복 10개라면 합집합 50개</text>
+<path d="M600,345 L600,370" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="40" y="398" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" font-weight="700" fill="#17324d" text-anchor="start">RRF(d) = 순위가 있는 검색기마다 1 / (60 + 순위)를 더함</text>
+<rect x="40" y="430" width="235" height="60" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="157.5" y="469" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="700" fill="#17324d" text-anchor="middle">문서</text>
+<rect x="275" y="430" width="190" height="60" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="370.0" y="469" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="700" fill="#17324d" text-anchor="middle">Dense 순위</text>
+<rect x="465" y="430" width="190" height="60" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="560.0" y="469" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="700" fill="#17324d" text-anchor="middle">BM25 순위</text>
+<rect x="655" y="430" width="315" height="60" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="812.5" y="469" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="700" fill="#17324d" text-anchor="middle">RRF 점수</text>
+<rect x="970" y="430" width="190" height="60" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="1065.0" y="469" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="700" fill="#17324d" text-anchor="middle">표 안 순위</text>
+<rect x="40" y="490" width="235" height="60" rx="0" fill="#edf8f5" stroke="#cad6e0" stroke-width="2"/>
+<text x="157.5" y="529" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">A: 환불 정책</text>
+<rect x="275" y="490" width="190" height="60" rx="0" fill="#edf8f5" stroke="#cad6e0" stroke-width="2"/>
+<text x="370.0" y="529" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">2</text>
+<rect x="465" y="490" width="190" height="60" rx="0" fill="#edf8f5" stroke="#cad6e0" stroke-width="2"/>
+<text x="560.0" y="529" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">1</text>
+<rect x="655" y="490" width="315" height="60" rx="0" fill="#edf8f5" stroke="#cad6e0" stroke-width="2"/>
+<text x="812.5" y="529" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">0.032522</text>
+<rect x="970" y="490" width="190" height="60" rx="0" fill="#edf8f5" stroke="#cad6e0" stroke-width="2"/>
+<text x="1065.0" y="529" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">1</text>
+<rect x="40" y="550" width="235" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="157.5" y="589" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">B: 반품 절차</text>
+<rect x="275" y="550" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="370.0" y="589" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">1</text>
+<rect x="465" y="550" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="560.0" y="589" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">5</text>
+<rect x="655" y="550" width="315" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="812.5" y="589" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">0.031778</text>
+<rect x="970" y="550" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="1065.0" y="589" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">2</text>
+<rect x="40" y="610" width="235" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="157.5" y="649" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">C: 결제 수단</text>
+<rect x="275" y="610" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="370.0" y="649" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">8</text>
+<rect x="465" y="610" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="560.0" y="649" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">2</text>
+<rect x="655" y="610" width="315" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="812.5" y="649" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">0.030835</text>
+<rect x="970" y="610" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="1065.0" y="649" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">3</text>
+<rect x="40" y="670" width="235" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="157.5" y="709" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">D: 쿠폰 안내</text>
+<rect x="275" y="670" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="370.0" y="709" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">없음</text>
+<rect x="465" y="670" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="560.0" y="709" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">3</text>
+<rect x="655" y="670" width="315" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="812.5" y="709" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">0.015873</text>
+<rect x="970" y="670" width="190" height="60" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="1065.0" y="709" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="middle">4</text>
+<text x="40" y="777" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#617184" text-anchor="start">네 문서 사이 상대 순위. 전체 순위는 생략 문서도 계산한다.</text>
+<rect x="40" y="825" width="330" height="120" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="205.0" y="863" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">RRF Top-20</text>
+<text x="205.0" y="902" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">후보를 추림</text>
+<rect x="435" y="825" width="330" height="120" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="600.0" y="863" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">Rerank 20쌍</text>
+<text x="600.0" y="902" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">질문·청크를 함께 평가</text>
+<rect x="830" y="825" width="330" height="120" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="995.0" y="863" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">근거 Top-4</text>
+<text x="995.0" y="902" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">중복·길이·조건 확인</text>
+<path d="M370,885 L427,885" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M765,885 L822,885" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="40" y="1005" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="400" fill="#aa3542" text-anchor="start">주의: 후보 밖 정답은 reranker가 복구하지 못한다.</text>
+</svg>

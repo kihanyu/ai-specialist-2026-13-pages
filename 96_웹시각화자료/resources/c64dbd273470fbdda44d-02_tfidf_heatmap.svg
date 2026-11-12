@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+<title id="title">TF-IDF: 빈도 비율과 문서 희귀도를 곱하기</title><desc id="desc">질문 machine learning · 문서 가중치와 이진 질의 벡터의 내적</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526175"/></marker></defs>
+<style>text{font-family:"Malgun Gothic","Noto Sans KR",sans-serif;fill:#172B4D} .note{fill:#526175}</style>
+<rect width="1200" height="760" fill="white"/>
+<text x="30" y="48.0" font-size="32" text-anchor="start" style="fill:#172B4D;font-weight:700">TF-IDF: 빈도 비율과 문서 희귀도를 곱하기</text>
+<text x="30" y="92.0" font-size="24" text-anchor="start" style="fill:#526175;font-weight:400">질문 machine learning · 문서 가중치와 이진 질의 벡터의 내적</text>
+<text x="30" y="150.0" font-size="26" text-anchor="start" style="fill:#172B4D;font-weight:700">① 문서 길이</text>
+<rect x="245" y="120" width="135" height="55" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="312" y="157.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">d1: 3</text>
+<rect x="395" y="120" width="135" height="55" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="462" y="157.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">d2: 2</text>
+<rect x="545" y="120" width="135" height="55" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="612" y="157.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">d3: 5</text>
+<rect x="695" y="120" width="135" height="55" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="762" y="157.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">d4: 2</text>
+<text x="30" y="222.0" font-size="26" text-anchor="start" style="fill:#172B4D;font-weight:700">② 가중치 = f / 길이 × ln(N / df)</text>
+<text x="30" y="296.0" font-size="25" text-anchor="start" style="fill:#172B4D;font-weight:700">machine</text>
+<text x="30" y="332.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">df=3</text>
+<rect x="245" y="260" width="135" height="105" rx="12" fill="rgb(195,227,243)" stroke="#CFD8E3" stroke-width="2"/>
+<text x="312" y="302.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.095894</text>
+<text x="312" y="340.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">f=1</text>
+<rect x="395" y="260" width="135" height="105" rx="12" fill="rgb(171,216,239)" stroke="#CFD8E3" stroke-width="2"/>
+<text x="462" y="302.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.143841</text>
+<text x="462" y="340.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">f=1</text>
+<rect x="545" y="260" width="135" height="105" rx="12" fill="rgb(214,235,246)" stroke="#CFD8E3" stroke-width="2"/>
+<text x="612" y="302.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.057536</text>
+<text x="612" y="340.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">f=1</text>
+<rect x="695" y="260" width="135" height="105" rx="12" fill="rgb(244,248,252)" stroke="#CFD8E3" stroke-width="2"/>
+<text x="762" y="302.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.000000</text>
+<text x="762" y="340.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">f=0</text>
+<text x="30" y="426.0" font-size="25" text-anchor="start" style="fill:#172B4D;font-weight:700">learning</text>
+<text x="30" y="462.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">df=2</text>
+<rect x="245" y="390" width="135" height="105" rx="12" fill="rgb(126,197,231)" stroke="#CFD8E3" stroke-width="2"/>
+<text x="312" y="432.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.231049</text>
+<text x="312" y="470.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">f=1</text>
+<rect x="395" y="390" width="135" height="105" rx="12" fill="rgb(244,248,252)" stroke="#CFD8E3" stroke-width="2"/>
+<text x="462" y="432.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.000000</text>
+<text x="462" y="470.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">f=0</text>
+<rect x="545" y="390" width="135" height="105" rx="12" fill="rgb(103,187,227)" stroke="#CFD8E3" stroke-width="2"/>
+<text x="612" y="432.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.277259</text>
+<text x="612" y="470.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">f=2</text>
+<rect x="695" y="390" width="135" height="105" rx="12" fill="rgb(244,248,252)" stroke="#CFD8E3" stroke-width="2"/>
+<text x="762" y="432.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.000000</text>
+<text x="762" y="470.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">f=0</text>
+<rect x="890" y="260" width="280" height="235" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="908" y="295.0" font-size="25" text-anchor="start" style="fill:#7956A5;font-weight:700">IDF</text>
+<text x="908" y="330.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">machine: 0.287682</text>
+<text x="908" y="362.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">learning: 0.693147</text>
+<text x="908" y="394.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">N = 4 · 자연로그 ln</text>
+<text x="30" y="580.0" font-size="26" text-anchor="start" style="fill:#172B4D;font-weight:700">③ 두 term 가중치의 합 = 검색 점수</text>
+<rect x="245" y="610" width="135" height="62" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="312" y="650.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.326943</text>
+<rect x="395" y="610" width="135" height="62" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="462" y="650.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.143841</text>
+<rect x="545" y="610" width="135" height="62" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="612" y="650.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.334795</text>
+<rect x="695" y="610" width="135" height="62" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="762" y="650.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">0.000000</text>
+<text x="30" y="725.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">순위: d3 &gt; d1 &gt; d2 &gt; d4. 같은 점수라도 가중치·정규화 규약이 바뀌면 결과가 달라진다.</text>
+</svg>

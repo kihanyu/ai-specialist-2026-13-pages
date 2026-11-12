@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+<title id="title">캐시 읽기 단가 절감과 전체 요청 비용 절감은 다르다</title><desc id="desc">고정5000토큰 가변3050토큰 출력500토큰의가상단가예다. 일반요청.03165달러 첫캐시쓰기.03540달러 재사용.01815달러이며 1000회총비용18.16725달러 절감42.60퍼센트다.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+<rect width="1200" height="900" fill="white"/>
+<text x="40" y="52" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="32" fill="#172b4d" font-weight="700" text-anchor="start">캐시 읽기 단가 절감과 전체 요청 비용 절감은 다르다</text>
+<text x="40" y="99" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#475569" font-weight="400" text-anchor="start">가상 단가: 입력 $3/M · 출력 $15/M · 캐시 쓰기 $3.75/M · 읽기 $0.30/M</text>
+<rect x="45" y="128" width="22" height="22" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<text x="79" y="148" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">고정 입력 5,000토큰</text>
+<rect x="440" y="128" width="22" height="22" rx="3" fill="#7c3aed" stroke="#7c3aed" stroke-width="2"/>
+<text x="474" y="148" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">가변 입력 3,050토큰</text>
+<rect x="845" y="128" width="22" height="22" rx="3" fill="#b45309" stroke="#b45309" stroke-width="2"/>
+<text x="879" y="148" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">출력 500토큰</text>
+<text x="40" y="235" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="26" fill="#172b4d" font-weight="700" text-anchor="start">캐시 없음</text>
+<rect x="230" y="205" width="330.0" height="48" rx="0" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<rect x="560.0" y="205" width="201.3" height="48" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="2"/>
+<rect x="761.3" y="205" width="165.0" height="48" rx="0" fill="#b45309" stroke="#b45309" stroke-width="2"/>
+<text x="940.3" y="238" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#172b4d" font-weight="700" text-anchor="start">$0.03165</text>
+<text x="230" y="292" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#475569" font-weight="400" text-anchor="start">고정 $0.01500  +  가변 $0.00915  +  출력 $0.00750</text>
+<text x="40" y="361" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="26" fill="#172b4d" font-weight="700" text-anchor="start">첫 쓰기</text>
+<rect x="230" y="331" width="412.5" height="48" rx="0" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<rect x="642.5" y="331" width="201.3" height="48" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="2"/>
+<rect x="843.8" y="331" width="165.0" height="48" rx="0" fill="#b45309" stroke="#b45309" stroke-width="2"/>
+<text x="1022.8" y="364" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#172b4d" font-weight="700" text-anchor="start">$0.03540</text>
+<text x="230" y="418" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#475569" font-weight="400" text-anchor="start">고정 $0.01875  +  가변 $0.00915  +  출력 $0.00750</text>
+<text x="40" y="487" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="26" fill="#172b4d" font-weight="700" text-anchor="start">이후 읽기</text>
+<rect x="230" y="457" width="33.0" height="48" rx="0" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<rect x="263.0" y="457" width="201.3" height="48" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="2"/>
+<rect x="464.3" y="457" width="165.0" height="48" rx="0" fill="#b45309" stroke="#b45309" stroke-width="2"/>
+<text x="643.3" y="490" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#172b4d" font-weight="700" text-anchor="start">$0.01815</text>
+<text x="230" y="544" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#475569" font-weight="400" text-anchor="start">고정 $0.00150  +  가변 $0.00915  +  출력 $0.00750</text>
+<rect x="40" y="610" width="1115" height="160" rx="12" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+<text x="65" y="650" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">같은 prefix가 유지되어 첫 쓰기 1회 + 읽기 999회라면</text>
+<text x="65" y="696" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="27" fill="#0f766e" font-weight="700" text-anchor="start">캐시 없음: $31.65000  →  캐시 사용: $18.16725</text>
+<text x="65" y="740" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#172b4d" font-weight="400" text-anchor="start">전체 비용 절감 ≈ 42.60%   (캐시 읽기 단가만 90% 낮다는 가정)</text>
+<text x="40" y="817" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#475569" font-weight="400" text-anchor="start">막대 길이 = 비용 · 글자 수나 토큰 수가 아니다. 가변 입력·출력 비용은 그대로 남는다.</text>
+<text x="40" y="855" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#475569" font-weight="400" text-anchor="start">만료·캐시 미스·반복 호출·검색과 임베딩 비용이 추가되면 실제 절감률은 달라진다.</text>
+</svg>

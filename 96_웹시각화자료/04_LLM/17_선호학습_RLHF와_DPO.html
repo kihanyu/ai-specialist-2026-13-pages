@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>17. 선호학습, RLHF와 DPO | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html" aria-current="page">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>17. 선호학습, RLHF와 DPO</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>PPO 기반 RLHF와 DPO의 자료·목표·기준 모델 역할을 비교한다.</li><li>응답 로그확률 차이와 선호 손실을 계산한다.</li></ul></details></header><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-ppo-기반-rlhf와-dpo는-어떤-자료가-필요한가">1. PPO 기반 RLHF와 DPO는 어떤 자료가 필요한가</a></li><li><a href="#sec-2-dpo-식을-작은-숫자로-따라가기">2. DPO 식을 작은 숫자로 따라가기</a></li><li><a href="#sec-3-보상-차이가-선호-확률이-되는-이유">3. 보상 차이가 선호 확률이 되는 이유</a></li><li><a href="#sec-4-기준-이탈-제약과-dpo로의-연결">4. 기준 이탈 제약과 DPO로의 연결</a></li><li><a href="#sec-5-데이터를-구성하고-결과의-한계-판단하기">5. 데이터를 구성하고 결과의 한계 판단하기</a></li><li><a href="#sec-6-확인-질문과-해설">6. 확인 질문과 해설</a></li><li><a href="#sec-원문-페이지별-상세-해설">원문 페이지별 상세 해설</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-17-선호학습-rlhf와-dpo">17. 선호학습, RLHF와 DPO</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15장</a> · <a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16장</a></p>
+<p><a id="intro"></a></p>
+<p>선호학습은 같은 지시에 대한 여러 응답 중 <strong>어느 응답을 더 선호하는지</strong>로 모델을 조정한다. SFT의 정답 예시와 달리 상대 비교가 학습 신호다. winner/chosen은 주어진 기준에서 선택된 응답이지 절대적인 진리의 표지가 아니다.</p>
+<p>이 장의 목표는 정책·보상 모델·reference의 역할을 구분하고, 점수차→선호확률→손실 및 DPO의 네 로그확률을 손계산하는 것이다. 선행 배경은 <a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16장</a>의 토큰 로그확률과 마스킹이다. 기본 경로는 1~2절이며 3~5절에서 유도·데이터 조건·분모와 한계를 확인한다. 모든 계산의 로그는 자연로그다.</p>
+<p><a id="rlhf"></a></p>
+<h2 id="sec-1-ppo-기반-rlhf와-dpo는-어떤-자료가-필요한가">1. PPO 기반 RLHF와 DPO는 어떤 자료가 필요한가</h2>
+<p>선호 데이터는 같은 prompt x와 선택된 응답 y_w(chosen), 선택되지 않은 응답 y_l(rejected)로 구성할 수 있다. chosen은 평가 기준상 더 선호된다는 뜻이며 객관적으로 항상 옳다는 보장은 없다. 분류의 0/1 라벨이나 한 개의 정답 응답과 구분한다.</p>
+<p>PPO 기반 RLHF의 한 경로는 선호 판단으로 보상 모델을 학습하고, 정책 모델이 만든 응답을 보상 모델로 평가해 정책을 갱신하는 것이다. 기준 모델에서 너무 멀어지지 않게 KL 제약·벌점을 둘 수 있다. 보상 모델의 허점을 이용하는 행동과 불안정성 때문에 평가가 필요하다. PPO는 최적화 알고리즘이지 보상 모델 그 자체가 아니다.</p>
+<p>DPO는 선호 쌍으로 정책을 직접 학습하며 표준 형태에서는 별도의 학습 보상 모델과 온라인 PPO 루프를 요구하지 않는다. 고정 reference 모델은 여전히 사용한다. ‘보상 모델이 없다’와 ‘기준 모델이 없다’를 혼동하지 않는다. <a href="https://arxiv.org/abs/2305.18290">DPO 원논문</a></p>
+<p><a id="dpo"></a></p>
+<h2 id="sec-2-dpo-식을-작은-숫자로-따라가기">2. DPO 식을 작은 숫자로 따라가기</h2>
+<p>응답 로그확률은 각 토큰을 <strong>이전 prompt와 응답 토큰에 조건부로</strong> 평가한 로그확률의 합이다. 토큰들이 독립이라서 곱하는 것이 아니라 확률의 연쇄법칙을 쓴다.</p>
+<div class="math-raw math-display">$$\log\pi(y\mid x)=\sum_t\log\pi(y_t\mid x,y_{&lt;t}).$$</div><p>표준 DPO에서 아래 d는 reference 대비 chosen의 개선량과 rejected의 개선량 차이다. β&gt;0은 배율이고 σ는 sigmoid다.</p>
+<div class="math-raw math-display">$$d=[\log\pi_\theta(y_w|x)-\log\pi_{ref}(y_w|x)]-[\log\pi_\theta(y_l|x)-\log\pi_{ref}(y_l|x)],\quad L=-\log\sigma(\beta d).$$</div><p>설명용으로 chosen의 현재/reference 로그확률을 -2/-3, rejected는 -4/-3으로 놓자. chosen 차이는 1, rejected 차이는 -1, d는 2다. β=0.5이면 βd=1, σ(1)≈0.731059, 손실≈0.313262다. 현재 정책이 reference와 같으면 d=0이고 손실은 ln2≈0.693147이다. chosen의 <strong>상대적</strong> 점수를 높이는 것이므로 chosen 확률이 어떤 상황에서나 절대 증가한다고 단정하지 않는다. 응답 길이·마스킹·EOS 포함 규칙도 로그확률 집계에 영향을 주므로 일치시킨다.</p>
+<p>Bradley–Terry 선호 모형의 <code>P(w 선호)=sigmoid(r_w-r_l)</code>은 점수 차이를 비교 확률로 바꾼다. 관측한 선호에 음의 로그를 취해 학습 손실로 만들 수 있다. 원문 209쪽 ‘확률은 loss로 사용할 수 없음’은 <strong>확률에서 목적에 맞는 손실을 구성한다</strong>로 보완한다. KL은 대칭 거리나 단순 유사도 점수가 아니라 방향 있는 분포 차이 척도다. 정규화된 P,Q에 대해 <code>D_KL(P||Q)=Σ P log(P/Q)</code>이며, P&gt;0인데 Q=0인 항은 무한대가 될 수 있다.</p>
+<p><a id="bradley"></a></p>
+<h2 id="sec-3-보상-차이가-선호-확률이-되는-이유">3. 보상 차이가 선호 확률이 되는 이유</h2>
+<p>Bradley–Terry 모형은 두 응답의 실수 보상 r_w,r_l을 <code>exp(r_w)/(exp(r_w)+exp(r_l))=σ(r_w-r_l)</code>로 바꾼다. 실수 점수를 그대로 합으로 나누면 음수 확률이나0 분모가 생길 수 있다. 지수화는 양수를 만들고 정규화는 두 확률의 합을1로 만든다. 두 점수에 같은 상수를 더해도 차이가 같아 선호확률은 변하지 않는다.</p>
+<p>원문 그림에서 5와2가 어디에 들어가는지 확인하자.</p>
+<p><img alt="time 보상5와 banana 보상2를 지수 정규화해 sigmoid3 약0.95의 선호확률로 바꾸는 그림" decoding="async" id="figure-1" loading="lazy" src="../resources/48e1c35fb0a8c067e909-p209_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/48e1c35fb0a8c067e909-p209_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>가운데의 단순5/7에는 취소선이 있다. 아래의 exp(5)/(exp(5)+exp(2))=0.952574가 선호 확률이며 선택된 time의 음의 로그손실은0.048587이다. 이는 이 두 후보에 대한 비교 확률이지 다음 토큰의 실제 언어모델 확률을 측정한 결과가 아니다. 원문209쪽의 ‘확률은 loss로 사용할 수 없음’은 지나친 단정이다. 관측 선호의 음의 로그처럼 목적에 맞게 변환하여 최소화한다.</p>
+<p>가로축을 보상 자체가 아닌 <strong>보상 차이</strong>로 읽어 보자.</p>
+<p><img alt="보상 차이 a-b와 b-a에서 상보적인 선호확률을 읽는 sigmoid 곡선" decoding="async" id="figure-2" loading="lazy" src="../resources/e8028f0cd60674e10748-p210_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/e8028f0cd60674e10748-p210_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>가로0에서 세로0.5를 지나고 양의 차이일수록1에 가까워진다. a=b이면 두 후보는 동점이다. 점수차만 보므로 모든 보상의 절대 원점을 알아내는 모형은 아니다. 실제 사람 선호가 모순되거나 평가 기준이 달라지면 하나의 점수로 모두 설명하지 못할 수 있다.</p>
+<p><a id="kl"></a></p>
+<h2 id="sec-4-기준-이탈-제약과-dpo로의-연결">4. 기준 이탈 제약과 DPO로의 연결</h2>
+<p>RLHF의 한 목적을 <code>E_(y~π)[r(x,y)] - β D_KL(π(·|x)∥π_ref(·|x))</code>로 쓸 수 있다. 첫 항은 좋은 보상을 얻으려는 방향, 두 번째는 고정 reference와의 차이에 대한 벌점이며 β&gt;0이다. 이 식의 KL 방향은 정책→reference다. P=(0.5,0.5), Q=(0.75,0.25)이면 KL(P∥Q)=0.143841, KL(Q∥P)=0.130812로 다르다. 원문211쪽 질문별 막대는 정규화된 확률 데이터가 아니므로 거기서 KL 값을 계산할 수 없다.</p>
+<p><strong>보충 유도:</strong> 위 목적의 최적 정책은 <code>π*(y|x)=π_ref(y|x)exp(r(x,y)/β)/Z(x)</code> 형태다. 따라서 <code>r(x,y)=β log[π*(y|x)/π_ref(y|x)]+β log Z(x)</code>로 다시 쓸 수 있다. 같은 prompt의 두 응답 보상 차이를 내면 βlogZ(x)가 상쇄된다. 이를 Bradley–Terry 확률에 넣으면 2절의 DPO 식이 된다. 표준 DPO의 reference 항은 이런 KL 제약에서 유도되지만 실습 손실에서 매번 전체 응답 공간의 KL을 별도로 합산해야 한다는 뜻은 아니다. <a href="https://arxiv.org/html/2305.18290v3">DPO 원논문 3~4절, 부록 A.1~A.2</a></p>
+<p>부호와 두 로그비의 순서를 그림에서 확인하자.</p>
+<p><img alt="정책과 reference의 chosen 로그비에서 rejected 로그비를 빼고 beta sigmoid 음의 로그 데이터 평균을 적용하는 DPO 손실" decoding="async" id="figure-3" loading="lazy" src="../resources/44782ee37ba53ef2ff26-p213_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/44782ee37ba53ef2ff26-p213_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽 음수는 최소화와 선호확률 증가를 연결한다. 안쪽 chosen-minus-rejected가 양수면 선호 방향과 맞고, 바깥 평균은 <strong>쌍</strong>에 대한 평균이다. 그림 아래의 독립 사건 설명은 언어 토큰에 그대로 적용하면 틀린다. 토큰 확률은 앞 문맥에 조건부이고 연쇄법칙 때문에 곱하며, 그 로그를 합한다. logπ(y|x)는 보통 응답 토큰 로그확률의 합으로 정의한다. 임의로 토큰 수로 나누면 여기서 설명한 표준 DPO와 다른 목적이 된다.</p>
+<p><strong>분모 검산:</strong> 각 응답 로그확률은 유효 응답 토큰 로그의 합, 한 쌍 손실은 -logσ(βd), 미니배치 손실은 유효 쌍 N개 합/N이다. SFT의 유효 토큰 수로 나누는 평균과 구분한다. 예를 들어 쌍 손실0.313262와1.313262의 평균은0.813262다. chosen/rejected에서 EOS 포함·prompt 제외·padding 제외·truncation 규칙을 맞춰야 차이가 의미를 가진다.</p>
+<p><a id="dataset"></a></p>
+<h2 id="sec-5-데이터를-구성하고-결과의-한계-판단하기">5. 데이터를 구성하고 결과의 한계 판단하기</h2>
+<p>원문214쪽은 reward 자료의 Prompt/Response/Feedback(Rating)와 DPO 자료의 Prompt/Chosen/Rejected를 비교한다. 이는 한 가지 자료 형식 예다. 보상 모델도 chosen/rejected 쌍으로 학습할 수 있다. 예를 들어 A&gt;B&gt;C 순위는 (A,B),(A,C),(B,C) 세 쌍으로 바꿀 수 있다. DPO에서는 <strong>같은 prompt</strong>에 대한 두 응답이어야 한다. 다른 질문의 점수5와2를 가져와 쌍을 만들면 질문 난이도와 선호가 뒤섞인다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>SFT</th>
+<th>PPO 기반 RLHF</th>
+<th>표준 DPO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>주된 학습 신호</td>
+<td>기대 응답 토큰</td>
+<td>보상 모델 등의 점수</td>
+<td>chosen/rejected 비교</td>
+</tr>
+<tr>
+<td>별도 보상 모델</td>
+<td>보통 불필요</td>
+<td>이 장의 경로에서는 필요</td>
+<td>학습하지 않음</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>필수 요소 아님</td>
+<td>이탈 제약에 사용 가능</td>
+<td>고정 로그확률 기준</td>
+</tr>
+<tr>
+<td>집계 예</td>
+<td>유효 정답 토큰 평균</td>
+<td>정책 목적·advantage 등에 따름</td>
+<td>유효 선호 쌍 평균</td>
+</tr>
+</tbody>
+</table></div>
+<p>RLHF는 인간 피드백을 이용한 강화학습이라는 범주이고 PPO는 그 안에서 사용할 수 있는 알고리즘이다. DPO는 같은 선호 자료를 직접 목적함수에 쓰는 경로다. 원문의 ‘RLHF or DPO’ 구분을 모든 용어 사용의 유일한 규칙으로 확대하지 않는다. 보상모델 기반 경로의 근거는 <a href="https://arxiv.org/abs/2203.02155">InstructGPT 원논문</a>이다.</p>
+<p>DPO loss가 낮아졌다는 사실만으로 사실 정확성·사용자 만족·분포 밖 일반화가 보장되지는 않는다. 선호 라벨 품질, 긴 답변 선호 편향, prompt 누출, tokenizer와 template 불일치, 과적합을 별도 평가한다. 고정 reference와 같은 상태에서 d=0이라는 기준점을 먼저 검산하면 부호·mask 오류를 찾기 쉽다. β는 유도상 이탈 벌점과 연결되며, 주어진 d에서 손실 입력을 배율 조절한다. β를 크게 하면 언제나 더 좋은 모델이 된다는 식으로 해석하지 않는다.</p>
+<h2 id="sec-6-확인-질문과-해설">6. 확인 질문과 해설</h2>
+<ol>
+<li>DPO에는 reward model이 없으므로 reference도 없는가?</li>
+<li>β=0.5, d=2에서 손실은? chosen/rejected를 바꾸면?</li>
+<li>정책=reference이면 응답 길이가 달라도 d는 무엇인가?</li>
+<li>logπ(y|x)를 계산할 때 토큰을 독립으로 가정하는가?</li>
+</ol>
+<details><summary>해설</summary>
+<ol>
+<li>아니다. 표준 DPO에는 고정 reference 로그확률이 필요하다. 1~2절.</li>
+<li>-lnσ(1)=0.313262, 뒤집으면 -lnσ(-1)=1.313262다. 2절.</li>
+<li>같은 mask·집계 규칙이라면 각 로그비가0이므로 d=0이고 손실 ln2=0.693147이다. 4절.</li>
+<li>아니다. 각 토큰은 prompt와 이전 응답에 조건부다. 로그합은 확률 연쇄법칙에서 나온다. 2·4절.</li>
+</ol>
+</details>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p215.html">215쪽 내부 활동</a>에서 한 쌍을 계산하고 라벨을 뒤집어 보자. 원 실습 노트북 전체 실행 결과는 주장하지 않는다.</p>
+<h2 id="sec-원문-페이지별-상세-해설">원문 페이지별 상세 해설</h2>
+<ul>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p205.html">205쪽: 정답 응답에서 선호 쌍으로</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p206.html">206쪽: PPO 기반 RLHF의 학습 루프</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p207.html">207쪽: 사람 순위를 보상 학습 쌍으로</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p208.html">208쪽: DPO의 직접 경로와 고정 reference</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p209.html">209쪽: 보상 점수에서 선호 확률 만들기</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p210.html">210쪽: sigmoid 그래프의 가로축은 점수 차이</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p211.html">211쪽: 개선과 과도한 분포 변화 구별</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p212.html">212쪽: KL은 방향이 있는 분포 차이</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p213.html">213쪽: DPO 손실의 부호·reference·로그합</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p214.html">214쪽: rating 자료와 chosen/rejected 자료</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p215.html">215쪽: DPO 한 쌍 손계산 실습</a></li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.md">17. 선호학습, RLHF와 DPO 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html"><small>이전 장</small>16. 지시학습과 손실 마스킹</a><a rel="next" href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html"><small>다음 장</small>18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

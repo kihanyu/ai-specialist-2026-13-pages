@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>05. 조건부확률과 베이즈 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html" aria-current="page">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>05. 조건부확률과 베이즈</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>조건부확률의 기준 집합을 구별한다.</li><li>자연빈도와 베이즈 식으로 사후확률을 계산한다.</li></ul></details></header><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-조건이-기준-집합을-바꾼다">1. 조건이 기준 집합을 바꾼다</a></li><li><a href="#sec-2-베이즈-정리는-교집합을-두-방향에서-세는-식이다">2. 베이즈 정리는 교집합을 두 방향에서 세는 식이다</a></li><li><a href="#sec-3-자연빈도로-계산한-뒤-확률식으로-옮긴다">3. 자연빈도로 계산한 뒤 확률식으로 옮긴다</a></li><li><a href="#sec-4-llm의-문맥-조건과-베이지안-해석을-구분한다">4. LLM의 문맥 조건과 베이지안 해석을 구분한다</a></li><li><a href="#sec-5-확인-질문과-해설">5. 확인 질문과 해설</a></li><li><a href="#sec-페이지별-상세-읽기">페이지별 상세 읽기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-05-조건부확률과-베이즈">05. 조건부확률과 베이즈</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">이전: 교차엔트로피·KL·PPL</a></p>
+<p>확률을 읽을 때 가장 먼저 물을 것은 <strong>무엇을 분모로 세고 있는가</strong>다. 조건부확률은 관측한 조건을 만족하는 경우만 기준 집합으로 삼는다. 베이즈 정리는 이미 아는 방향의 조건부확률을 이용해 반대 방향을 계산한다. LLM의 다음 토큰 확률도 앞 문맥에 조건을 둔다는 점에서 연결된다.</p>
+<p>원문 62~66쪽을 다룬다. 비율과 사칙연산만으로 학습할 수 있다. 이 장을 마치면 조건부확률의 분모를 고르고, 자연빈도 표에서 사후확률을 구하며, LLM 문맥 변화와 파라미터 학습을 구별할 수 있어야 한다. 1~3절을 계산한 뒤 4절에서 언어모델과 연결한다.</p>
+<p><a id="conditional"></a></p>
+<h2 id="sec-1-조건이-기준-집합을-바꾼다">1. 조건이 기준 집합을 바꾼다</h2>
+<p>사건은 관심 조건을 만족하는 결과들의 집합이다. 원문의 A는 농구를 좋아하는 학생, B는 축구를 좋아하는 학생이다. 전체 100명 중 B는 50명, 둘 다 좋아하는 <code>A∩B</code>는 30명이다. ‘축구를 좋아하는 학생 중 농구도 좋아할 확률’은 B의 50명만 놓고 그 안의 30명을 세는 질문이다.</p>
+<p>아래에서 붉은 상자로 강조된 분모와 오른쪽 사람 수의 변화를 연결하자.</p>
+<p><img alt="조건부확률 P(A|B)에서 분모 P(B)를 강조하고 전체 100명에서 축구 50명, 두 종목 30명으로 좁히는 화살표" decoding="async" id="figure-1" loading="lazy" src="../resources/f13be086a9c3925e3c30-p062_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/f13be086a9c3925e3c30-p062_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>원문 그림의 영어 Play Basketball/Football은 본문 ‘좋아함’과 섞여 있다. 이 교재에서는 학생들의 <strong>선호</strong>라는 같은 사건으로 일관되게 읽는다. 실제 운동 참여와 선호가 같다고 가정하는 것은 아니다. 오른쪽 화살표는 기준 집합을 좁히는 순서이며 시간에 따라 학생 수가 줄었다는 뜻이 아니다.</p>
+<pre><code class="language-text">P(A∩B)=30/100=0.3
+P(B)=50/100=0.5
+P(A|B)=P(A∩B)/P(B)=0.3/0.5=30/50=0.6
+</code></pre>
+<p><code>|</code>는 ‘주어졌을 때’, <code>∩</code>는 ‘둘 다’를 뜻한다. <code>P(B)&gt;0</code>이어야 이 분수 정의를 쓸 수 있다. 조건부확률 0.6과 교집합 확률 0.3은 서로 다른 질문의 답이다. 현재 정보로 <code>P(B|A)</code>는 구할 수 없다. A 전체 인원이 주어지지 않았기 때문이다.</p>
+<p><strong>작은 활동:</strong> 농구를 좋아하는 전체 학생이 40명이라고 추가로 가정하면 <code>P(B|A)=30/40=0.75</code>다. 축구 조건의 0.6과 다르다. 이 40명은 원문 값이 아닌 교육용 보충 가정이다. 조건의 방향을 바꾸면 분모가 바뀌는 것이 원인이다.</p>
+<p><a id="bayes"></a></p>
+<h2 id="sec-2-베이즈-정리는-교집합을-두-방향에서-세는-식이다">2. 베이즈 정리는 교집합을 두 방향에서 세는 식이다</h2>
+<p><code>P(A|B)P(B)=P(A∩B)</code>이고 <code>P(B|A)P(A)=P(A∩B)</code>다. 같은 교집합이므로 두 식을 같게 놓고 P(B)로 나누면 다음과 같다.</p>
+<pre><code class="language-text">P(A|B) = P(B|A)P(A) / P(B)
+</code></pre>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기호</th>
+<th>이름</th>
+<th>이 장에서의 역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P(A)</td>
+<td>사전확률(prior)</td>
+<td>B를 관측하기 전 관심 사건 A의 비율</td>
+</tr>
+<tr>
+<td>P(B</td>
+<td>A)</td>
+<td>우도(likelihood)</td>
+</tr>
+<tr>
+<td>P(B)</td>
+<td>증거확률(evidence)</td>
+<td>A 여부에 관계없이 B가 나올 전체 확률</td>
+</tr>
+<tr>
+<td>P(A</td>
+<td>B)</td>
+<td>사후확률(posterior)</td>
+</tr>
+</tbody>
+</table></div>
+<p>우도는 A를 가정했을 때 B가 얼마나 가능한지를 본다. 사후확률은 B를 관측한 상태에서 A를 묻는다. 둘을 바꾸어 읽지 않는다. 사전확률과 우도가 있어도 분모의 정규화가 필요하다. A와 A가 아닌 경우 <code>¬A</code>로 전체를 나누면:</p>
+<p><code>P(B)=P(B|A)P(A)+P(B|¬A)P(¬A)</code>.</p>
+<p>이는 두 경우가 겹치지 않으며 전체를 덮기 때문에 더할 수 있는 식이다. <strong>원문 63쪽 조건 보완:</strong> 교집합이 희귀한 경우에만 베이즈 정리를 쓰는 것은 아니다. 교집합을 직접 측정하기보다 반대 방향 확률과 사전 비율을 알기 쉬울 때 유용하다. B의 확률이 0이면 위 나눗셈은 정의되지 않는다. P(B|A)를 분수로 정의하는 이 전개에서는 P(A)&gt;0도 전제한다.</p>
+<p><a id="frequency"></a></p>
+<h2 id="sec-3-자연빈도로-계산한-뒤-확률식으로-옮긴다">3. 자연빈도로 계산한 뒤 확률식으로 옮긴다</h2>
+<p><strong>원문의 가상 검사 예제</strong>다. 실제 검사 결과를 해석하는 지침이 아니라 분모의 차이를 배우는 수학 모형이다. 전체 10,000명에서 해당 상태를 가진 비율을 1%, 그 상태일 때 양성 비율을 99%, 상태가 아닐 때 음성 비율을 95%로 가정한다.</p>
+<p>민감도는 <code>P(양성|상태)=0.99</code>, 특이도는 <code>P(음성|¬상태)=0.95</code>다. 따라서 위양성률은 <code>P(양성|¬상태)=0.05</code>다. <strong>자연빈도</strong>란 추상 비율 대신 같은 규모의 사람 수로 바꾸어 세는 방법이다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>실제 상태</th>
+<th>양성</th>
+<th>음성</th>
+<th>합계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>해당 상태</td>
+<td><code>100×0.99=99</code></td>
+<td>1</td>
+<td>100</td>
+</tr>
+<tr>
+<td>해당하지 않음</td>
+<td><code>9900×0.05=495</code></td>
+<td>9405</td>
+<td>9900</td>
+</tr>
+<tr>
+<td>합계</td>
+<td>594</td>
+<td>9406</td>
+<td>10000</td>
+</tr>
+</tbody>
+</table></div>
+<p>양성이라는 조건을 얻으면 표의 <strong>양성 열</strong>만 남긴다. 그중 실제 상태에 해당하는 99명을 전체 양성 594명으로 나누면 <code>99/594=1/6≈16.7%</code>다. 99%는 실제 상태가 있는 사람들 안에서의 비율이고, 16.7%는 양성인 사람들 안에서의 비율이다. 작은 위양성률도 큰 비해당 집단에 적용되면 많은 위양성을 만든다.</p>
+<p>65쪽의 확률식은 같은 표를 10,000으로 나눈 것이다.</p>
+<pre><code class="language-text">진양성 확률 = 0.99×0.01 = 0.0099
+위양성 확률 = 0.05×0.99 = 0.0495
+전체 양성 확률 = 0.0099+0.0495 = 0.0594
+P(상태|양성) = 0.0099/0.0594 = 99/594 ≈ 0.166667
+</code></pre>
+<p>분모에 진양성만 넣으면 답이 항상 1이 되어 위양성을 누락한다. 반대로 10,000으로 나누면 사후확률이 아니라 진양성의 전체 확률 0.0099를 구한 것이다.</p>
+<p><strong>조건 변경 활동:</strong> 같은 민감도·특이도에서 사전 비율만 10%로 바꾸자. 10,000명 중 해당 상태 1,000명에서 진양성 990명, 비해당 9,000명에서 위양성 450명이다. 예상 사후확률은 <code>990/(990+450)=0.6875</code>, 즉 68.75%다. 검사 특성을 그대로 두어도 사전 비율이 달라지면 결과가 달라진다. 이 가상 계산을 실제 집단으로 옮기려면 그 집단의 비율과 검사 특성이 같은지 별도로 확인해야 한다.</p>
+<p><a id="llm"></a></p>
+<h2 id="sec-4-llm의-문맥-조건과-베이지안-해석을-구분한다">4. LLM의 문맥 조건과 베이지안 해석을 구분한다</h2>
+<p>원문 66쪽은 세 연결을 나란히 제시한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>연결</th>
+<th>정확히 읽을 내용</th>
+<th>넘어서 해석하지 않을 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>다음 토큰 예측</td>
+<td>`P(wₜ</td>
+<td>w&lt;ₜ)`에서 앞 토큰들이 조건이다. 토큰이 붙으면 다음 단계의 조건이 달라진다.</td>
+</tr>
+<tr>
+<td>문맥 학습</td>
+<td>지시·예시가 프롬프트에 들어오면 답변의 조건이 달라진다.</td>
+<td>일반적인 추론 중에 가중치를 학습으로 갱신했다는 뜻은 아니다.</td>
+</tr>
+<tr>
+<td>검색 증강 생성(RAG)</td>
+<td>검색 자료를 생성에 이용하면 외부 근거를 조건으로 추가할 수 있다.</td>
+<td>검색 결과가 있다는 이유만으로 모든 답이 사실이라는 보장은 아니다.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>보충 작은 예:</strong> 두 후보 답변 A,B에 대해 문맥 C₁에서 <code>(0.7,0.3)</code>, 추가 근거가 담긴 C₂에서 <code>(0.2,0.8)</code>이 나왔다고 가정하자. 이는 조건이 달라져 출력 분포가 달라진 교육용 수치다. 이 두 분포만으로 모델이 실제 베이즈 식을 실행했는지, 내부 가중치가 바뀌었는지를 알 수 없다. 주어진 문맥에 맞춰 계산한 활성값과 확률의 변화는 학습의 가중치 갱신과 구분된다.</p>
+<p>RAG의 원 논문은 학습된 파라미터와 검색 가능한 외부 메모리를 결합해 생성하며, 비교 실험에서 더 사실적인 생성을 보고한다. 이는 특정 실험 결과이며 모든 검색·모델·질문에 대한 보증으로 확장할 수 없다. <a href="https://arxiv.org/abs/2005.11401">Lewis 외, Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</a>(2020, 확인 2026-11-09)를 근거로 연결을 보충했다. 이 교재는 실제 모델 호출이나 검색 실험을 수행한 결과를 제시하지 않는다.</p>
+<h2 id="sec-5-확인-질문과-해설">5. 확인 질문과 해설</h2>
+<ol>
+<li>1절에서 30/100과 30/50은 각각 어떤 확률인가?</li>
+<li><code>P(A|B)=P(B|A)</code>라고 써도 되는가?</li>
+<li>원문 예제에서 증거확률 0.0594는 무엇을 모두 포함하는가?</li>
+<li>사전 비율만 바뀌었는데 사후확률이 바뀌는 이유는 무엇인가?</li>
+<li>프롬프트에 자료를 붙여 답이 바뀌면 역전파가 일어난 것인가?</li>
+</ol>
+<p><strong>해설:</strong> 1은 교집합 확률과 축구 선호를 조건으로 한 농구 선호 확률이다(1절). 2는 일반적으로 안 된다. 같은 교집합을 서로 다른 기준 집합으로 나눈다(2절). 3은 진양성과 위양성 모두다(3절). 4는 진양성과 위양성이 생기는 두 집단의 상대 크기가 달라졌기 때문이다(3절). 5는 그렇다고 결론 낼 수 없다. 주어진 가중치로 다른 입력의 조건부확률을 계산한 것일 수 있다(4절).</p>
+<h2 id="sec-페이지별-상세-읽기">페이지별 상세 읽기</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p062.html">62 기준 집합</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p063.html">63 베이즈 유도</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p064.html">64 자연빈도</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p065.html">65 확률 계산</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p066.html">66 LLM 연결</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.md">05. 조건부확률과 베이즈 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html"><small>이전 장</small>04. 교차엔트로피·KL과 PPL</a><a rel="next" href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html"><small>다음 장</small>06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

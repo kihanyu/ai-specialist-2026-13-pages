@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Attention 학습 지도 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vision-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">VISION 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">Vision 자습 교재: 이미지에서 예측과 영역까지</a></li><li><a href="01_%EB%B9%84%EC%A0%84_%EC%9E%85%EB%AC%B8.html">비전 입문: 사진을 숫자로 표현하고 예측을 평가하기</a></li><li><a href="02_01_DNN_Note.html">DNN: 예측 확률에서 손실과 가중치 업데이트까지</a></li><li><a href="02_02_CNN_Note.html">CNN</a></li><li><a href="02_03_CNN_ResNet_18Layer.html">ResNet-18: 잔차를 이해하고 차원을 추적하며 구현하기</a></li><li><a href="03_01_Attention_Note.html" aria-current="page">Attention 학습 지도</a></li><li><a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT: 관계 계산에서 이미지 분류까지</a></li><li><a href="03_03_DeiT%EC%99%80_Swin.html">DeiT와 Swin: 데이터 효율과 계산 효율</a></li><li><a href="03_04_CLIP%EA%B3%BC_DINO.html">CLIP과 DINO: 정답 신호를 어디서 얻을까</a></li><li><a href="04_01_Application_note.html">Vision Applications: 검출·추적·분할 학습 안내</a></li><li><a href="04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.html">객체 검출: 박스를 만들고, 중복을 줄이고, 성능을 판단하기</a></li><li><a href="04_03_%EA%B0%9D%EC%B2%B4_%EC%B6%94%EC%A0%81.html">객체 추적 — 위치를 갱신하면서 같은 ID를 유지하기</a></li><li><a href="04_04_%EC%98%81%EC%83%81_%EB%B6%84%ED%95%A0.html">영상 분할 — 픽셀의 의미와 개체의 경계를 예측하기</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">VISION</p><h1>Attention 학습 지도</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>내적·softmax·QKV에서 ViT·DeiT·Swin으로 이어지는 학습 순서를 정한다.</li><li>Attention 점수와 전달되는 Value의 역할을 구별한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="vision-patches" id="lab-vision-patches"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-먼저-준비할-것">먼저 준비할 것</a></li><li><a href="#sec-권장-학습-순서">권장 학습 순서</a></li><li><a href="#sec-개념을-한-지도에서-연결하기">개념을 한 지도에서 연결하기</a></li><li><a href="#sec-막힌-곳에서-바로-찾기">막힌 곳에서 바로 찾기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-attention-학습-지도">Attention 학습 지도</h1>
+<p>이 단원은 <strong>이미지 안의 정보를 어떻게 모으는가 → 제한된 자원으로 어떻게 학습하는가 → 정답 신호를 어디서 얻는가</strong>를 따라갑니다. 기존 긴 노트의 상세 설명·그림·수식·실험 해석은 아래 세 본문으로 옮겼습니다. 이 파일은 시작점이며 상세 본문의 중복본이 아닙니다.</p>
+<h2 id="sec-먼저-준비할-것">먼저 준비할 것</h2>
+<p><a href="02_01_DNN_Note.html">DNN</a>의 행렬 곱·Softmax·교차 엔트로피와 <a href="02_02_CNN_Note.html">CNN</a>의 특징 맵·지역 수용 영역을 알고 시작하면 좋습니다. 잔차 연결이 낯설면 <a href="02_03_CNN_ResNet_18Layer.html">ResNet</a>으로 돌아가세요.</p>
+<h2 id="sec-권장-학습-순서">권장 학습 순서</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>순서와 본문</th>
+<th>중심 질문</th>
+<th>다 읽고 할 수 있어야 하는 일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. <a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT</a></td>
+<td>다른 위치의 정보를 어떤 비율로 모으는가?</td>
+<td>QKV→Softmax→AV 계산, 패치·CLS·Head shape 추적</td>
+</tr>
+<tr>
+<td>2. <a href="03_03_DeiT%EC%99%80_Swin.html">DeiT와 Swin</a></td>
+<td>데이터와 계산의 병목을 어떻게 줄이는가?</td>
+<td>정답·교사 목표 구분, Window·Shift·Merging의 차이 설명</td>
+</tr>
+<tr>
+<td>3. <a href="03_04_CLIP%EA%B3%BC_DINO.html">CLIP과 DINO</a></td>
+<td>클래스 번호 없이 어떤 목표를 학습하는가?</td>
+<td>이미지·문장 대조 학습과 이미지 뷰 자기증류 비교</td>
+</tr>
+</tbody>
+</table></div>
+<p>각 본문에는 <strong>핵심 읽기 경로, 심화 실험, 작은 수치 예제, 확인 문제와 해설, 막힐 때 돌아갈 링크</strong>가 있습니다. 처음에는 핵심 경로를 읽고 문제를 풀며, 실험의 모든 숫자를 외우기보다 비교 조건과 한계를 확인하세요.</p>
+<h2 id="sec-개념을-한-지도에서-연결하기">개념을 한 지도에서 연결하기</h2>
+<p><code>패치 → QKV 관계 계산 → 이미지 특징</code>은 ViT의 구조입니다. 이 특징을 정답 라벨로 학습할 수도 있고, DeiT처럼 교사의 예측을 추가할 수도 있습니다. Swin은 관계를 계산하는 공간 범위를 바꿉니다. CLIP은 문장과의 대응을, DINO는 다른 이미지 뷰의 Teacher 출력을 목표로 삼습니다. 따라서 ViT·Swin 같은 <strong>구조</strong>와 CLIP·DINO 같은 <strong>학습 방식</strong>을 항상 배타적인 모델 선택지로 생각하면 안 됩니다.</p>
+<h2 id="sec-막힌-곳에서-바로-찾기">막힌 곳에서 바로 찾기</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>증상·복습 질문</th>
+<th>돌아갈 위치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q·K·V는 아는데 숫자를 못 구한다</td>
+<td><a href="03_02_Attention%EA%B3%BC_ViT.html#qkv-example">QKV 손계산</a></td>
+</tr>
+<tr>
+<td>패치 수와 임베딩 차원, 클래스 수가 섞인다</td>
+<td><a href="03_02_Attention%EA%B3%BC_ViT.html#vit">ViT 입력부터 출력</a></td>
+</tr>
+<tr>
+<td>두 특수 토큰이 같은 정답을 배우는지 모르겠다</td>
+<td><a href="03_03_DeiT%EC%99%80_Swin.html#deit">DeiT 두 학습 목표</a></td>
+</tr>
+<tr>
+<td>Shift와 Patch Merging을 혼동한다</td>
+<td><a href="03_03_DeiT%EC%99%80_Swin.html#swin">Swin 연결 범위</a></td>
+</tr>
+<tr>
+<td>파라미터가 작으면 무조건 빠르다고 생각한다</td>
+<td><a href="03_03_DeiT%EC%99%80_Swin.html#parameters">비용 비교</a></td>
+</tr>
+<tr>
+<td>Zero-shot이 학습을 안 했다는 뜻인가</td>
+<td><a href="03_04_CLIP%EA%B3%BC_DINO.html#clip">CLIP의 학습과 추론</a></td>
+</tr>
+<tr>
+<td>Teacher를 고정하면서 EMA로 바꾼다는 말이 모순 같다</td>
+<td><a href="03_04_CLIP%EA%B3%BC_DINO.html#dino">DINO 학습 단계</a></td>
+</tr>
+<tr>
+<td>CLIP과 DINO를 구별해서 설명할 수 있는가</td>
+<td><a href="03_04_CLIP%EA%B3%BC_DINO.html#check">종합 확인 문제</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>원문은 <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%EA%B5%90%EC%95%88/03_00_Attention.pdf">Attention 교안 전체 59쪽</a>입니다. 교안의 표현을 정정한 곳은 본문에서 근거와 함께 설명하고, 추가 계산은 교육용 보충으로 구별합니다. 다음 단원은 <a href="04_01_Application_note.html">검출·추적·분할 응용</a>입니다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/03_01_Attention_Note.md">Attention 학습 지도 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="02_03_CNN_ResNet_18Layer.html"><small>이전 장</small>ResNet-18: 잔차를 이해하고 차원을 추적하며 구현하기</a><a rel="next" href="03_02_Attention%EA%B3%BC_ViT.html"><small>다음 장</small>Attention과 ViT: 관계 계산에서 이미지 분류까지</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

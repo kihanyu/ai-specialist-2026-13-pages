@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1050" viewBox="0 0 1280 1050" role="img" aria-labelledby="title desc">
+<title id="title">RAG 열두 장 학습 지도</title>
+<desc id="desc">검색의 기본부터 점수와 평가, 신경 검색과 벡터 인덱스, RAG와 청킹과 확률 혼합을 거쳐 답변 근거·도구 사용·운영 평가로 이어지는 네 단계 지도</desc>
+<rect width="1280" height="1050" fill="#ffffff"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10" fill="#526478"/></marker></defs>
+<text x="50" y="62" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="36" font-weight="700" fill="#17324d">검색에서 근거 있는 답변까지</text>
+<text x="50" y="104" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="24" font-weight="400" fill="#526478">위에서 아래로 · 각 줄은 왼쪽에서 오른쪽으로 읽습니다</text>
+<text x="50" y="173" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">1. 검색을 수치로 이해하기</text>
+<rect x="50" y="193" width="370" height="115" rx="16" fill="#eef5ff" stroke="#b9c9d7"/>
+<text x="70" y="233" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">01 검색과 역색인</text>
+<text x="70" y="274" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">문서 → term → 후보</text>
+<path d="M426 250 H448" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="455" y="193" width="370" height="115" rx="16" fill="#eef5ff" stroke="#b9c9d7"/>
+<text x="475" y="233" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">02 TF-IDF · BM25</text>
+<text x="475" y="274" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">통계 → 관련성 점수</text>
+<path d="M831 250 H853" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="860" y="193" width="370" height="115" rx="16" fill="#eef5ff" stroke="#b9c9d7"/>
+<text x="880" y="233" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">03 검색 평가지표</text>
+<text x="880" y="274" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">순위 + 정답 → 품질</text>
+<path d="M625 318 V340" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="50" y="378" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">2. 의미와 규모를 다루기</text>
+<rect x="50" y="398" width="370" height="115" rx="16" fill="#ecf8f3" stroke="#b9c9d7"/>
+<text x="70" y="438" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">04 신경 검색의 학습</text>
+<text x="70" y="479" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">입력 쌍 → 점수 → 손실</text>
+<path d="M426 455 H448" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="455" y="398" width="370" height="115" rx="16" fill="#ecf8f3" stroke="#b9c9d7"/>
+<text x="475" y="438" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">05 벡터 검색 · 인덱스</text>
+<text x="475" y="479" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">공간 → 후보 탐색</text>
+<path d="M831 455 H853" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="860" y="398" width="370" height="115" rx="16" fill="#ecf8f3" stroke="#b9c9d7"/>
+<text x="880" y="438" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">06 RAG 전체 구조</text>
+<text x="880" y="479" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">검색 → 컨텍스트 → 생성</text>
+<path d="M625 523 V545" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="50" y="583" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">3. 정보와 확률을 구성하기</text>
+<rect x="50" y="603" width="370" height="115" rx="16" fill="#fff7e8" stroke="#b9c9d7"/>
+<text x="70" y="643" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">07 청킹과 컨텍스트</text>
+<text x="70" y="684" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">찾는 조각 ≠ 읽는 범위</text>
+<path d="M426 660 H448" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="455" y="603" width="370" height="115" rx="16" fill="#fff7e8" stroke="#b9c9d7"/>
+<text x="475" y="643" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">08 RAG-Sequence</text>
+<text x="475" y="684" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">문서별 확률 → 가중합</text>
+<path d="M831 660 H853" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="860" y="603" width="370" height="115" rx="16" fill="#fff7e8" stroke="#b9c9d7"/>
+<text x="880" y="643" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">09 검색 고도화</text>
+<text x="880" y="684" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">질문 변환 · 융합 · 재정렬</text>
+<path d="M625 728 V750" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="50" y="788" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">4. 답변을 검증하고 운영하기</text>
+<rect x="50" y="808" width="370" height="115" rx="16" fill="#f4efff" stroke="#b9c9d7"/>
+<text x="70" y="848" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">10 답변과 근거</text>
+<text x="70" y="889" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">주장 ↔ 출처 · 거절</text>
+<path d="M426 865 H448" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="455" y="808" width="370" height="115" rx="16" fill="#f4efff" stroke="#b9c9d7"/>
+<text x="475" y="848" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">11 도구와 Agentic RAG</text>
+<text x="475" y="889" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">선택 → 실행 → 판단 반복</text>
+<path d="M831 865 H853" stroke="#526478" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="860" y="808" width="370" height="115" rx="16" fill="#f4efff" stroke="#b9c9d7"/>
+<text x="880" y="848" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="25" font-weight="700" fill="#17324d">12 평가와 운영</text>
+<text x="880" y="889" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="23" font-weight="400" fill="#17324d">정확성 · 비용 · 지연</text>
+<text x="50" y="1015" font-family="Malgun Gothic,Noto Sans KR,sans-serif" font-size="24" font-weight="700" fill="#17324d">공통 질문: 무엇을 입력하고, 무엇을 바꾸며, 어떤 기준으로 좋아졌다고 판단할까?</text>
+</svg>

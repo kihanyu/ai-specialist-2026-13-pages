@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>14. 모델 학습 — 정답 확률에서 가중치 갱신까지 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html" aria-current="page">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>14. 모델 학습 — 정답 확률에서 가중치 갱신까지</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>다음 정답과 손실을 연결하고 데이터 누수를 피한다.</li><li>batch·step·epoch와 역전파·갱신을 구분한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-gradient" id="lab-llm-gradient"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="llm-loss-mask" id="lab-llm-loss-mask"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-시각적으로-확인할-핵심">시각적으로 확인할 핵심</a></li><li><a href="#sec-1-같은-자료로-공부하고-시험-보면-생기는-문제">1. 같은 자료로 공부하고 시험 보면 생기는 문제</a></li><li><a href="#sec-2-손실은-예측-대상에-맞게-고른다">2. 손실은 예측 대상에 맞게 고른다</a></li><li><a href="#sec-3-손실이-계산되어도-가중치는-저절로-바뀌지-않는다">3. 손실이 계산되어도 가중치는 저절로 바뀌지 않는다</a></li><li><a href="#sec-4-epochbatchstep과-생성의-차이">4. Epoch·batch·step과 생성의 차이</a></li><li><a href="#sec-5-이해-확인">5. 이해 확인</a></li><li><a href="#sec-6-사전학습의-위치와-정답-이동">6. 사전학습의 위치와 정답 이동</a></li><li><a href="#sec-7-외부-실행-없이-해보는-사전학습-점검">7. 외부 실행 없이 해보는 사전학습 점검</a></li><li><a href="#sec-8-원문-주장에-필요한-조건과-정정">8. 원문 주장에 필요한 조건과 정정</a></li><li><a href="#sec-페이지별-복습">페이지별 복습</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-14-모델-학습-정답-확률에서-가중치-갱신까지">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</h1>
+<p>언어모델 학습은 정답 토큰에 부여한 확률을 높이도록 가중치를 조정한다. <strong>손실 계산 → 기울기 계산 → 파라미터 갱신</strong>은 서로 다른 단계다. 생성과 같은 다음 토큰 문제를 풀지만, 학습 중에는 정답 문맥이 이미 주어져 여러 위치의 예측을 함께 계산할 수 있다.</p>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">전체 학습 경로</a> · <a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">선행: 출력과 logits</a></p>
+<p>학습 목표는 CE를 손계산하고 학습·검증·시험 데이터를 구분하며, batch와 optimizer step을 세는 것이다. 1~4절은 기본이고 Adam의 수식은 보충 확인용이다.</p>
+<h2 id="sec-시각적으로-확인할-핵심">시각적으로 확인할 핵심</h2>
+<p>확률에서 손실까지 내려간 뒤, 미분 계산과 가중치 변경을 따로 확인하세요.</p>
+<p><img alt="CE는 유효 정답의 음의 로그확률 평균: 정답 확률 설명용 p = (0.5, 0.25); 자연로그에 음수 부호 −ln p = (0.693147, 1.386294); 유효 위치 N=2로 평균 L = 1.039721; 기울기 계산 backward: 각 가중치의 미분; 파라미터 갱신 optimizer: 가중치를 실제 변경" decoding="async" id="figure-1" loading="lazy" src="../resources/7b4d3cfa202feef735de-10_%ED%95%B5%EC%8B%AC%EA%B4%80%EA%B3%84.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/7b4d3cfa202feef735de-10_%ED%95%B5%EC%8B%AC%EA%B4%80%EA%B3%84.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p>확률 합이 아니라 로그 손실의 평균이다. backward와 optimizer update는 별개 단계다.</p>
+<h2 id="sec-1-같은-자료로-공부하고-시험-보면-생기는-문제">1. 같은 자료로 공부하고 시험 보면 생기는 문제</h2>
+<p>train은 가중치를 맞추는 데이터, validation은 설정·중단 시점 등을 선택하는 데이터, test는 선택을 마친 뒤 최종 평가하는 데이터다. 같은 문서의 겹치는 조각을 서로 다른 분할에 넣으면 내용을 사실상 미리 본 누수가 생길 수 있다. 문서·사용자·시간 등 독립 단위를 고려해 나눈다. validation은 과적합을 <strong>발견하고 대응할 근거</strong>를 주며, 분리 자체가 과적합을 자동 방지하지는 않는다. 시험 데이터를 계속 보고 설정을 고르면 더 이상 독립 시험이 아니다.</p>
+<h2 id="sec-2-손실은-예측-대상에-맞게-고른다">2. 손실은 예측 대상에 맞게 고른다</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>대상</th>
+<th>출력과 정답</th>
+<th>손실의 의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>실수 회귀</td>
+<td>예측값·실제값</td>
+<td>MSE: 제곱 오차 평균</td>
+</tr>
+<tr>
+<td>이진 분류</td>
+<td>양성 logit·0/1</td>
+<td>BCE: 정답 사건의 음의 로그확률</td>
+</tr>
+<tr>
+<td>다중 토큰 분류</td>
+<td>V개 logits·정답 ID</td>
+<td>CE: 정답 후보의 음의 로그확률</td>
+</tr>
+</tbody>
+</table></div>
+<p>토큰 ID 3과 4가 숫자로 가깝다고 의미가 가까운 것은 아니다. ID 차이의 MSE로 next-token 문제를 풀지 않는다. CE는 자연로그를 사용하고 유효한 정답 위치 수 N으로 평균낸다.</p>
+<div class="math-raw math-display">$$L=-\frac1N\sum_{i=1}^N\ln p(y_i\mid x_{\le i}).$$</div><p>설명용으로 정답 확률이 0.5와 0.25인 두 위치를 생각하자. 첫 손실은 <code>-ln(0.5)=0.693147</code>, 둘째는 <code>-ln(0.25)=1.386294</code>, 평균은 1.039721이다. 확률들을 단순히 더하는 것이 아니다. perplexity는 <code>exp(L)≈2.828427</code>이다. 평균 대상·토큰화·데이터가 다르면 PPL 숫자만으로 모델 우열을 비교하지 않는다. 정답 확률이 0이면 이론적 손실은 무한대이므로 실제 구현에서는 logits에서 log-softmax를 안정적으로 계산한다.</p>
+<p>입력 <code>[7,2,9]</code>, 정답 <code>[2,9,5]</code>라면 첫 위치는 7을 보고 2를 예측한다. causal mask가 뒤의 정답을 직접 보지 못하게 한다. <code>[B,T,V]</code> logits를 <code>[B*T,V]</code>, 정답 <code>[B,T]</code>를 <code>[B*T]</code>로 펴도 위치 대응은 보존해야 한다. API가 내부에서 정답을 shift한다면 밖에서 다시 shift하지 않는다. padding 정답은 평균의 분모에서도 제외한다.</p>
+<h2 id="sec-3-손실이-계산되어도-가중치는-저절로-바뀌지-않는다">3. 손실이 계산되어도 가중치는 저절로 바뀌지 않는다</h2>
+<pre><code class="language-text">배치 → forward → logits → loss → backward → optimizer update
+                                   ↑               ↓
+                                   다음 배치 전에 gradient 초기화
+</code></pre>
+<p>위는 의사 흐름이다. 보통 이전 기울기를 초기화한 뒤 forward/backward/step을 진행한다. backward는 각 가중치가 손실에 미치는 미분을 계산하고 optimizer가 그 값을 이용해 갱신한다. SGD는 <code>w_new=w_old-ηg</code>다. w=2, g=0.3, η=0.1이면 1.97이다. η를 너무 크게 하면 손실이 증가하거나 발산할 수 있다. <code>model.eval()</code>은 Dropout 등 모듈 동작을 바꾸고, <code>no_grad()</code>는 자동미분 기록을 끈다. 검증 시 둘을 구별해 사용한다.</p>
+<p>Adam은 기울기 g의 지수이동평균 m과 제곱 기울기의 지수이동평균 v를 유지한다. 보충 수식은 <code>m_t=β1 m_(t-1)+(1-β1)g_t</code>, <code>v_t=β2 v_(t-1)+(1-β2)g_t²</code>이다. 초기 0의 편향을 보정한 <code>mhat=m_t/(1-β1^t)</code>, <code>vhat=v_t/(1-β2^t)</code>로 <code>w←w-η mhat/(sqrt(vhat)+ε)</code>를 계산한다. ‘방향’과 ‘보폭’ 비유는 직관이며 최적 손실·일반화를 보장하지 않는다.</p>
+<blockquote>
+<p>원문 해석 주의: 169쪽의 ‘고차원에서는 local minimum이 발생하지 않음’은 일반 명제로 사용하지 않는다. 고차원에도 국소 최소가 존재할 수 있으며 평탄한 영역·안장점·기울기 문제를 구분해야 한다. 173쪽의 작은/큰 배치 효과 역시 학습률·데이터·총 학습량·하드웨어 조건에 의존하므로 단정하지 않는다.</p>
+</blockquote>
+<h2 id="sec-4-epochbatchstep과-생성의-차이">4. Epoch·batch·step과 생성의 차이</h2>
+<p>데이터 1,000개, batch size 100, 마지막 배치 버림 없음, 배치마다 한 번 갱신이면 한 epoch은 10 optimizer step이다. batch size 128이면 <code>ceil(1000/128)=8</code>배치이며 마지막 104개를 포함한다. <code>drop_last=True</code>면 7배치, 896개만 사용한다. gradient accumulation으로 두 배치마다 갱신하면 배치 수와 optimizer step 수는 달라지므로 마지막 나머지를 갱신할지도 명시해야 한다.</p>
+<p>학습에서는 teacher forcing으로 정답 이전 토큰을 각 위치에 공급해 한 번의 causal forward로 여러 next-token 손실을 계산한다. 생성에서는 다음 입력 토큰을 아직 모르므로 선택한 토큰을 붙여 반복한다. 조건부 예측의 방향은 같지만, 학습 문맥은 정답이고 생성 문맥은 자기 예측이므로 두 전체 과정이 완전히 동일하지는 않다. 원문 174쪽의 ‘동일’은 미래를 가리는 조건부 예측 구조로 한정해 읽는다.</p>
+<h2 id="sec-5-이해-확인">5. 이해 확인</h2>
+<ol>
+<li>두 정답 확률을 0.5,0.5로 바꾸면 CE와 PPL은?</li>
+<li>데이터 10개, batch size 4에서 마지막을 버릴 때와 유지할 때 배치 수는?</li>
+<li>validation loss가 오르는데 train loss만 내려간다면 무엇을 의심하는가?</li>
+<li>backward만 호출한 다음 가중치를 비교하면 왜 그대로일 수 있는가?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>평균 CE=0.693147, PPL=2. 둘째 정답의 확률이 높아져 손실이 줄었다. 2절.</li>
+<li>버리면 2, 유지하면 3. 한 배치당 갱신 가정 아래 step 수도 각각 2·3이다. 4절.</li>
+<li>과적합, 분할 차이 등을 살핀다. test를 조정용으로 쓰지 않는다. 1절.</li>
+<li>backward는 기울기를 계산할 뿐이다. 실제 optimizer update가 필요하다. 3절.</li>
+</ol>
+</details>
+<p>원문 175쪽 Chapter 5는 실습 안내 페이지다. 이 장의 수치는 새 설명용 예시이며 원 노트북 실행 결과가 아니다. 다음 <a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15장</a>은 사전학습 모델을 특정 작업에 맞추는 방법이다.</p>
+<h2 id="sec-6-사전학습의-위치와-정답-이동">6. 사전학습의 위치와 정답 이동</h2>
+<p><strong>정의와 목적.</strong> 사전학습은 작업별 조정 전에 넓은 텍스트에서 다음 토큰 예측 규칙을 맞추는 과정이다. 정답은 별도 사람이 모든 토큰에 라벨을 붙이지 않아도 원문 텍스트에서 얻는다. <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p159.html">159쪽</a>의 지도는 모델 구성→사전학습 또는 학습된 가중치 로드→분류·지시 데이터로 미세튜닝이라는 흐름이다. 이 장은 가운데 기본 모델의 학습 루프에 집중한다.</p>
+<p>한 문서의 토큰이 [7,2,9,5]이면 입력 X=[7,2,9], 정답 Y=[2,9,5]로 한 칸 이동시킨다. B=1,T=3,V=11일 때 모델 출력 [1,3,11]의 각 행을 다음처럼 대응한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>위치 t</th>
+<th>모델이 볼 수 있는 문맥</th>
+<th>정답 ID</th>
+<th>손실에 고를 좌표</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>[7]</td>
+<td>2</td>
+<td>p[0,0,2]</td>
+</tr>
+<tr>
+<td>1</td>
+<td>[7,2]</td>
+<td>9</td>
+<td>p[0,1,9]</td>
+</tr>
+<tr>
+<td>2</td>
+<td>[7,2,9]</td>
+<td>5</td>
+<td>p[0,2,5]</td>
+</tr>
+</tbody>
+</table></div>
+<p>causal mask는 위치 0이 입력 배열 뒤의 2·9를 미리 보지 못하게 한다. shift는 어느 출력을 어느 정답과 비교할지 정하는 작업이고 mask는 모델이 어느 입력을 볼지 제한하는 작업이다. 둘 중 하나를 생략하면 정답을 그대로 베끼거나 잘못된 위치를 학습할 수 있다. 라이브러리가 내부 shift를 제공하는 경우 데이터 쪽에서 다시 이동하지 않는다.</p>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p166.html">166쪽</a>의 every→effort, effort→moves, moves→you 그림은 argmax 인덱스를 문자로 복원하는 예다. 손실 계산에서 필요한 것은 가장 큰 후보가 아니라 <strong>정답 후보의 확률</strong>이다. 아래 <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p167.html">167쪽</a> 화살표의 target probabilities 단계를 찾는다.</p>
+<p><img alt="logits에서 확률·정답 확률·로그 확률·평균·음의 평균으로 내려가는 CE 계산 과정" decoding="async" id="figure-2" loading="lazy" src="../resources/7e18f7564058593b6911-p167_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/7e18f7564058593b6911-p167_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>그림에는 전체 값이 생략되어 있으므로 마지막 10.7940을 표시된 세 항만으로 검산할 수 없다. 본문의 0.5·0.25 예시는 모든 입력을 제공해 직접 검산하도록 만든 보충이다. padding을 제외할 때는 손실의 합과 분모 모두에서 제외한다. 모두 padding인 배치는 유효 위치 N=0이므로 평균을 계산하지 않고 건너뛰는 등의 정책이 필요하다.</p>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p174.html">174쪽</a>에서 오른쪽 학습의 정답 행이 한 칸 이동한 것을 확인한다.</p>
+<p><img alt="왼쪽은 토큰을 순서대로 덧붙이는 추론, 오른쪽은 입력 문장과 한 칸 이동한 정답 문장을 한 번에 대응하는 학습" decoding="async" id="figure-3" loading="lazy" src="../resources/d4b7b105a8b773287585-p174_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/d4b7b105a8b773287585-p174_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽에서는 앞선 선택이 다음 입력이므로 순차 생성이 필요하다. 오른쪽에서는 전체 정답 문장을 이미 알고 있어 causal mask 아래 모든 위치 손실을 병렬로 계산한다. ‘두 과정이 동일’하다는 원문 문장은 미래를 볼 수 없는 조건부 예측 구조를 공유한다는 범위로 한정한다.</p>
+<h2 id="sec-7-외부-실행-없이-해보는-사전학습-점검">7. 외부 실행 없이 해보는 사전학습 점검</h2>
+<p><strong>활동 A: 손실 선택.</strong> <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p163.html">163쪽</a>의 실제값 [10,20,30,40,50]과 예측값 [11,19,30,43,47]에서 MSE를 계산한다. 제곱 오차 합은 20, 평균은 4다. <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p164.html">164쪽</a>의 이진 정답 [1,0,1,1,0], 양성 확률 [0.99,0.11,0.5,0.05,0.75]에서는 정답 사건 확률이 [0.99,0.89,0.5,0.05,0.25]다. 자연로그 손실 합은 5.201758, 평균은 1.040352이다. 합과 평균의 기준을 먼저 확인한다.</p>
+<p><strong>활동 B: next-token 손실.</strong> 입력 [7,2,9], 정답 [2,9,5]에 대한 정답 확률이 [0.5,0.25,0.5]이면 CE=0.924196, PPL=2.519842다. 두 번째 정답만 0.5로 높이면 CE=0.693147, PPL=2로 낮아진다. 숫자는 설명용 분포이며 원 노트북의 출력값이 아니다.</p>
+<p><strong>활동 C: 갱신 횟수.</strong> 데이터 10개, batch 4, 나머지 유지이면 배치는 4·4·2로 세 개다. 두 microbatch마다 gradient accumulation을 하고 마지막 잔여도 갱신하면 optimizer step은 두 번이다. 마지막 잔여를 버리면 한 번이므로 정책을 명시해야 한다. 서로 크기가 다른 배치의 평균 손실을 단순 평균하면 토큰별 평균과 달라질 수 있어 유효 토큰 수로 가중해야 한다.</p>
+<p><strong>활동 D: Adam 첫 단계.</strong> g=0.3, β₁=0.9, β₂=0.999이면 m=0.03, v=0.00009다. 첫 step 편향 보정으로 m̂=0.3, v̂=0.09가 되고, η=0.1, ε=1e-8이면 w=2에서 약 1.9000000033으로 이동한다. 이동평균과 편향 보정은 <a href="https://arxiv.org/abs/1412.6980">Adam 원논문</a>의 알고리즘을 따른다. 원문의 ‘방향·보폭’은 이 수식의 직관이다.</p>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p175.html">175쪽</a>의 <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%EC%8B%A4%EC%8A%B5/Chapter_5_Excercise_Pretraining.ipynb">원 사전학습 노트북</a>은 추가 실행 경로다. 위 작은 활동은 내부에서 완결되며 원 노트북 전체 실행과 재학습 성능 평가는 수행하지 않았다.</p>
+<h2 id="sec-8-원문-주장에-필요한-조건과-정정">8. 원문 주장에 필요한 조건과 정정</h2>
+<ul>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p161.html">160~161쪽</a>: 검증 데이터는 과적합 탐지와 설정 선택에 쓰인다. 분리해 놓는 것만으로 과적합이 방지되지는 않는다. test를 반복 선택에 사용하면 독립 평가 기능이 약해진다.</li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p165.html">165쪽</a>: ‘정답 확률 합’은 CE의 정의가 아니다. 각 위치의 정답 확률을 골라 음의 로그 평균을 계산한다. 같은 위치에서 모든 어휘 후보의 확률 합만 1이어야 한다.</li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p166.html">166쪽</a>: 그림 첫 확률 행의 합은 0.98이다. 원문 근삿값을 정확한 분포로 간주한 수치 결론은 피한다.</li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p168.html">168쪽</a>: 0&lt;학습률&lt;1은 모든 손실의 보편 수렴 조건이 아니다. 가령 L(w)=100w², w=1, η=0.1이면 새 값 -19가 되어 손실이 커진다.</li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p169.html">169쪽</a>: 고차원에도 L(w)=Σwᵢ²의 원점처럼 최소가 존재한다. 안장점·평탄 영역과 국소 최소를 구별한다. 관련 <a href="https://arxiv.org/abs/1406.2572">Dauphin 외 원논문</a>은 고차원 비볼록 최적화에서 안장점의 어려움을 논한다. 원문의 무조건적 ‘발생하지 않음’을 뒷받침하는 근거로 쓰지 않는다.</li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p173.html">173쪽</a>: 같은 global step에서 batch가 다르면 총 처리 데이터량도 달라질 수 있다. 원 그래프의 실험 조건이 제공되지 않아 일반화·실행 시간의 인과적 우열은 미확인이다.</li>
+</ul>
+<h2 id="sec-페이지별-복습">페이지별 복습</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p158.html">158 표지</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p159.html">159 전체 과정</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p160.html">160 분할</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p161.html">161 검증</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p162.html">162 학습 순환</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p163.html">163 MSE</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p164.html">164 BCE</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p165.html">165 정답 확률</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p166.html">166 인덱스</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p167.html">167 CE</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p168.html">168 경사하강</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p169.html">169 지형</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p170.html">170 Adam 직관</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p171.html">171 Adam 식</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p172.html">172 학습 단위</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p173.html">173 배치 비교</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p174.html">174 학습·추론</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p175.html">175 실습</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.md">14. 모델 학습 — 정답 확률에서 가중치 갱신까지 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html"><small>이전 장</small>13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a><a rel="next" href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html"><small>다음 장</small>15. 미세튜닝, LoRA와 QLoRA</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

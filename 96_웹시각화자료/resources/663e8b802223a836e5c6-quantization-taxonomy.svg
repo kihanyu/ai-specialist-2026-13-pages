@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1930" height="1300" viewBox="0 0 1930 1300">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#375c85"/></marker></defs>
+<rect width="100%" height="100%" fill="#f6f8fc"/><text x="35" y="50" font-family="Malgun Gothic,sans-serif" font-size="28" fill="#10243e">양자화 가지치기 지도 — 스칼라 대표값 배치와 벡터 부호화를 구별</text>
+<path d="M980.0,260 L355.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M980.0,260 L1035.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M980.0,260 L1640.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M355.0,540 L190.0,700" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M355.0,540 L520.0,700" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1035.0,540 L870.0,700" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1035.0,540 L1200.0,700" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1640.0,540 L1640.0,700" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="780" y="100" width="400" height="160" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="796" y="140" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Quantization 양자화</text>
+<text x="796" y="175" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">실수 → 유한한 대표값</text>
+<text x="796" y="210" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">배치 / 부호화 단위 구분</text>
+<rect x="40" y="370" width="630" height="170" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Linear / Uniform — 선형·균일 스칼라</text>
+<text x="56" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">공유 scale 안에서 대표값 간격이 일정</text>
+<text x="56" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">복원: r ~ S(q - Z)</text>
+<rect x="720" y="370" width="630" height="170" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="736" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Nonlinear / Non-uniform — 비균일 스칼라</text>
+<text x="736" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">대표값 위치에 따라 간격이 달라짐</text>
+<text x="736" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">이 자료에서는 비균일이라는 의미로 사용</text>
+<rect x="1400" y="370" width="480" height="170" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1416" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Vector Quantization — 별도 분류축</text>
+<text x="1416" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">분류 기준: 여러 원소의 공동 부호화</text>
+<text x="1416" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">스칼라 간격 분류의 하위집합 아님</text>
+<rect x="40" y="700" width="300" height="260" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="740" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">대칭 선형</text>
+<text x="56" y="775" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Zero point Z = 0</text>
+<text x="56" y="810" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">INT8 / INT4 등</text>
+<text x="56" y="845" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">q = round(r / S)</text>
+<text x="56" y="880" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">최종 코드 범위로 clip</text>
+<rect x="370" y="700" width="300" height="260" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="386" y="740" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">비대칭 선형</text>
+<text x="386" y="775" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">범위에 맞게 Z 선택</text>
+<text x="386" y="810" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Z는 0일 수도 있음</text>
+<text x="386" y="845" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">q = round(r / S) + Z</text>
+<text x="386" y="880" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">최종 코드 범위로 clip</text>
+<rect x="720" y="700" width="300" height="260" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="736" y="740" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">로그 · 거듭제곱</text>
+<text x="736" y="775" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Log quantization</text>
+<text x="736" y="810" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">INQ: 0 또는 ±2^k</text>
+<text x="736" y="845" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">INQ는 점진 양자화와</text>
+<text x="736" y="880" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">재학습을 함께 사용</text>
+<rect x="1050" y="700" width="300" height="260" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1066" y="740" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">기타 비균일 스칼라</text>
+<text x="1066" y="775" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">NF4 / learned codebook</text>
+<text x="1066" y="810" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Binary-code: 강의의 예</text>
+<text x="1066" y="845" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">FP4(E2M1), MX/NV</text>
+<text x="1066" y="880" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">원소 대표값 간격 비균일</text>
+<rect x="1400" y="700" width="480" height="260" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1416" y="740" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">벡터 양자화의 강의 예</text>
+<text x="1416" y="775" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">QuIP#: E8 격자 기반 codebook</text>
+<text x="1416" y="810" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">AQLM: 여러 codebook 벡터의 합</text>
+<text x="1416" y="845" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">여러 원소를 벡터로 묶어 공동 부호화</text>
+<text x="1416" y="880" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">1차원 간격 기준을 그대로 적용하지 않음</text>
+<rect x="40" y="1060" width="850" height="190" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="1100" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">별도 설계축 — 위 가지와 조합 가능</text>
+<text x="56" y="1135" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">PTQ / QAT: 변환·학습 방식; static / dynamic: 결정 시점</text>
+<text x="56" y="1170" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">per-tensor / channel / group / token: scale 공유 단위</text>
+<text x="56" y="1205" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Weight / Activation / KV: 양자화 대상</text>
+<rect x="940" y="1060" width="940" height="190" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="956" y="1100" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">오차 제어·전처리 기법 — 독립적인 대표값 분류가 아님</text>
+<text x="956" y="1135" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">RTN·AdaRound·BRECQ·OBQ·GPTQ: 반올림·재구성·오차 보상</text>
+<text x="956" y="1170" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">SmoothQuant·AWQ: scaling; QuaRot·SpinQuant: 회전</text>
+<text x="956" y="1205" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">블록 선형 형식 예: Q4_0 / Q4_1 / K-quant (구체 정의 확인)</text>
+</svg>

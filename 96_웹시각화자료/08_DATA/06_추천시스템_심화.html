@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>6. 그래프 기반 추천 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/data-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">DATA · 시계열과 추천시스템 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">DATA 자습서: 시계열 예측과 추천시스템</a></li><li><a href="01_%EC%8B%9C%EA%B3%84%EC%97%B4_%EA%B8%B0%EC%B4%88.html">1. 시계열 예측 기초</a></li><li><a href="02_%EC%8B%9C%EA%B3%84%EC%97%B4_%EC%8B%AC%ED%99%94.html">2. 시계열 예측 심화</a></li><li><a href="03_04_%EC%8B%9C%EA%B3%84%EC%97%B4_%EC%8B%A4%EC%8A%B5.html">3·4. 시계열 데이터 구성과 예측 평가</a></li><li><a href="05_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EA%B8%B0%EC%B4%88.html">5. 개인화 추천 시스템</a></li><li><a href="06_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%8B%AC%ED%99%94.html" aria-current="page">6. 그래프 기반 추천</a></li><li><a href="07_08_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%8B%A4%EC%8A%B5.html">7·8. 추천 점수와 순위 평가</a></li><li><a href="09_%EB%B3%B5%EC%8A%B5%EA%B3%BC_%EC%9E%90%EA%B0%80%EC%A0%90%EA%B2%80.html">DATA 복습과 자가 점검</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">DATA · 시계열과 추천시스템</p><h1>6. 그래프 기반 추천</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>방향성과 이분성, 인접행렬과 임베딩, 링크 예측과 노드 분류를 구분한다.</li><li>메시지·집계·자기 항·순열 불변성과 직전 층을 읽는 동기식 전파를 계산한다.</li><li>GCN의 자기 루프 포함 차수와 NGCF의 원래 차수·성분별 곱·LeakyReLU·층별 concat을 구분한다.</li><li>훈련 간선만 전파에 사용하고 최종 내적·BPR·초기 임베딩과 층 가중치의 학습을 연결한다. LightGCN은 단순화 비교용 확장으로 구분한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="data-graph" id="lab-data-graph"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="data-bpr" id="lab-data-bpr"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-상호작용-행렬을-이분-그래프로-바꾼다">1. 상호작용 행렬을 이분 그래프로 바꾼다</a></li><li><a href="#sec-2-메시지를-만들고-이웃-순서와-무관하게-모은다">2. 메시지를 만들고 이웃 순서와 무관하게 모은다</a></li><li><a href="#sec-3-연결-수에-따라-정보의-비중을-바꾼다">3. 연결 수에 따라 정보의 비중을 바꾼다</a></li><li><a href="#sec-4-ngcf는-그래프를-임베딩-학습에-넣는다">4. NGCF는 그래프를 임베딩 학습에 넣는다</a></li><li><a href="#sec-확인-질문">확인 질문</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-6-그래프-기반-추천">6. 그래프 기반 추천</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="05_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EA%B8%B0%EC%B4%88.html">이전: 개인화 추천 시스템</a> · <a href="07_08_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%8B%A4%EC%8A%B5.html">다음: 추천 평가</a></p>
+<p>같은 영화를 본 사용자의 다른 영화 기록은 개인화 추천의 간접 단서다. <strong>그래프 기반 추천(Graph-based Recommendation)</strong>은 사용자·항목과 그 관계를 그래프로 나타내 추천에 활용한다. 그중 이 장의 그래프 신경망 방식은 <strong>이웃의 정보를 받아 사용자와 항목의 임베딩을 바꾸는 과정</strong>으로 협업 신호를 학습한다. 그래프를 사용하는 모든 추천 방법이 반드시 신경망인 것은 아니다.</p>
+<p>앞 장에서 배운 효용 행렬의 관측 기록을 연결로 옮긴 뒤, 한 층의 메시지 전달을 이해하고, 여러 층의 결과를 개인화 점수와 순위 학습에 연결한다. 교안을 따로 열지 않아도 본문의 그림과 예제로 따라갈 수 있다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>학습 단계</th>
+<th>중심 질문</th>
+<th>교안의 관련 위치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>그래프와 추천 과제</td>
+<td>무엇을 노드·간선으로 만들고 어떤 연결을 예측하는가?</td>
+<td>p.3–13</td>
+</tr>
+<tr>
+<td>한 층의 계산</td>
+<td>이웃 정보와 자기 정보를 어떻게 모으는가?</td>
+<td>p.17–26</td>
+</tr>
+<tr>
+<td>층을 쌓는 효과</td>
+<td>연결 수와 전달 거리를 어떻게 다루는가?</td>
+<td>p.21, 27–28</td>
+</tr>
+<tr>
+<td>NGCF</td>
+<td>그래프 전파가 기존 협업 필터링을 어떻게 확장하는가?</td>
+<td>p.30–36</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-1-상호작용-행렬을-이분-그래프로-바꾼다">1. 상호작용 행렬을 이분 그래프로 바꾼다</h2>
+<h3 id="sec-11-방향의-유무와-노드-종류를-구분한다">1.1 방향의 유무와 노드 종류를 구분한다</h3>
+<p><strong>그래프(Graph)</strong>는 대상을 나타내는 점인 <strong>노드(Node)</strong>와 관계를 나타내는 선인 <strong>간선(Edge)</strong>으로 구성된다. 영화 추천에서는 사용자와 영화가 노드이고, 시청·클릭·구매 같은 기록이 간선이 될 수 있다. <strong>인접행렬(Adjacency Matrix)</strong>은 어떤 노드끼리 연결되어 있는지를 표로 나타낸 것이다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구분</th>
+<th>관계의 의미</th>
+<th>추천과 연결해 읽기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>무방향 그래프(Undirected Graphs)</td>
+<td>A–B 연결을 양쪽에서 같은 관계로 참조</td>
+<td>사용자–영화의 상호작용을 양방향 정보 전달에 활용</td>
+</tr>
+<tr>
+<td>방향 그래프(Directed Graphs)</td>
+<td>A→B와 B→A가 서로 다른 관계</td>
+<td>사용자 A가 B를 팔로우해도 B가 A를 팔로우한다는 뜻은 아님</td>
+</tr>
+<tr>
+<td>이분 그래프(Bipartite Graph)</td>
+<td>노드를 두 집합으로 나누고 서로 다른 집합 사이에만 연결</td>
+<td>사용자 집합과 항목 집합 사이에 상호작용 간선 배치</td>
+</tr>
+</tbody>
+</table></div>
+<p>방향의 유무와 이분 여부는 서로 다른 기준이다. 이분 그래프도 방향을 가질 수 있지만, <strong>이 장은 무방향 사용자–항목 이분 그래프</strong>를 사용한다. 사용자가 영화를 봤다는 행동을 양방향으로 계산한다는 것이 영화가 사용자를 봤다는 뜻은 아니다. 같은 관측 관계를 사용자와 항목의 표현 갱신에 모두 활용하는 모델링 선택이다.</p>
+<p>무방향 인접행렬에서는 A에서 B로 연결되어 있으면 B에서 A로도 같은 값을 표시하므로 대칭이다. 방향 그래프에서는 두 값이 달라도 된다. 교안 p.7의 구분을 먼저 확인한 뒤 아래 예를 읽자.</p>
+<h3 id="sec-12-효용-행렬의-관측-칸을-간선으로-옮긴다">1.2 효용 행렬의 관측 칸을 간선으로 옮긴다</h3>
+<p>교육용 관측 간선은 <code>u0–i0, u1–i0, u1–i1</code> 세 개다. <code>u</code>는 사용자, <code>i</code>는 항목인 영화다. 가능한 간선은 사용자와 항목 사이뿐이므로 <strong>이분 그래프</strong>다. 노드 순서를 <code>u0,u1,i0,i1</code>로 정하면 다음처럼 된다.</p>
+<pre><code class="language-text">         u0 u1 i0 i1
+A = u0 [  0  0  1  0 ]
+    u1 [  0  0  1  1 ]
+    i0 [  1  1  0  0 ]
+    i1 [  0  1  0  0 ]
+
+R (사용자 × 항목) = [[1,0], [1,1]]
+같은 종류끼리 만나는 두 블록은 전부 0이다.
+</code></pre>
+<p><img alt="사용자 u0에서 영화 i0, 사용자 u1, 영화 i1로 실선 세 개가 이어진다. u0와 i1의 점선은 관측 간선이 아니다." decoding="async" id="figure-1" loading="lazy" src="../resources/4ab3bf3d627c2b6c24a6-bipartite.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/4ab3bf3d627c2b6c24a6-bipartite.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/4ab3bf3d627c2b6c24a6-bipartite.svg">이분 그래프 그림 크게 보기</a></p>
+<p>실선을 1→2→3으로 따라간 <code>u0 → i0 → u1 → i1</code>은 3-hop 경로다. <code>u0–i1</code> 점선은 입력에서 없는 간선이며 추천 후보가 될 수 있다. 단, 경로가 있다는 사실만으로 사용자가 반드시 좋아한다고 단정하지 않는다. 보유 로그의 타임스탬프와 노출 조건도 별도로 살핀다.</p>
+<p><img alt="왼쪽의 인접행렬은 사용자와 항목 사이의 블록에만 R과 R 전치를 넣고 오른쪽에서는 각 노드에 초기 벡터를 붙인다." decoding="async" id="figure-2" loading="lazy" src="../resources/ab616fef67633dd34300-rec-adjacency-embedding.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/ab616fef67633dd34300-rec-adjacency-embedding.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽의 두 0 블록은 같은 종류의 노드끼리 간선이 없음을 뜻한다. 가운데 임베딩 표는 인접행렬과 달리 노드마다 학습할 값이 한 행씩 있다. 오른쪽 그래프의 선이 연결을, 노드 옆 막대가 벡터를 뜻한다. <a href="../resources/ab616fef67633dd34300-rec-adjacency-embedding.png">그림 크게 보기</a> · 출처: 추천시스템 심화, 33쪽(도식 원출처: Stanford CS224W, 2024).</p>
+<h3 id="sec-13-추천은-새로운-사용자항목-링크를-예측한다">1.3 추천은 새로운 사용자–항목 링크를 예측한다</h3>
+<p><strong>링크 예측(Link Prediction)</strong>은 아직 관측하지 않은 간선이 생길 가능성을 예측하는 과제다. 여기서는 훈련 시점까지의 클릭·시청 기록을 그래프로 만들고, 사용자별로 앞으로 상호작용할 항목을 높은 점수로 정렬한다. 모든 사용자에게 같은 인기 항목을 주는 것보다 <strong>그 사용자의 주변 연결에서 얻는 정보</strong>를 활용한다.</p>
+<p>반면 <strong>노드 분류(Node Classification)</strong>는 영화의 장르나 사용자의 범주처럼 노드 자체의 라벨을 맞힌다. “이 영화는 코미디인가?”와 “이 사용자가 이 영화를 볼까?”는 정답의 단위가 다르다.</p>
+<p>예의 <code>u0–i1</code>은 관측되지 않은 추천 후보지만, 실제로 싫어한다고 확인된 음성은 아니다. 아직 노출되지 않았거나 나중에 볼 수도 있다. 학습 그래프에는 훈련 간선만 넣고, 검증·평가 때 맞힐 간선은 전파에서 숨긴다. 간선 자체에 점수를 매기는 이 장의 과제를 이해하면 뒤의 순위 학습과 자연스럽게 이어진다.</p>
+<h2 id="sec-2-메시지를-만들고-이웃-순서와-무관하게-모은다">2. 메시지를 만들고 이웃 순서와 무관하게 모은다</h2>
+<h3 id="sec-21-전파와-변환은-각각-무엇인가">2.1 전파와 변환은 각각 무엇인가?</h3>
+<p><strong>그래프 신경망(GNN, Graph Neural Network; 복수형 GNNs)</strong>은 그래프의 연결과 노드의 표현을 이용해 새 표현을 만드는 신경망이다. 교안의 <strong>정보를 전파하고 변환한다(Propagate and Transform Information)</strong>는 설명에는 두 역할이 있다.</p>
+<ul>
+<li><strong>전파(Propagate):</strong> 간선을 따라 어느 이웃의 정보를 받을지 정한다. 연결이 정보를 주고받는 경로가 된다.</li>
+<li><strong>변환(Transform):</strong> 받은 정보를 현재 층의 학습 가능한 가중치로 바꾼다. 추천에 유용한 특징의 조합을 학습하는 역할이다.</li>
+</ul>
+<p>입력은 <strong>누가 연결되어 있는지</strong>를 나타내는 인접행렬과 <strong>각 노드가 현재 어떤 상태인지</strong>를 나타내는 벡터다. 벡터는 장르 같은 관측 특성이거나 학습하는 임베딩일 수 있다. 이 장의 NGCF에서는 사용자와 항목의 초기 임베딩 자체를 학습한다. 연결 표와 임베딩 표는 크기와 역할이 다르므로 같은 데이터로 보지 않는다.</p>
+<p>예를 들어 사용자 2명·영화 2개에 각 노드의 벡터 길이가 4라면, 인접행렬은 노드 4개 사이의 연결을 담는 <code>4×4</code> 표이고 임베딩은 노드마다 값 4개를 담는 <code>4×4</code> 표다. 이 예에서는 크기가 우연히 같지만, 벡터 길이를 8로 바꾸면 임베딩만 <code>4×8</code>이 된다.</p>
+<h3 id="sec-22-gnn-한-층의-입력과-출력">2.2 GNN 한 층의 입력과 출력</h3>
+<p><strong>그래프 신경망 층(GNN Layer)</strong> 하나는 목표 노드의 이웃 벡터들을 받아 그 노드의 새 벡터 하나를 만든다. 노드마다 이웃 수는 달라도, 같은 층의 출력 벡터 길이는 모델이 정한 크기로 맞춘다. 아래 세 작업을 한 번 수행하는 것이 한 층이며, 이웃 하나를 읽을 때마다 층이 하나씩 늘어나는 것이 아니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구성</th>
+<th>입력에서 출력으로 하는 일</th>
+<th>추천 관점의 의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>메시지(Message)</td>
+<td>이웃의 이전 벡터를 변환해 전달할 벡터를 만듦</td>
+<td>이웃 영화나 사용자의 어떤 정보를 받아들일지 학습</td>
+</tr>
+<tr>
+<td>집계(Aggregation)</td>
+<td>여러 메시지를 합·평균·원소별 최댓값 등으로 하나로 모음</td>
+<td>여러 상호작용의 단서를 하나의 표현에 반영</td>
+</tr>
+<tr>
+<td>자기 연결(Self-Connection)과 갱신</td>
+<td>자기의 이전 표현도 포함하고 필요한 활성화 함수를 적용</td>
+<td>이웃의 정보만 받고 자기 정보는 잃어버리는 상황을 방지</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>메시지와 집계는 다른 작업이다.</strong> 예를 들어 메시지 변환이 값을 두 배로 만드는 규칙이라면, 이웃의 이전 값 2·4는 메시지 4·8이 된다. 이를 평균으로 집계하면 결과는 6이다. 메시지는 각 이웃에 적용하고, 집계는 만들어진 메시지들을 모아 적용한다. 실제 벡터에서는 여러 성분의 조합을 학습할 수 있고, 뒤의 NGCF처럼 받는 노드의 표현까지 메시지에 활용하기도 한다.</p>
+<p><strong>집계에는 이웃 순서가 결과를 바꾸지 않는 성질이 필요하다.</strong> 4·8의 평균은 순서를 바꿔도 6이다. 반면 임의의 나열 순서대로 그대로 이어 붙이면 순서에 따라 결과가 달라지고, 이웃 수가 달라질 때 길이도 달라진다. 교안 p.24의 여러 벡터를 하나로 만드는 함수라는 설명은 이런 집계 조건과 함께 읽는다.</p>
+<h3 id="sec-23-자기-연결은-실제-시청-기록과-다르다">2.3 자기 연결은 실제 시청 기록과 다르다</h3>
+<p>위 예에서 목표 노드의 자기 값이 10이고 같은 두 배 변환을 쓴다면 자기 메시지는 20이다. 이를 이웃 메시지 4·8과 함께 평균하면 약 10.67이 된다. 자기 값을 제외했을 때의 6과 다르다. 이는 <strong>메시지 변환과 평균 집계를 설명하는 별도 교육용 예</strong>이며, 다음 절의 GCN이나 NGCF 계산을 그대로 재현한 값은 아니다.</p>
+<p>자기 연결은 자기 벡터를 계속 참고하기 위한 계산 경로다. 사용자–사용자 시청 간선을 새로 관측했다는 뜻이 아니다. 원본 상호작용 그래프의 이분 구조를 유지하면서, 계산용 인접행렬에 자기 루프(Self-loop)를 더하거나 자기 항을 따로 결합할 수 있다. 두 방식을 겹쳐 넣어 자기 정보를 의도치 않게 두 번 세지 않도록 한다. 이웃이 없는 노드의 평균은 따로 정의해야 하며, 자기 정보나 기본값을 이용하는 정책이 필요하다.</p>
+<h3 id="sec-24-모든-노드가-같은-층을-어떻게-통과할까">2.4 모든 노드가 같은 층을 어떻게 통과할까?</h3>
+<p>교안 p.20의 <strong>모든 노드(Every Node)</strong>는 목표 노드 하나만 갱신하는 것이 아니라 사용자와 항목 각각을 중심으로 같은 계산을 수행한다는 뜻이다. 이웃은 노드마다 다르지만, 같은 종류의 메시지 변환에는 층의 파라미터를 공유한다. 노드마다 별도의 신경망 전체를 만드는 것은 아니다.</p>
+<p>같은 층의 모든 노드는 <strong>직전 층의 값</strong>을 읽고 새 값을 만든다. 먼저 계산한 사용자의 새 값을 같은 층의 영화 계산에 바로 넣으면, 계산 순서에 따라 정보가 더 멀리 전달되는 다른 알고리즘이 된다. 개념적으로 이전 값과 새 값을 나누어 갱신하면 여러 노드의 계산을 병렬로 조직할 수 있다. 큰 그래프에서는 일부 노드와 이웃을 묶어 처리하기도 하므로, 모든 노드를 반드시 메모리에 한꺼번에 올려야 한다는 뜻은 아니다.</p>
+<h3 id="sec-25-gnn-층-수와-정보가-닿는-거리">2.5 GNN 층 수와 정보가 닿는 거리</h3>
+<p>일반적인 이웃 메시지 전달 방식에서는 한 층을 거칠 때 정보가 최대 한 연결만큼 이동한다. <strong>여러 GNN 층(GNN Layers)</strong>을 쌓으면 더 멀리 있는 연결의 영향을 표현에 반영할 수 있다. 위 그림에서 u0은 한 층 뒤 i0의 정보를 받고, 두 층 뒤에는 i0를 통해 u1의 영향을 받을 수 있다. 세 층이면 i1의 정보까지 닿는다. 두 끝점의 표현을 동시에 바꾸므로 링크를 맞히려면 반드시 세 층이 필요하다는 뜻은 아니다. 계산 트리는 원래 그래프의 여러 경로를 펼쳐 보여 준다. 구현에서는 같은 노드의 표현을 재사용할 수 있다.</p>
+<p><img alt="왼쪽의 원 그래프에서 목표 노드 A를 고르면 오른쪽에서 A 주변의 여러 층 이웃을 계산 트리로 펼친다." decoding="async" id="figure-3" loading="lazy" src="../resources/3654626b758e792023ca-rec-computation-tree.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/3654626b758e792023ca-rec-computation-tree.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>오른쪽의 A를 향해 바깥쪽 이웃 표현이 모인다. 같은 이름의 노드가 여러 가지에 나타날 수 있는데, 그래프에 새로운 노드가 생긴 것이 아니라 서로 다른 경로에 같은 노드가 등장한 것이다. <a href="../resources/3654626b758e792023ca-rec-computation-tree.png">그림 크게 보기</a> · 출처: 추천시스템 심화, 19쪽.</p>
+<h2 id="sec-3-연결-수에-따라-정보의-비중을-바꾼다">3. 연결 수에 따라 정보의 비중을 바꾼다</h2>
+<p><strong>그래프 합성곱 신경망(GCN, Graph Convolutional Network)</strong>은 받은 정보를 그냥 더하지 않고, 연결이 많은 노드가 지나치게 큰 영향을 주지 않도록 비중을 조정한다. 연결 수를 <strong>차수</strong>라고 한다. 여기서는 먼저 자기 자신과의 연결을 더한 뒤 차수를 센다. 한 간선에서 쓰는 비중은 <strong>양쪽 연결 수를 곱하고 제곱근을 구한 뒤, 1을 그 값으로 나눈 것</strong>이다.</p>
+<p><a href="../resources/487cadecae7c94259b52-gcn-weights.svg"><img alt="자기 연결을 포함해 u0의 차수는 2, i0는 3이다. u0은 자기 정보 약 1과 이웃 정보 약 1.22를 더한다." decoding="async" id="figure-4" loading="lazy" src="../resources/487cadecae7c94259b52-gcn-weights.svg"/></a></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/487cadecae7c94259b52-gcn-weights.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p>예를 들어 u0에 2, i0에 3이라는 이전 값이 있고 별도 변환을 하지 않는다고 하자. u0은 자기 값의 절반인 1과 이웃에서 온 약 1.22를 더한다. 활성화 전 값은 약 2.22다. 두 값을 똑같이 평균한 2.5와 다르다. 뒤의 <strong>신경 그래프 협업 필터링(NGCF, Neural Graph Collaborative Filtering)</strong> 예는 원래 이웃 관계에서 센 양 끝 노드의 차수로 비중을 정하고 자기 정보는 따로 더한다. 두 계산에서 차수를 세는 기준을 섞지 않는다.</p>
+<h2 id="sec-4-ngcf는-그래프를-임베딩-학습에-넣는다">4. NGCF는 그래프를 임베딩 학습에 넣는다</h2>
+<h3 id="sec-41-1차-구조에서-고차-연결로-확장한다">4.1 1차 구조에서 고차 연결로 확장한다</h3>
+<p>교안 p.31의 <strong>1차 구조(First-order Structure)</strong>는 여기서 비교하는 기본 잠재 요인 모델이 사용자–항목 쌍의 직접 상호작용을 학습 대상으로 삼는다는 뜻이다. 사용자 u0과 영화 i1의 점수는 그 둘의 벡터를 꺼내 계산하며, 그 순간 <code>u0 → i0 → u1 → i1</code> 같은 경로를 따라 이웃을 집계하는 전파 단계는 없다.</p>
+<p>다만 <strong>기본 행렬 분해도 여러 사용자의 기록을 함께 학습하므로 간접적인 협업 신호가 반영될 수 있다.</strong> “1차만 본다”를 “다른 사용자의 기록은 전혀 배우지 않는다”로 해석하면 안 된다. 이웃 기반 방법이나 다른 그래프 방법까지 포함한 모든 협업 필터링(CF, Collaborative Filtering)이 1차 관계만 다룬다는 주장도 아니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>연결 거리</th>
+<th>이 장의 예</th>
+<th>추천에 제공하는 단서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1-hop</td>
+<td>u0–i0</td>
+<td>이 사용자가 실제로 상호작용한 영화</td>
+</tr>
+<tr>
+<td>2-hop</td>
+<td>u0–i0–u1</td>
+<td>같은 영화를 본 다른 사용자</td>
+</tr>
+<tr>
+<td>3-hop</td>
+<td>u0–i0–u1–i1</td>
+<td>그 다른 사용자가 본 추가 영화</td>
+</tr>
+</tbody>
+</table></div>
+<p>NGCF는 학습 가능한 초기 임베딩에서 출발해 이런 연결을 따라 정보를 전파하고, <strong>점수를 계산하기 전의 표현 자체에 고차 연결(High-order Connectivity)을 명시적으로 반영</strong>한다. 직접 관측되지 않은 <code>u0–i1</code>의 추천 가능성을 판단할 단서를 만드는 것이다.</p>
+<h3 id="sec-42-무엇이-입력이고-무엇을-학습할까">4.2 무엇이 입력이고 무엇을 학습할까?</h3>
+<pre><code class="language-text">훈련 상호작용 R → 이분 그래프 A
+사용자·항목의 초기 임베딩 → 첫 번째 이웃 집계 → 두 번째 이웃 집계
+층별 벡터 결합 → 사용자·항목별 최종 벡터
+사용자 벡터 · 항목 벡터 → 점수 → 베이지안 개인화 순위(BPR) 손실 → 임베딩과 층 가중치 갱신
+</code></pre>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구성</th>
+<th>역할</th>
+<th>학습 중 달라지는가?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>훈련 상호작용 그래프</td>
+<td>정보를 전달할 이웃을 정함</td>
+<td>일반적인 고정 그래프 학습에서는 간선을 학습 파라미터로 갱신하지 않음</td>
+</tr>
+<tr>
+<td>사용자·항목의 초기 임베딩</td>
+<td>각 노드의 출발 표현</td>
+<td>손실의 기울기로 갱신</td>
+</tr>
+<tr>
+<td>층별 메시지 변환 가중치</td>
+<td>이웃 정보와 상호작용을 변환</td>
+<td>손실의 기울기로 갱신</td>
+</tr>
+<tr>
+<td>층별 결과와 최종 점수</td>
+<td>현재 파라미터로 계산한 결과</td>
+<td>파라미터가 바뀌면 다음 계산 결과도 달라짐</td>
+</tr>
+</tbody>
+</table></div>
+<p>노드별 임베딩과 층에서 공유하는 가중치는 서로 다른 학습 대상이다. 순위 손실의 신호는 내적 → 최종 벡터 → 여러 전파 층 → 초기 임베딩으로 이어진다. <strong>벡터를 그래프에 흘려 보내기만 하면 자동으로 취향이 학습되는 것은 아니며, 실제 상호작용에 맞는 손실로 파라미터를 조정해야 한다.</strong></p>
+<h3 id="sec-43-ngcf-메시지에는-두-노드의-상호작용도-들어간다">4.3 NGCF 메시지에는 두 노드의 상호작용도 들어간다</h3>
+<p>일반적인 이웃 변환에 더해, 원 논문의 NGCF는 보내는 영화의 벡터와 받는 사용자의 벡터를 <strong>같은 위치끼리 곱한 정보</strong>도 메시지에 사용한다. 이는 내적으로 점수 하나를 만드는 단계와 다르다. 두 벡터의 성분별 상호작용을 메시지에 담아, 같은 영화도 받는 사용자의 현재 표현에 따라 다른 정보를 보낼 수 있게 한다.</p>
+<p>아래 그림은 벡터를 숫자 하나로 단순화하고 두 변환 가중치를 1로 둔 교육용 예다. 영화 i0의 이전 값이 3, 사용자 u0의 이전 값이 2라면 영화에서 보내는 정보는 영화 자체 값 3과 두 값의 곱 6을 합친 9다. 이를 양쪽 차수로 조정하고 자기 정보와 결합한다. 원 논문의 층별 비선형 변환을 설명하기 위해, 양수 구간에서 값이 유지되는 설정을 사용한다.</p>
+<p><a href="../resources/fa915b0c24fc60346be5-graph-aggregation.svg"><img alt="NGCF에서 영화 i0에서 u0으로 전달하는 값은 약 6.364이고 자기 항을 더한 u0의 값은 약 8.364다." decoding="async" id="figure-5" loading="lazy" src="../resources/fa915b0c24fc60346be5-graph-aggregation.svg"/></a></p><div class="image-actions"><button data-image-zoom="figure-5" type="button">그림 확대</button><a href="../resources/fa915b0c24fc60346be5-graph-aggregation.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p>이 예는 GCN과 다른 계산을 보여 준다. 원래 그래프에서 u0의 차수는 1, i0의 차수는 2다. 두 수의 곱 2의 제곱근으로 9를 나누면 약 6.36이고, 자기 항 2를 더하면 약 8.36이다. 반대 방향인 u0→i0에서는 사용자 값 2와 곱 6을 더한 8에서 시작하므로 메시지는 약 5.66이다. <strong>간선이 무방향이고 정규화 비중이 같아도, 두 방향의 메시지 값까지 같아야 하는 것은 아니다.</strong> 보내는 정보와 받는 노드의 표현이 다르기 때문이다.</p>
+<h3 id="sec-44-최종-벡터를-추천-순위와-연결한다">4.4 최종 벡터를 추천 순위와 연결한다</h3>
+<p>원 논문의 NGCF는 초기 임베딩과 각 층의 결과를 이어 붙인다. 그래서 바로 옆 이웃에서 얻은 단서와 더 멀리서 온 단서를 함께 쓸 수 있다. 교안 p.36은 마지막 층의 벡터로 점수를 계산하는 일반적 설명을 제시하지만, 여기서는 원 NGCF의 층별 결합과 구분해서 읽는다. 층이 많아지면 더 먼 연결을 읽을 수 있으나 계산량이 늘고 노드들의 표현이 지나치게 비슷해질 수 있다. 층 수를 늘리는 것이 항상 좋은 추천을 뜻하지는 않는다.</p>
+<p>전파가 끝나면 사용자와 후보 항목의 최종 벡터를 내적해 점수 하나를 얻는다. <strong>베이지안 개인화 순위(BPR, Bayesian Personalized Ranking)</strong> 학습에서는 같은 사용자가 관측한 항목의 점수가 미관측 비교 항목보다 높아지도록 파라미터를 갱신한다. 미관측 비교 항목은 실제로 싫어한다고 확인된 항목과 다르며, 평가에서 맞힐 간선은 전파 그래프에 넣지 않는다.</p>
+<p>정리하면, <strong>훈련 기록으로 이웃을 정하고 → 층별로 표현을 갱신하고 → 사용자·항목 쌍의 점수를 만들고 → 원하는 순위가 되도록 학습한다.</strong> 배포 때는 같은 사용자의 후보들을 점수 순으로 정렬하며, 새 영화 추천이라면 이미 본 항목을 제외하는 정책도 적용한다. 점수 계산과 학습 흐름은 이 절에서 끝까지 읽을 수 있고, 후보·평가 지표 비교는 <a href="07_08_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%8B%A4%EC%8A%B5.html">다음 장</a>에서 이어진다.</p>
+<p><strong>근거 구분:</strong> 그래프·층별 메시지 전달·추천 문제 설정은 교안 p.3–36을 따른다. 성분별 곱을 포함한 메시지와 층별 벡터 결합은 <a href="https://arxiv.org/abs/1905.08108">NGCF 원 논문</a>의 구체적인 모델 설명을 보충한 것이다. 본문 숫자는 원문 실험값이 아닌 교육용 예다.</p>
+<h2 id="sec-확인-질문">확인 질문</h2>
+<ol>
+<li>위 그래프에서 <code>u1–i1</code> 간선을 학습에서 빼고 그 연결을 맞히도록 평가하려면, 전파에 어떤 간선이 들어가야 하는가?</li>
+<li>GCN에서 <code>u1–i0</code>의 정규화 가중치는 얼마인가?</li>
+<li>집계 중 이웃 벡터를 입력 순서대로 이어 붙이면 어떤 가정이 깨지는가?</li>
+<li>u0의 새 값을 계산한 직후 같은 층의 i0 계산에 넣어도 되는가?</li>
+<li>자기 연결을 추가했다는 것은 사용자–사용자 행동 기록이 생겼다는 뜻인가?</li>
+<li>기본 잠재 요인 모델과 NGCF는 점수 계산 전에 이웃을 다루는 방식이 어떻게 다른가?</li>
+</ol>
+<details>
+<summary>해설</summary>
+<ol>
+<li><code>u0–i0, u1–i0</code>만 전파에 사용하고 <code>u1–i1</code>은 평가 정답으로만 둔다. 이 예에서 <code>i1</code>은 훈련 고립 노드이므로 평가가 콜드스타트 성격을 띤다(§1, §4).</li>
+<li>자기 연결을 포함해 양쪽 차수가 각각 3이다. 두 수를 곱한 9의 제곱근이 3이므로 비중은 3분의 1이다(§3).</li>
+<li>임의로 이웃을 나열한 순서가 바뀌면 결과가 바뀐다. 순서가 의미 없는 일반 그래프에서는 순열에 불변인 집계가 필요하다(§2).</li>
+<li>이 장의 일반적인 동기식 층 계산에서는 안 된다. 모든 노드가 직전 층의 값을 읽어야 한 층당 한 연결만큼의 전달 의미를 유지한다(§2.4).</li>
+<li>아니다. 자기 표현을 갱신에 포함하는 계산 경로다. 관측 상호작용의 이분 구조와 계산용 자기 연결을 구분한다(§2.3).</li>
+<li>기본 모델은 학습된 두 벡터를 바로 점수 계산에 쓰고, NGCF는 그래프 이웃의 정보를 전파해 벡터를 바꾼 뒤 점수를 계산한다. 기본 모델도 전체 기록에서 간접 협업 신호를 학습할 수 있으므로 그 차이는 명시적 전파의 유무다(§4.1–4.4).</li>
+</ol>
+</details>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/08_DATA/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/06_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%8B%AC%ED%99%94.md">6. 그래프 기반 추천 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="05_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EA%B8%B0%EC%B4%88.html"><small>이전 장</small>5. 개인화 추천 시스템</a><a rel="next" href="07_08_%EC%B6%94%EC%B2%9C%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%8B%A4%EC%8A%B5.html"><small>다음 장</small>7·8. 추천 점수와 순위 평가</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

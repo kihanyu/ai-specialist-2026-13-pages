@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="850" viewBox="0 0 1200 850" role="img" aria-labelledby="title desc">
+<title id="title">RAG의 두 흐름: 문서를 준비하고, 질문마다 근거를 찾는다</title>
+<desc id="desc">위쪽은 문서 변경에 따라 실행하는 인덱싱, 아래쪽은 요청마다 실행하는 질의 처리다. 저장된 표현과 본문이 검색·컨텍스트 구성으로 연결된다.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#617184"/></marker></defs>
+<rect width="1200" height="100%" fill="white"/>
+<text x="40" y="55" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="34" font-weight="700" fill="#17324d" text-anchor="start">RAG의 두 흐름: 문서를 준비하고, 질문마다 근거를 찾는다</text>
+<text x="40" y="96" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#617184" text-anchor="start">파란 영역 = 문서 준비 · 초록 영역 = 요청 처리 · 화살표 = 데이터 이동</text>
+<rect x="40" y="125" width="1120" height="250" rx="12" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="65" y="164" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#2266ab" text-anchor="start">① 인덱싱 — 문서 등록·변경 시</text>
+<rect x="65" y="205" width="215" height="110" rx="12" fill="#edf5fc" stroke="#2266ab" stroke-width="2"/>
+<text x="172.5" y="243" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#2266ab" text-anchor="middle">원본 문서</text>
+<text x="172.5" y="282" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">PDF·HTML·DB</text>
+<rect x="350" y="205" width="215" height="110" rx="12" fill="#edf5fc" stroke="#2266ab" stroke-width="2"/>
+<text x="457.5" y="243" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#2266ab" text-anchor="middle">정리·청킹</text>
+<text x="457.5" y="282" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">본문·출처·권한</text>
+<rect x="635" y="205" width="215" height="110" rx="12" fill="#edf5fc" stroke="#2266ab" stroke-width="2"/>
+<text x="742.5" y="243" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#2266ab" text-anchor="middle">표현·인덱스</text>
+<text x="742.5" y="282" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">임베딩·역색인</text>
+<rect x="920" y="205" width="215" height="110" rx="12" fill="#edf5fc" stroke="#2266ab" stroke-width="2"/>
+<text x="1027.5" y="243" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#2266ab" text-anchor="middle">저장소</text>
+<text x="1027.5" y="282" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">벡터·본문·버전</text>
+<path d="M280,260 L345,260" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M565,260 L630,260" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M850,260 L915,260" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="40" y="460" width="1120" height="250" rx="12" fill="#edf8f5" stroke="#cad6e0" stroke-width="2"/>
+<text x="65" y="500" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="start">② 질의 처리 — 질문마다</text>
+<rect x="65" y="545" width="178" height="110" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="154.0" y="583" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">질문·권한</text>
+<text x="154.0" y="622" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">대상·범위 확인</text>
+<rect x="288" y="545" width="178" height="110" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="377.0" y="583" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">질문 표현</text>
+<text x="377.0" y="622" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">검색어·질의 벡터</text>
+<rect x="511" y="545" width="178" height="110" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="600.0" y="583" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">검색·필터</text>
+<text x="600.0" y="622" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">관련 후보 확보</text>
+<rect x="734" y="545" width="178" height="110" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="823.0" y="583" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">근거 구성</text>
+<text x="823.0" y="622" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">선택·중복·예산</text>
+<rect x="957" y="545" width="178" height="110" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="1046.0" y="583" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">답변·인용</text>
+<text x="1046.0" y="622" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">조건·예외 해석</text>
+<path d="M243,600 L281,600" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M466,600 L504,600" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M689,600 L727,600" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M912,600 L950,600" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1027,315 L1027,412 L600,412 L600,540" fill="none" stroke="#617184" stroke-width="3" stroke-linejoin="round" stroke-dasharray="9 7" marker-end="url(#arrow)"/>
+<text x="625" y="400" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#617184" text-anchor="start">저장된 표현·본문 재사용</text>
+<rect x="40" y="750" width="550" height="70" rx="12" fill="#fff5df" stroke="#cad6e0" stroke-width="2"/>
+<text x="65" y="782" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="start">문서 변경 → 색인·본문·캐시를 함께 갱신</text>
+<rect x="610" y="750" width="550" height="70" rx="12" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="635" y="782" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="start">검색해 입력에 넣기 ≠ 모델 가중치 학습</text>
+</svg>

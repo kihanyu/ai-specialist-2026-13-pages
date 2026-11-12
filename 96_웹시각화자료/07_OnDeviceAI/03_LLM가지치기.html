@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/ondevice-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">On-Device AI 전체 흐름</a></li><li><a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">1장. AI 연산과 성능·메모리 병목</a></li><li><a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">2장. 온디바이스 AI 실행 환경</a></li><li><a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">3장. 수 표현과 선형 양자화의 원리</a></li><li><a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">4장. 비균일 양자화와 PTQ 오차 제어</a></li><li><a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html">5. QAT와 정수 추론</a></li><li><a href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html">6. 고급 LLM 양자화와 적용 판단</a></li><li><a href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html">부록 — 개념 사이의 연결과 종합 복습</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</a></li><li><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></li><li><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a></li><li><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html" aria-current="page">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></li><li><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></li><li><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</a></li><li><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></li><li><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a></li><li><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">8. 종합 복습: 조건에 맞는 수단을 선택하기</a></li><li><a href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html">LLM 양자화 실무 의사결정 가이드</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">On-Device AI</p><h1>3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>Magnitude·OBD·OBS의 중요도와 수렴·곡률·역행렬 가정을 설명한다.</li><li>SparseGPT의 마스크 선택과 보상, GPTQ 양자화와의 차이를 설명한다.</li><li>Wanda의 입력 norm과 가중치 곱으로 순위를 계산하고 출력 재구성 손실을 확인한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="od-pruning" id="lab-od-pruning"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-시작-전-준비">시작 전 준비</a></li><li><a href="#sec-31-llm에서는-무엇이-어려운가---p29">3.1 LLM에서는 무엇이 어려운가? - p.29</a></li><li><a href="#sec-32-obd-손실-곡률을-반영하기---p30-32">3.2 OBD: 손실 곡률을 반영하기 - p.30-32</a></li><li><a href="#sec-33-obs-제거한-영향을-다른-가중치로-보상하기---p33-34">3.3 OBS: 제거한 영향을 다른 가중치로 보상하기 - p.33-34</a></li><li><a href="#sec-34-sparsegpt-layer-출력-재구성으로-규모를-줄이기---p35-37">3.4 SparseGPT: layer 출력 재구성으로 규모를 줄이기 - p.35-37</a></li><li><a href="#sec-35-wanda-가중치와-입력-activation의-곱으로-보기---p38-39">3.5 Wanda: 가중치와 입력 activation의 곱으로 보기 - p.38-39</a></li><li><a href="#sec-36-요약과-확인-질문">3.6 요약과 확인 질문</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-3-llm-가지치기-크기-손실-민감도-activation을-함께-보기">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">이전</a> · <a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">다음: 지식 증류</a></p>
+<p><strong>원본 범위:</strong> p.29-39</p>
+<p><strong>학습 목표</strong></p>
+<ul>
+<li>가중치 크기·손실 민감도·입력 활성값이 서로 다른 기준임을 설명하기</li>
+<li>OBS의 간단한 보상과 Wanda 점수 계산하기</li>
+<li>작은 예제의 품질 보존과 실제 장치 가속을 구분하기</li>
+</ul>
+<p><strong>읽기 수준</strong></p>
+<ul>
+<li>첫 학습: 3.1 → 3.2의 교육용 계산 → 3.3의 전후 값 → 3.4·3.5 → 비교표</li>
+<li>심화 학습: 3.2·3.3의 미분식과 역행렬 조건</li>
+</ul>
+<h2 id="sec-시작-전-준비">시작 전 준비</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>용어</th>
+<th>이 장에서 필요한 의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLM</td>
+<td>많은 텍스트로 학습한 대규모 언어모델</td>
+</tr>
+<tr>
+<td>손실</td>
+<td>예측 오차를 수치로 나타낸 값. 학습 중 줄이려는 대상</td>
+</tr>
+<tr>
+<td>Calibration 입력</td>
+<td>실제 사용 상황을 대표하도록 준비한 소량의 입력</td>
+</tr>
+<tr>
+<td>재구성</td>
+<td>변환 전후의 층 출력이 가깝게 되도록 맞추는 과정</td>
+</tr>
+<tr>
+<td>Gradient</td>
+<td>가중치를 조금 바꿀 때 손실이 변하는 방향·민감도</td>
+</tr>
+<tr>
+<td>Hessian</td>
+<td>여러 가중치에 대한 손실의 곡률·상호작용을 모은 행렬</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>생각할 질문:</strong> 같은 크기의 가중치 두 개를 지우면 손실도 똑같이 커질까?</p>
+<h2 id="sec-31-llm에서는-무엇이-어려운가---p29">3.1 LLM에서는 무엇이 어려운가? - p.29</h2>
+<p><strong>문제와 접근</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>어려움</th>
+<th>대응 방향</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>큰 모델 전체를 다시 학습하기에는 메모리·시간이 큼</td>
+<td>재학습 비용을 줄이는 중요도·보상 방법 사용</td>
+</tr>
+<tr>
+<td>가중치 크기만으로 중요한 연결을 놓칠 수 있음</td>
+<td>손실 민감도 또는 대표 입력의 활성값 반영</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>원문 수치 주의:</strong> p.29의 “magnitude는 10%까지 정확도 보존”은 해당 사례의 맥락이다. 모든 LLM의 공통 임계값이 아니다.</p>
+<h2 id="sec-32-obd-손실-곡률을-반영하기---p30-32">3.2 OBD: 손실 곡률을 반영하기 - p.30-32</h2>
+<p><strong>OBD(Optimal Brain Damage)</strong>는 손실의 곡률을 이용하는 <strong>2차 정보 기반 가지치기(Second-Order-based Pruning)</strong>다. “크기가 작다”보다 “없애도 손실이 덜 늘어난다”를 기준으로 삼는다. 아래 직관과 후보 비교표를 먼저 읽고, 수식은 계산 근거를 확인할 때 보면 된다.</p>
+<h3 id="sec-먼저-직관으로-이해하기">먼저 직관으로 이해하기</h3>
+<ul>
+<li><strong>Magnitude:</strong> 숫자가 작은 가중치를 제거한다.</li>
+<li><strong>OBD:</strong> 제거했을 때 손실이 덜 커질 것으로 예상되는 가중치를 제거한다.</li>
+<li><strong>곡률:</strong> 같은 크기로 움직여도 손실이 급격히 커지는 곳과 완만히 변하는 곳의 차이다.</li>
+</ul>
+<p>산의 경사를 비유로 쓰면 gradient는 현재의 기울기, 곡률은 기울기가 변하는 정도에 대응한다. 실제 모델은 수많은 가중치 방향이 함께 있는 공간이므로 2차원 지형 그림과 완전히 같지는 않다.</p>
+<p><strong>독립(Independent)이라는 가정은 무엇인가?</strong> OBD는 각 가중치를 제거하는 효과를 따로 평가하기 위해 서로 다른 가중치 변화가 함께 만드는 <strong>교차항(Cross-terms)</strong>을 생략한다. 실제 신경망의 가중치가 서로 독립이라는 사실을 증명한 것이 아니라, 헤시안(Hessian)의 대각 성분만 남기는 계산상의 근사다. 학습이 수렴해 1차 기울기가 작고, 주변 손실을 2차로 근사할 수 있다는 조건도 함께 필요하다.</p>
+<h3 id="sec-심화-손실-변화의-2차-근사">심화: 손실 변화의 2차 근사</h3>
+<p>학습 손실 <span class="math-raw math-inline">$L(w)$</span>는 파라미터 벡터 <span class="math-raw math-inline">$w$</span>에 따라 변한다. 제거 후 변화를 <span class="math-raw math-inline">$\Delta w=w_{new}-w$</span>로 <strong>일관되게 정의</strong>하면 Taylor 근사는 다음과 같다.</p>
+<div class="math-raw math-display">$$
+\Delta L=L(w+\Delta w)-L(w)
+\approx g^T\Delta w+\frac12\Delta w^TH\Delta w.
+$$</div><div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기호·조건</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$g=\nabla L(w)$</span></td>
+<td>1차 미분인 gradient</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$H=\nabla^2L(w)$</span></td>
+<td>2차 미분 행렬인 Hessian</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$g\approx0$</span></td>
+<td>학습 수렴 부근에서 기울기가 작다는 가정</td>
+</tr>
+<tr>
+<td>대각 근사</td>
+<td>서로 다른 가중치 사이의 상호작용을 무시하는 단순화</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$\Delta w_i=-w_i$</span></td>
+<td>원래 가중치에 이 변화를 더하면 0이 됨</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>OBD(Optimal Brain Damage)</strong>의 중요도는 <span class="math-raw math-inline">$s_i\approx\frac12H_{ii}w_i^2$</span>가 된다. <span class="math-raw math-inline">$H_{ii}$</span>가 모두 같으면 magnitude와 비슷한 순위를 얻지만, 곡률이 다르면 큰 가중치를 제거하는 편이 덜 손해일 수도 있다.</p>
+<p><strong>교육용 계산: 작은 가중치를 남기는 경우</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>후보</th>
+<th>가중치</th>
+<th>곡률</th>
+<th>OBD 점수 <span class="math-raw math-inline">$\frac12H_{ii}w_i^2$</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>0.2</td>
+<td>100</td>
+<td><span class="math-raw math-inline">$0.5\times100\times0.2^2=2$</span></td>
+</tr>
+<tr>
+<td>b</td>
+<td>1</td>
+<td>1</td>
+<td><span class="math-raw math-inline">$0.5\times1\times1^2=0.5$</span></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Magnitude의 선택: 더 작은 <strong>a</strong> 제거.</li>
+<li>OBD의 선택: 예상 손실 증가가 더 작은 <strong>b</strong> 제거.</li>
+<li>해석: 가중치가 작아도 손실이 민감하게 반응하면 중요한 연결일 수 있다.</li>
+</ul>
+<p>OBD 점수는 근사값이다. 수렴·2차·대각 가정이 부정확하면 판단도 부정확해질 수 있다.</p>
+<p><strong>정정·주의:</strong> p.30-31은 제거량과 손실 차이의 부호 표기가 혼재해 양의 saliency와 혼동될 수 있다. 여기서는 위의 “새 손실 - 기존 손실”과 “새 가중치 - 기존 가중치”를 사용한다. p.32의 학습셋·테스트셋 곡선은 가지치기와 재학습에 따른 변화를 비교하는 사례다. 학습 손실 보존이 일반화 품질 보존을 자동으로 뜻하지는 않는다.</p>
+<h2 id="sec-33-obs-제거한-영향을-다른-가중치로-보상하기---p33-34">3.3 OBS: 제거한 영향을 다른 가중치로 보상하기 - p.33-34</h2>
+<p><strong>OBS(Optimal Brain Surgeon)</strong>는 OBD에서 생략했던 교차항을 고려하여, 하나를 지우면서 다른 가중치를 함께 조정해 영향을 보상한다. 가령 두 연결이 비슷한 정보를 전달한다면 한 연결을 지울 때 다른 연결의 기여를 늘리는 식이다. 실제 보상 방향은 역헤시안의 가중치 간 관계로 정하며, 단순히 주변 숫자를 모두 키우는 방법은 아니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>제거 후 나머지 가중치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>단순 제거</td>
+<td>원래 값 그대로 둠</td>
+</tr>
+<tr>
+<td>OBS</td>
+<td>가중치 사이의 관계를 고려해 변경</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>심화 식의 목적:</strong> “q번 가중치는 0”이라는 조건 아래 2차 근사 손실 증가를 최소화한다.</p>
+<div class="math-raw math-display">$$
+\Delta w=-\frac{w_q}{[H^{-1}]_{qq}}H^{-1}_{:,q},
+\qquad s_q=\frac{w_q^2}{2[H^{-1}]_{qq}}.
+$$</div><div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기호·조건</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$H^{-1}$</span></td>
+<td>Hessian의 역행렬</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$H^{-1}_{:,q}$</span></td>
+<td>그 행렬의 q번째 열 전체</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$[H^{-1}]_{qq}$</span></td>
+<td>q번째 대각 성분</td>
+</tr>
+<tr>
+<td>필요한 조건</td>
+<td><span class="math-raw math-inline">$g\approx0$</span>, 안정적인 역행렬, 손실의 2차 근사</td>
+</tr>
+</tbody>
+</table></div>
+<p>실제 대형 모델에서는 계산·저장 비용과 수치 안정성이 문제다. 감쇠(damping) 등 안정화 처리가 사용될 수 있다.</p>
+<p><strong>원문 표현 주의:</strong> “재학습 불필요(No Need for Retraining)”는 제거와 함께 계산한 보상 업데이트로 손실 증가를 억제하므로, 별도의 반복 학습에 의존하지 않으려는 취지다. 남은 가중치를 원래 값 그대로 둔다는 뜻은 아니다. 아래 예제에서도 제거 대상 외의 두 값이 함께 바뀐다. 이는 국소 2차 근사와 안정적인 역행렬을 전제로 하며, 어떤 제거 비율에서도 품질이 유지된다는 보장은 아니다.</p>
+<p>다음 그림은 텍스트 추출로 내용이 거의 나오지 않는 p.34다. <strong>선택한 가중치의 업데이트가 정확히 그 값을 상쇄하고, 나머지 두 가중치는 보상 방향으로 바뀌는지</strong>를 읽는다.</p>
+<p><img alt="p.34 OBS의 3개 가중치 계산 예제" decoding="async" id="figure-1" loading="lazy" src="../resources/da29ddab0f97ca63d87f-p034-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/da29ddab0f97ca63d87f-p034-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/da29ddab0f97ca63d87f-p034-source.png">원본 그림 크게 보기</a></p>
+<p>원문 값은 <span class="math-raw math-inline">$w=[0.8,-0.3,0.5]^T$</span>, 역헤시안 두 번째 열은 <span class="math-raw math-inline">$[0.4,1,0.1]^T$</span>다. 두 번째 가중치를 제거하면</p>
+<div class="math-raw math-display">$$
+\Delta w=-\frac{-0.3}{1}[0.4,1,0.1]^T
+=[0.12,0.30,0.03]^T,
+\quad w_{new}=[0.92,0,0.53]^T.
+$$</div><p><strong>계산 결과 해석</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>제거할 두 번째 가중치</td>
+<td><span class="math-raw math-inline">$-0.3+0.30=0$</span></td>
+</tr>
+<tr>
+<td>첫째·셋째 가중치</td>
+<td>0.8→0.92, 0.5→0.53으로 보상</td>
+</tr>
+<tr>
+<td>근사 손실 증가</td>
+<td><span class="math-raw math-inline">$(-0.3)^2/(2\times1)=0.045$</span></td>
+</tr>
+<tr>
+<td>전체 후보의 점수</td>
+<td><code>[0.16,0.045,0.08333…]</code></td>
+</tr>
+<tr>
+<td>최종 선택</td>
+<td>점수가 가장 작은 두 번째 가중치</td>
+</tr>
+</tbody>
+</table></div>
+<p>단순히 <code>-0.3</code>을 0으로 바꾸는 방법과 최종 모델이 다르다.</p>
+<h2 id="sec-34-sparsegpt-layer-출력-재구성으로-규모를-줄이기---p35-37">3.4 SparseGPT: layer 출력 재구성으로 규모를 줄이기 - p.35-37</h2>
+<p><strong>레이어별(Layer-wise)로 접근하는 이유:</strong> 모델 전체의 거대한 헤시안을 직접 다루는 대신, 보정 입력을 사용해 한 선형층의 출력을 가깝게 유지하는 문제를 푼다. OBS의 오차 보상 관점을 대규모 언어 모델(LLM, Large Language Model)에 적용할 수 있도록 계산 범위를 줄이는 것이다.</p>
+<p><strong>SparseGPT가 맞추는 대상: 한 층의 출력</strong></p>
+<p>선형 층을 <span class="math-raw math-inline">$Y=WX$</span>로 나타낸다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기호</th>
+<th>크기</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$W$</span></td>
+<td><span class="math-raw math-inline">$m\times d$</span></td>
+<td>입력 d개를 출력 m개로 연결하는 가중치</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$X$</span></td>
+<td><span class="math-raw math-inline">$d\times n$</span></td>
+<td>대표 입력 n개에서 모은 활성값</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$Y$</span></td>
+<td><span class="math-raw math-inline">$m\times n$</span></td>
+<td>원래 층의 출력</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$\widehat W$</span></td>
+<td><span class="math-raw math-inline">$m\times d$</span></td>
+<td>가지치기 후의 가중치</td>
+</tr>
+</tbody>
+</table></div>
+<p>목표는 <span class="math-raw math-inline">$\|WX-\widehat WX\|_F^2$</span>를 줄이는 것이다. <span class="math-raw math-inline">$\|\cdot\|_F^2$</span>는 행렬의 각 원소를 제곱해 더한 값으로, 여기서는 <strong>출력 차이의 전체 제곱합</strong>이다.</p>
+<p><strong>구분:</strong> 한 층의 출력을 비슷하게 만드는 문제와 전체 과제의 손실을 최소화하는 문제는 같다기보다 관련된 대리 목표다.</p>
+<p><strong>처리 흐름</strong></p>
+<ol>
+<li>대표 입력의 통계에서 2차 정보를 얻는다.</li>
+<li>가중치를 열 단위로 처리하며 제거 여부를 정한다.</li>
+<li>생긴 오차를 아직 확정하지 않은 가중치에 전달한다.</li>
+<li>처리한 부분을 고정하고 다음 부분으로 이동한다.</li>
+</ol>
+<p><strong>마스크 선택과 가중치 재구성의 구분(Mask Selection and Weight Reconstruction Are Separated)</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>작업</th>
+<th>결정하는 것</th>
+<th>아래 p.36 그림에서 볼 곳</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>마스크 선택</td>
+<td>각 위치를 남길지 0으로 만들지</td>
+<td>왼쪽의 0·1 마스크</td>
+</tr>
+<tr>
+<td>가중치 재구성</td>
+<td>제거 오차를 줄이도록 남은 값을 어떻게 조정할지</td>
+<td>오른쪽 단계별 가중치 변화</td>
+</tr>
+</tbody>
+</table></div>
+<p>교안 그림은 마스크를 주고 열을 하나씩 처리하는 복원 흐름이다. 처리한 왼쪽 열은 고정하고, 아직 확정하지 않은 오른쪽 열만 조정한다. 그래서 전체 가중치를 매번 다시 최적화하는 비용을 줄일 수 있다. 보정(Calibration) 입력은 실제 사용을 대표해야 한다.</p>
+<p><strong>원 논문과의 연결:</strong> 이 구분을 “모든 마스크를 처음 한 번만 정하고 끝낸다”로 외우면 안 된다. 실제 SparseGPT의 적응적 마스크 선택은 열 블록마다 이전 보상으로 바뀐 가중치도 반영한다. 선택과 복원은 구분되는 역할이지만 전체 실행에서는 번갈아 연결될 수 있다. <a href="https://proceedings.mlr.press/v202/frantar23a/frantar23a.pdf">원 논문 3.2절</a>을 함께 참고한다.</p>
+<p><img alt="p.36 마스크와 오른쪽 가중치 보상의 단계적 적용" decoding="async" id="figure-2" loading="lazy" src="../resources/0086120c889987941278-p036-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/0086120c889987941278-p036-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/0086120c889987941278-p036-source.png">원본 그림 크게 보기</a></p>
+<p>그림에서 <code>1</code>은 유지, <code>0</code>은 제거다. 첫 열에서 <span class="math-raw math-inline">$W_{2,1}=-0.2$</span>를 제거할 때 보정량 <span class="math-raw math-inline">$e=-0.2/1.0=-0.2$</span>를 써서 다음 값은 <span class="math-raw math-inline">$0.4-(-0.2)(0.2)=0.44$</span>가 된다. 네 번째 행에서는 <span class="math-raw math-inline">$0.6-(0.1)(0.2)=0.58$</span>이다. 그림의 나머지 값은 소수점 반올림이 섞인 설명용 전개이므로 원 논문의 고성능 구현과 같은 코드로 취급하지 않는다.</p>
+<p><strong>정정·주의:</strong> p.35의 <code>GTPQ</code>는 문맥상 <code>GPTQ</code> 오기로 읽는다. SparseGPT는 GPTQ와 2차 정보·layer별 재구성이라는 연관이 있지만, <strong>가지치기와 양자화는 서로 다른 변환</strong>이다. p.37의 OPT-175B·BLOOM-176B, 60% 희소성, 4.5시간 이내는 원 연구 조건의 결과다. 현재 장치의 처리 시간이나 모든 모델의 품질 보장이 아니다. <a href="https://arxiv.org/abs/2301.00774">SparseGPT 원 논문</a>.</p>
+<p><strong>혼란도(PPL, Perplexity)로 결과 읽기:</strong> 정답으로 주어진 다음 토큰에 모델이 얼마나 높은 확률을 주는지 요약한 언어모델 평가값이다. 같은 데이터·토큰화·문맥 길이·평가 방식에서는 낮을수록 정답 토큰을 더 잘 예측한다. 가지치기 비율이 높아질 때 PPL이 급격히 오르면 예측 품질을 잃고 있다는 신호다. p.37의 “PPL 증가가 작다”는 품질 보존 결과이며, 메모리 절감률이나 실행 속도 자체를 뜻하지 않는다.</p>
+<h2 id="sec-35-wanda-가중치와-입력-activation의-곱으로-보기---p38-39">3.5 Wanda: 가중치와 입력 activation의 곱으로 보기 - p.38-39</h2>
+<p><strong>Wanda(Weights and activations)</strong>는 위 표기에서 입력 채널 j의 calibration 벡터 norm을 사용한다.</p>
+<div class="math-raw math-display">$$
+s_{ij}=|W_{ij}|\,\|X_{j,:}\|_2.
+$$</div><p>같은 출력 행에서 점수가 작은 연결을 제거한다. activation norm이 크면 같은 가중치라도 출력에 큰 영향을 줄 수 있다는 직관이다. 원래 Wanda는 이 점수로 고르고 <strong>남은 값을 재구성하는 업데이트 없이</strong> 사용하는 방법이다.</p>
+<p><img alt="원문 p.38: Magnitude와 Wanda의 중요도·제거 위치 비교" decoding="async" id="figure-3" loading="lazy" src="../resources/6f4fa47b536d7d36e230-p038-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/6f4fa47b536d7d36e230-p038-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/6f4fa47b536d7d36e230-p038-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>왼쪽: 가중치 절댓값만 사용하는 magnitude.</li>
+<li>오른쪽: 입력 활성값 norm을 곱하는 Wanda.</li>
+<li>norm: 여러 입력에서 관찰한 활성값의 크기를 한 숫자로 요약한 값.</li>
+<li>비교 질문: 원래 가중치는 같아도 <strong>어떤 입력 열이 자주 크게 활성화되는지</strong> 반영하면 제거 위치가 어떻게 달라지는가?</li>
+</ul>
+<p><strong>교육용 계산</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>입력 채널</th>
+<th>가중치</th>
+<th>입력 norm</th>
+<th>Wanda 점수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>첫째</td>
+<td>0.1</td>
+<td>10</td>
+<td><span class="math-raw math-inline">$0.1\times10=1$</span></td>
+</tr>
+<tr>
+<td>둘째</td>
+<td>0.5</td>
+<td>1</td>
+<td><span class="math-raw math-inline">$0.5\times1=0.5$</span></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Magnitude: 작은 가중치인 첫째 연결 제거.</li>
+<li>Wanda: 작은 점수인 둘째 연결 제거.</li>
+<li>이유: 첫째 입력의 크기가 커서 작은 가중치라도 기여가 클 수 있음.</li>
+</ul>
+<p>Wanda 점수와 OBD의 근사 손실은 단위와 기준이 다르다. 두 숫자를 직접 비교해 방법의 우열을 정하지 않는다.</p>
+<p><strong>주의:</strong> p.39의 “SparseGPT를 능가한다”는 표의 특정 모델·희소성·과제 결과다. 보편 우열은 아니다. <a href="https://arxiv.org/abs/2306.11695">Wanda 원 논문</a>은 magnitude 대비 개선과 비교 방법에 대한 경쟁력을 보고한다. 입력 통계가 바뀌면 중요도도 바뀔 수 있다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>중요도에 쓰는 정보</th>
+<th>남은 가중치 보상</th>
+<th>주요 한계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Magnitude</td>
+<td>가중치 절댓값</td>
+<td>기본형은 없음</td>
+<td>입력·곡률을 반영하지 않음</td>
+</tr>
+<tr>
+<td>OBD</td>
+<td>대각 Hessian과 가중치</td>
+<td>기본 제거 단계에서는 없음</td>
+<td>수렴·대각·2차 근사</td>
+</tr>
+<tr>
+<td>OBS</td>
+<td>역헤시안과 가중치</td>
+<td>다른 가중치 함께 조정</td>
+<td>큰 모델의 계산·저장 비용</td>
+</tr>
+<tr>
+<td>SparseGPT</td>
+<td>대표 입력 기반 layer 재구성</td>
+<td>처리하지 않은 가중치 갱신</td>
+<td>calibration·근사·커널 조건</td>
+</tr>
+<tr>
+<td>Wanda</td>
+<td>가중치 × 입력 norm</td>
+<td>원래 방법은 없음</td>
+<td>입력 분포 의존, 보상 부재</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-36-요약과-확인-질문">3.6 요약과 확인 질문</h2>
+<p>가중치가 작다는 것, 손실에 덜 민감하다는 것, 대표 입력의 출력에 덜 기여한다는 것은 다른 판단이다. 제거 후 품질 회복이 필요하고 학습 자원이 있다면 <a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">다음 장의 증류</a>를 결합할 수 있다.</p>
+<ol>
+<li>OBS 예제에서 -0.3을 제거하는데 업데이트 두 번째 성분이 +0.30인 이유는?</li>
+<li>Wanda 예제에서 첫 입력 채널 norm을 10에서 0.1로 바꾸면 무엇을 제거하는가?</li>
+<li>SparseGPT로 50% 희소 모델을 만들면 dense 실행 시간이 절반이 되는가?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li><span class="math-raw math-inline">$\Delta w=w_{new}-w$</span>이므로 -0.3에 +0.3을 더해 0으로 만든다. 다른 두 성분도 함께 바뀐다. 3.3으로 돌아간다.</li>
+<li>새 점수는 <code>[0.01,0.5]</code>여서 첫 연결을 제거한다. 같은 가중치라도 입력 통계가 달라지면 순위가 바뀐다. 3.5를 확인한다.</li>
+<li>아니다. 품질 보존과 실제 가속은 별도다. <a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2장</a>의 형식·패턴·커널 지원을 확인한다.</li>
+</ol>
+</details>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-2/03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.md">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html"><small>이전 장</small>2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a><a rel="next" href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html"><small>다음 장</small>4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

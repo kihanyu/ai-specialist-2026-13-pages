@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">On-Device AI 전체 흐름</a></li><li><a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">1장. AI 연산과 성능·메모리 병목</a></li><li><a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">2장. 온디바이스 AI 실행 환경</a></li><li><a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">3장. 수 표현과 선형 양자화의 원리</a></li><li><a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">4장. 비균일 양자화와 PTQ 오차 제어</a></li><li><a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html">5. QAT와 정수 추론</a></li><li><a href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html">6. 고급 LLM 양자화와 적용 판단</a></li><li><a href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html">부록 — 개념 사이의 연결과 종합 복습</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html" aria-current="page">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</a></li><li><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></li><li><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a></li><li><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></li><li><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></li><li><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</a></li><li><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></li><li><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a></li><li><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">8. 종합 복습: 조건에 맞는 수단을 선택하기</a></li><li><a href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html">LLM 양자화 실무 의사결정 가이드</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">On-Device AI</p><h1>On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>제거·학습·읽기 선택·실행 순서 변경이라는 최적화 대상을 구분한다.</li><li>Part 1 선수 지식과 Part 2의 전체 학습 경로를 연결한다.</li></ul></details></header><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-배경지식이-없다면-여기서-시작하기">배경지식이 없다면 여기서 시작하기</a></li><li><a href="#sec-먼저-잡을-전체-관계">먼저 잡을 전체 관계</a></li><li><a href="#sec-어디서-시작할까">어디서 시작할까?</a></li><li><a href="#sec-선수-지식과-되돌아갈-위치">선수 지식과 되돌아갈 위치</a></li><li><a href="#sec-자료를-읽는-방법">자료를 읽는 방법</a></li><li><a href="#sec-제작-범위와-근거-찾기">제작 범위와 근거 찾기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-on-device-ai-part-2-작은-모델을-실제로-빠르게-실행하기">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</h1>
+<p><strong>이 자료의 질문</strong></p>
+<blockquote>
+<p>모델을 작게 만들면, 실제 기기에서도 빨라질까?</p>
+</blockquote>
+<p>모델의 크기와 실행 속도는 서로 관련이 있지만 같은 뜻은 아니다. 이 자료에서는 <strong>무엇을 줄였는지</strong>, <strong>어떤 비용이 남는지</strong>, <strong>품질에 어떤 영향이 있는지</strong>를 구분해 배운다.</p>
+<p><strong>기준 자료</strong></p>
+<ul>
+<li>원본: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%EA%B5%90%EC%95%88/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90AI%EC%A0%84%EB%AC%B8%EA%B0%80%EA%B5%90%EC%9C%A1-ODAI-2.pdf">삼성전자AI전문가교육-ODAI-2.pdf</a></li>
+<li>강의자: 신동군 교수, <em>On-Device AI Part 2</em></li>
+<li>범위: PDF 전체 84쪽</li>
+<li>페이지 기준: 표지를 1쪽으로 센 <strong>PDF 실제 페이지 번호</strong></li>
+<li>개정일: 2026-11-10</li>
+</ul>
+<p>원문의 실험 결과와 이 문서에서 추가한 교육용 예제를 구분해 표시한다.</p>
+<h2 id="sec-배경지식이-없다면-여기서-시작하기">배경지식이 없다면 여기서 시작하기</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기초 용어</th>
+<th>쉬운 뜻</th>
+<th>이 자료에서의 역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI 모델</td>
+<td>입력을 받아 예측을 만드는 계산 규칙</td>
+<td>줄이거나 실행 방법을 바꿀 대상</td>
+</tr>
+<tr>
+<td>가중치·파라미터</td>
+<td>학습으로 정한 숫자</td>
+<td>가지치기에서 제거할 후보</td>
+</tr>
+<tr>
+<td>층(layer)</td>
+<td>모델 안에서 입력을 변환하는 계산 단계</td>
+<td>단계마다 중요도와 비용이 다름</td>
+</tr>
+<tr>
+<td>학습</td>
+<td>데이터로 가중치를 조정하는 과정</td>
+<td>제거 후 품질 회복, 학생 모델 훈련</td>
+</tr>
+<tr>
+<td>추론</td>
+<td>학습한 모델로 새 입력의 결과를 계산하는 과정</td>
+<td>장치에서 빠르게 수행할 작업</td>
+</tr>
+<tr>
+<td>손실(loss)</td>
+<td>예측이 목표와 얼마나 다른지 나타내는 값</td>
+<td>학습 중 줄이려는 기준</td>
+</tr>
+<tr>
+<td>활성값(activation)</td>
+<td>입력이 층을 통과하며 만들어진 중간값</td>
+<td>입력마다 달라지고 메모리를 사용함</td>
+</tr>
+<tr>
+<td>토큰(token)</td>
+<td>언어모델이 처리하는 글 조각</td>
+<td>단어 전체 또는 단어의 일부일 수 있음</td>
+</tr>
+<tr>
+<td>메모리</td>
+<td>숫자·중간 결과를 보관하는 공간</td>
+<td>모델이 작아도 실행 중 부족할 수 있음</td>
+</tr>
+<tr>
+<td>지연시간</td>
+<td>요청한 결과가 나올 때까지 걸리는 시간</td>
+<td>실제 사용자가 기다리는 시간</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>가장 작은 모델 예제</strong></p>
+<p>입력 두 개를 <code>y = 2 × x₁ + 3 × x₂</code>로 계산한다고 하자.</p>
+<ul>
+<li>입력: <code>x₁=1</code>, <code>x₂=2</code></li>
+<li>가중치: <code>2</code>, <code>3</code></li>
+<li>출력: <code>y=2×1+3×2=8</code></li>
+<li>가지치기 예: 두 번째 가중치를 0으로 만들면 출력은 <code>2</code></li>
+</ul>
+<p>가중치를 없애면 계산을 줄일 기회가 생긴다. 동시에 <strong>답도 달라질 수 있으므로 품질 확인이 필요하다.</strong></p>
+<p><strong>읽는 순서</strong></p>
+<ol>
+<li>각 장의 <strong>시작 전 준비</strong>와 기본 개념을 읽는다.</li>
+<li>그림에서 무엇을 봐야 하는지 확인한다.</li>
+<li>작은 예제를 직접 계산한다.</li>
+<li>확인 질문에 자신의 말로 답한다.</li>
+<li>미분·행렬 수식이 필요한 심화 설명으로 돌아온다.</li>
+</ol>
+<h2 id="sec-먼저-잡을-전체-관계">먼저 잡을 전체 관계</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>질문</th>
+<th>주요 수단</th>
+<th>줄이는 대상</th>
+<th>먼저 확인할 위험</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>불필요한 연결을 없앨 수 있는가?</td>
+<td>가지치기(pruning)</td>
+<td>가중치·채널·연산</td>
+<td>품질 손실, 희소 커널 미지원</td>
+</tr>
+<tr>
+<td>더 작은 모델을 잘 학습할 수 있는가?</td>
+<td>지식 증류(KD)</td>
+<td>배포할 학생 모델의 크기</td>
+<td>교사의 오류, 데이터·학습 비용</td>
+</tr>
+<tr>
+<td>모든 과거 토큰을 읽어야 하는가?</td>
+<td>희소 attention, KV 선택·양자화</td>
+<td>attention 계산·KV 읽기와 저장</td>
+<td>중요한 문맥 손실, 복원 비용</td>
+</tr>
+<tr>
+<td>큰 모델을 매 토큰 호출해야 하는가?</td>
+<td>투기적 디코딩</td>
+<td>확정 토큰당 큰 모델 호출</td>
+<td>초안·검증 비용, 낮은 수용률</td>
+</tr>
+<tr>
+<td>같은 계산을 덜 이동하며 수행할 수 있는가?</td>
+<td>fusion, FlashAttention, patch</td>
+<td>메모리 왕복·중간값·실행 overhead</td>
+<td>장치·커널 제약, 중복 계산</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>방법을 조합하는 예</strong></p>
+<p>작은 학생 모델을 만든 뒤 증류로 학습하고, 양자화를 적용한 다음 최적화된 커널로 실행할 수 있다.</p>
+<ul>
+<li>모델 구조: 얼마나 작게 만들 것인가?</li>
+<li>학습 신호: 작은 모델의 품질을 어떻게 높일 것인가?</li>
+<li>실행 방법: 장치에서 어떤 비용을 줄일 것인가?</li>
+</ul>
+<pre><code class="language-mermaid">flowchart TD
+    A[같은 입력·품질 조건으로 기준 측정] --&gt; B{주요 병목은?}
+    B --&gt;|모델 크기·계산| C[가지치기 또는 작은 학생 + 증류]
+    B --&gt;|긴 문맥의 KV| D[선택·퇴거 또는 양자화]
+    B --&gt;|토큰별 순차 호출| E[초안 작성 + 큰 모델 검증]
+    B --&gt;|메모리 왕복·중간값| F[Fusion·FlashAttention·Patch]
+    C --&gt; G[목표 장치에서 품질·지연·최대 메모리 재측정]
+    D --&gt; G
+    E --&gt; G
+    F --&gt; G
+</code></pre>
+<p>그림은 <strong>병목에서 후보를 고르는 순서</strong>를 나타낸다. 실제 모델은 병목이 여러 개일 수 있고, 한 방법을 적용한 뒤 다른 병목이 드러날 수 있다. Mermaid 미지원 뷰어에서는 위 표를 같은 관계의 텍스트 대안으로 읽으면 된다.</p>
+<h2 id="sec-어디서-시작할까">어디서 시작할까?</h2>
+<p>처음 읽는다면 아래 순서를 따른다. 복습할 때는 질문에 해당하는 장부터 읽고 각 장 끝의 문제로 확인한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>순서</th>
+<th>기준 본문</th>
+<th>답할 질문</th>
+<th>원문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">가지치기 기초와 비율 선택</a></td>
+<td>무엇을 어떤 기준으로 제거하는가?</td>
+<td>p.3-16</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">희소 저장과 하드웨어 실행</a></td>
+<td>0을 만들면 왜 바로 빨라지지 않는가?</td>
+<td>p.17-28</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">LLM 가지치기</a></td>
+<td>가중치의 크기만으로 중요도를 정해도 되는가?</td>
+<td>p.29-39</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">지식 증류</a></td>
+<td>정답 이외에 무엇을 학생에게 가르치는가?</td>
+<td>p.40-56</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">희소 attention·KV·MoE</a></td>
+<td>덜 읽는 것과 적은 비트로 저장하는 것은 어떻게 다른가?</td>
+<td>p.57-66</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">투기적 디코딩</a></td>
+<td>여러 후보를 한꺼번에 검증해 어떻게 토큰을 확정하는가?</td>
+<td>p.67-75</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">하드웨어를 고려한 실행</a></td>
+<td>같은 연산의 데이터 이동과 최대 메모리를 어떻게 줄이는가?</td>
+<td>p.76-84</td>
+</tr>
+<tr>
+<td>복습</td>
+<td><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">적용 시나리오·용어·종합 문제</a></td>
+<td>조건이 바뀌면 선택도 바꿀 수 있는가?</td>
+<td>전체 연결</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-선수-지식과-되돌아갈-위치">선수 지식과 되돌아갈 위치</h2>
+<ul>
+<li>행렬곱, MAC/FLOP, prefill/decode, KV cache: <a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">Part 1 1장</a>.</li>
+<li>장치와 실행 backend, peak 성능과 실제 속도: <a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">Part 1 2장</a>.</li>
+<li>scale·zero point·양자화 오차: <a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">Part 1 3장</a>.</li>
+<li>calibration과 입력 분포: <a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">Part 1 4장</a>.</li>
+<li>gradient와 학습·추론 구분: <a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html">Part 1 5장</a>.</li>
+</ul>
+<p>새로운 용어는 각 장에서 정의한다. Taylor 전개와 OBS 수식은 심화다. 처음에는 손실이 적게 증가할 가중치를 고르고 남은 가중치로 보상한다는 관계를 이해한 뒤 계산으로 돌아와도 된다.</p>
+<h2 id="sec-자료를-읽는-방법">자료를 읽는 방법</h2>
+<p><strong>본문과 그림의 역할</strong></p>
+<ul>
+<li>본문: 정의, 원리, 작은 계산, 오해하기 쉬운 점</li>
+<li>원문 그림: 구조, 연결, 축과 범례를 직접 확인하는 자료</li>
+<li>심화 수식: 기본 원리를 이해한 뒤 계산 근거를 확인하는 자료</li>
+</ul>
+<p>그림의 영어 용어는 주변 해설에서 풀어 설명한다. 그림을 확대하기 어려워도 핵심은 본문과 표로 확인할 수 있다.</p>
+<p>원문의 내용은 페이지를 표시하고, 새로 만든 작은 계산은 <strong>교육용 예제</strong>, 오기나 해석 주의는 <strong>정정·주의</strong>로 구별한다. 원문의 모델·제품·성능 수치는 당시 사례이며 현재 지원이나 보편적인 보장으로 읽지 않는다. 추가 대조에 사용한 논문·공식 문서는 해당 절에 링크했다.</p>
+<p>각 장의 확인 질문은 먼저 해설을 접고 답한다. 틀렸다면 해설에 적힌 절로 돌아간다. 시험 출제 여부나 중요도는 원문에 없는 판단을 추가하지 않았다.</p>
+<h2 id="sec-제작-범위와-근거-찾기">제작 범위와 근거 찾기</h2>
+<p>원본 84쪽과 각 장의 연결은 <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-2/09_%EC%9B%90%EB%AC%B8%EB%8C%80%EC%9D%91%EA%B3%BC%EA%B2%80%ED%86%A0.md">원문 대응·개정 검토표</a>에서 확인한다. 이미지 보강 이유와 이번 검토의 범위도 같은 문서에 기록했다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-2/00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.md">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html"><small>이전 장</small>부록 — 개념 사이의 연결과 종합 복습</a><a rel="next" href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html"><small>다음 장</small>1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

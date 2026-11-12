@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1750" height="1190" viewBox="0 0 1750 1190">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#375c85"/></marker></defs>
+<rect width="100%" height="100%" fill="#f6f8fc"/><text x="35" y="50" font-family="Malgun Gothic,sans-serif" font-size="28" fill="#10243e">PTQ 오차 제어 — 무엇을 조정하는지에 따라 수단을 묶어 보기</text>
+<path d="M870.0,250 L290.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M870.0,250 L870.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M870.0,250 L1450.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M290.0,520 L290.0,650" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M870.0,520 L870.0,650" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1450.0,520 L1450.0,650" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="620" y="100" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="636" y="140" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">PTQ 오차를 줄이는 세 가지 관점</text>
+<text x="636" y="175" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">양자화 설정과 보정 수단을 조합</text>
+<text x="636" y="210" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">원인 확인 후 필요한 수단 선택</text>
+<rect x="40" y="370" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">1. 대표 입력과 범위를 조정</text>
+<text x="56" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">값이 잘리거나 한 코드에 뭉치는가?</text>
+<text x="56" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 4.5절</text>
+<rect x="620" y="370" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="636" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">2. 반올림·출력 오차를 조정</text>
+<text x="636" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">가중치 오차가 출력에 크게 전파되는가?</text>
+<text x="636" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 4.6절</text>
+<rect x="1200" y="370" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1216" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">3. 공유 단위와 분포를 조정</text>
+<text x="1216" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">서로 다른 채널 범위를 함께 쓰는가?</text>
+<text x="1216" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 4.7–4.8절</text>
+<rect x="40" y="650" width="500" height="240" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="690" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Calibration: 대표 입력·통계 수집</text>
+<text x="56" y="725" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">범위 선택: min/max·percentile·MSE</text>
+<text x="56" y="760" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Clipping: 극단값과 보통 값의 오차 절충</text>
+<text x="56" y="795" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Static / dynamic: 범위 결정 시점</text>
+<text x="56" y="830" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Dynamic이 항상 더 정확한 것은 아님</text>
+<rect x="620" y="650" width="500" height="240" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="636" y="690" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">RTN: 각 값의 최근접 반올림</text>
+<text x="636" y="725" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">AdaRound: 반올림 방향 최적화</text>
+<text x="636" y="760" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">BRECQ: 여러 연산의 block 재구성</text>
+<text x="636" y="795" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">OBQ: 2차 정보와 남은 가중치 보상</text>
+<text x="636" y="830" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">각 기법의 비용과 목적함수는 다름</text>
+<rect x="1200" y="650" width="500" height="240" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1216" y="690" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Per-channel / group: scale 공유 범위</text>
+<text x="1216" y="725" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Weight equalization: 채널 범위 균등화</text>
+<text x="1216" y="760" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Bias correction: 평균적인 출력 이동 보정</text>
+<text x="1216" y="795" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Granularity와 static/dynamic은 별도 축</text>
+<text x="1216" y="830" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">ReLU equalization은 양의 동차성 활용</text>
+<rect x="40" y="990" width="1660" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="1030" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">읽는 법: 관점별 도구 지도다. 세 가지는 배타적인 알고리즘 분류나 고정된 처리 순서가 아니며 서로 조합할 수 있다.</text>
+<text x="56" y="1065" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">NF4·INQ·codebook·QuIP#·AQLM의 표현 분류는 3장 상단 지도와 이 장 4.2–4.4절에서 별도로 확인한다.</text>
+<text x="56" y="1100" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">목표 미달 시 QAT를 검토하되, calibration에서의 오차와 별도 평가·실제 장치에서의 품질·성능을 구별한다.</text>
+</svg>

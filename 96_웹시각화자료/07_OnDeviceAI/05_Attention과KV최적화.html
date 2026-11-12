@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까? | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/ondevice-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">On-Device AI 전체 흐름</a></li><li><a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">1장. AI 연산과 성능·메모리 병목</a></li><li><a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">2장. 온디바이스 AI 실행 환경</a></li><li><a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">3장. 수 표현과 선형 양자화의 원리</a></li><li><a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">4장. 비균일 양자화와 PTQ 오차 제어</a></li><li><a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html">5. QAT와 정수 추론</a></li><li><a href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html">6. 고급 LLM 양자화와 적용 판단</a></li><li><a href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html">부록 — 개념 사이의 연결과 종합 복습</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</a></li><li><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></li><li><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a></li><li><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></li><li><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></li><li><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html" aria-current="page">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</a></li><li><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></li><li><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a></li><li><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">8. 종합 복습: 조건에 맞는 수단을 선택하기</a></li><li><a href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html">LLM 양자화 실무 의사결정 가이드</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">On-Device AI</p><h1>5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>고정·동적 희소 attention, SpAtten·Deja Vu의 선택 단위를 구분한다.</li><li>H₂O·SnapKV의 보존과 Quest의 query별 읽기 선택을 구분한다.</li><li>KIVI의 K/V 공유 축, TurboQuant의 재구성·내적 오차 및 MoE 총/활성 파라미터를 설명한다.</li><li>KV head 수·정밀도·최근 고정밀 구간·metadata를 포함한 캐시 예산을 계산한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="od-kv" id="lab-od-kv"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="od-granularity" id="lab-od-granularity"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-시작-전-준비-attention을-말로-이해하기">시작 전 준비: Attention을 말로 이해하기</a></li><li><a href="#sec-51-서로-다른-비용을-분리해서-보기---p57">5.1 서로 다른 비용을 분리해서 보기 - p.57</a></li><li><a href="#sec-52-고정-패턴과-동적-희소성---p58-60">5.2 고정 패턴과 동적 희소성 - p.58-60</a></li><li><a href="#sec-53-kv-퇴거와-현재-query의-읽기-선택---p61-62">5.3 KV 퇴거와 현재 query의 읽기 선택 - p.61-62</a></li><li><a href="#sec-54-kivi-k와-v의-묶는-축을-다르게---p63">5.4 KIVI: K와 V의 묶는 축을 다르게 - p.63</a></li><li><a href="#sec-55-turboquant-회전-scalar-quantization-내적-오차---p64-65">5.5 TurboQuant: 회전, scalar quantization, 내적 오차 - p.64-65</a></li><li><a href="#sec-56-kv-용량을-계산하고-대상-고르기">5.6 KV 용량을 계산하고 대상 고르기</a></li><li><a href="#sec-57-moe-총-파라미터와-활성-파라미터---p66">5.7 MoE: 총 파라미터와 활성 파라미터 - p.66</a></li><li><a href="#sec-58-요약과-확인-질문">5.8 요약과 확인 질문</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-5-attentionkvmoe-어떤-계산과-데이터를-줄일까">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">이전</a> · <a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">다음: 투기적 디코딩</a></p>
+<p><strong>원본 범위:</strong> p.57-66</p>
+<p><strong>학습 목표</strong></p>
+<ul>
+<li>Attention 연결 축소, KV 삭제·읽기 선택·양자화 구분하기</li>
+<li>KV 값 본체의 메모리 용량 계산하기</li>
+<li>MoE의 총 가중치와 현재 계산에 사용하는 가중치 구분하기</li>
+</ul>
+<h2 id="sec-시작-전-준비-attention을-말로-이해하기">시작 전 준비: Attention을 말로 이해하기</h2>
+<p>문장 속 한 위치를 해석할 때 다른 위치의 정보를 얼마나 참고할지 정하는 계산이 attention이다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구성</th>
+<th>역할</th>
+<th>검색에 비유하면</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Query(Q)</td>
+<td>현재 위치가 찾는 정보</td>
+<td>검색 질문</td>
+</tr>
+<tr>
+<td>Key(K)</td>
+<td>각 위치가 가진 정보의 비교용 표현</td>
+<td>검색 색인</td>
+</tr>
+<tr>
+<td>Value(V)</td>
+<td>선택 비중에 따라 가져올 실제 표현</td>
+<td>검색 결과의 내용</td>
+</tr>
+</tbody>
+</table></div>
+<ol>
+<li>Q와 각 K의 내적으로 관련성 점수를 구한다.</li>
+<li>Softmax로 점수를 합이 1인 가중치로 바꾼다.</li>
+<li>그 가중치로 V를 곱해 더한다.</li>
+</ol>
+<p><strong>교육용 작은 예제:</strong> 두 위치의 attention 가중치가 <code>[0.75,0.25]</code>, value가 <code>[10,2]</code>라면 출력은 <code>0.75×10+0.25×2=8</code>이다.</p>
+<p>실제 K·V는 학습된 벡터이며 검색 시스템의 문자 색인과 같지는 않다.</p>
+<h2 id="sec-51-서로-다른-비용을-분리해서-보기---p57">5.1 서로 다른 비용을 분리해서 보기 - p.57</h2>
+<p><strong>위 절차를 수식으로 쓰면</strong></p>
+<div class="math-raw math-display">$$O=softmax(QK^T/\sqrt{d_k})V$$</div><ul>
+<li><span class="math-raw math-inline">$d_k$</span>: Q와 K 벡터의 성분 수. 점수 크기를 조절하는 데 사용한다.</li>
+<li><span class="math-raw math-inline">$K^T$</span>: K의 행과 열을 바꾼 전치 행렬.</li>
+<li>O: attention 출력.</li>
+<li><strong>Causal mask:</strong> 다음 토큰을 예측할 때 미래 토큰을 미리 보지 못하게 막는 조건.</li>
+</ul>
+<p><strong>Prefill·decode·KV cache</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계·구성</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prefill</td>
+<td>입력 prompt의 여러 토큰을 처리하는 초기 단계</td>
+</tr>
+<tr>
+<td>Decode</td>
+<td>이미 생성한 앞부분을 바탕으로 새 토큰을 이어 만드는 단계</td>
+</tr>
+<tr>
+<td>KV cache</td>
+<td>과거 토큰의 K·V를 저장해 매번 다시 계산하지 않도록 하는 공간</td>
+</tr>
+</tbody>
+</table></div>
+<p>문맥이 길어질수록 cache에 보관하고 읽어야 할 값이 늘어난다. 이 장은 <strong>가중치 외의 계산·데이터 비용</strong>을 다룬다. 원문 p.57은 여러 최적화 방향의 개요다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>수단</th>
+<th>줄이거나 선택하는 것</th>
+<th>모델 동작 변화</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>고정 희소 attention</td>
+<td>허용 query-key 연결</td>
+<td>dense attention과 다른 패턴</td>
+</tr>
+<tr>
+<td>동적 token/head/차원 선택</td>
+<td>입력별 사용할 계산</td>
+<td>입력에 따라 근사 오차 발생 가능</td>
+</tr>
+<tr>
+<td>KV 퇴거·읽기 선택</td>
+<td>보존할 KV 또는 현재 읽을 KV</td>
+<td>중요한 과거 정보를 놓칠 수 있음</td>
+</tr>
+<tr>
+<td>KV 양자화</td>
+<td>KV 값의 비트 수</td>
+<td>수치 근사·복원 비용</td>
+</tr>
+<tr>
+<td>MoE</td>
+<td>token별 활성 expert</td>
+<td>학습된 routing 구조, 총 파라미터는 별도</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-52-고정-패턴과-동적-희소성---p58-60">5.2 고정 패턴과 동적 희소성 - p.58-60</h2>
+<p><strong>고정 패턴: 미리 정한 위치만 참조하기 — p.58</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>패턴</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local/sliding window</td>
+<td>가까운 위치만 참조</td>
+</tr>
+<tr>
+<td>Global</td>
+<td>지정된 일부 위치가 넓은 문맥과 연결</td>
+</tr>
+<tr>
+<td>Dilated</td>
+<td>간격을 두고 떨어진 위치까지 참조</td>
+</tr>
+<tr>
+<td>Random</td>
+<td>무작위로 고른 추가 위치에 연결</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Longformer:</strong> local·global 연결과 dilated window 등의 구성.</li>
+<li><strong>BigBird:</strong> local·global·random 연결의 결합. random 연결만 쓰는 것은 아니다.</li>
+</ul>
+<p><img alt="원문 p.58: 전체 연결과 local·global·random 연결 패턴" decoding="async" id="figure-1" loading="lazy" src="../resources/0854ddb4f3aebc7f23c1-p058-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/0854ddb4f3aebc7f23c1-p058-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/0854ddb4f3aebc7f23c1-p058-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>격자의 행·열: 토큰 위치. 색칠한 칸: 허용한 query-key 연결.</li>
+<li>대각선 주변 띠: 가까운 위치를 참조하는 local 패턴.</li>
+<li>길게 이어진 행·열: global 위치와 연결.</li>
+<li>띄엄띄엄한 칸: dilated 또는 random 연결. 범례로 구분한다.</li>
+<li>질문: 모든 칸을 계산할 때와 비교해 어떤 관계를 생략하는가?</li>
+</ul>
+<p>길이 L, 고정 local 폭 w의 연결 수는 대략 <span class="math-raw math-inline">$O(Lw)$</span>다. 이는 규모가 커질 때 비용이 늘어나는 정도를 뜻하며 global 등 추가 연결 비용은 별도다. 이미 학습한 dense 모델에 마스크만 적용해도 품질이 유지된다고 가정하지 않는다.</p>
+<p><strong>동적 패턴: 입력에 따라 참조 대상을 고르기 — p.59-60</strong></p>
+<p><strong>동적 희소성(Dynamic Sparsity)</strong>은 고정된 연결을 항상 지우는 대신 현재 입력의 문맥에 따라 계산할 부분을 고르는 방식이다. 같은 모델에서도 입력이 바뀌면 필요한 토큰·헤드·내부 차원이 달라질 수 있다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>무엇을 기준으로 고르는가?</th>
+<th>추가 비용·위험</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SpAtten</td>
+<td>누적 attention 중요도로 토큰·head를 단계적으로 제거</td>
+<td>초기에 낮은 중요도가 이후에도 낮으리라는 보장 없음</td>
+</tr>
+<tr>
+<td>Deja Vu</td>
+<td>작은 예측기로 필요한 MLP 내부 차원·attention head 추정</td>
+<td>예측기 실행, 오판정, 희소 커널 비용</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Head:</strong> 서로 다른 관점의 attention 계산 갈래. <strong>MLP:</strong> attention과 별도로 특징을 변환하는 다층 신경망 블록.</p>
+<p><strong>SpAtten: 토큰과 헤드는 무엇이 다를까? — p.59</strong></p>
+<ul>
+<li><strong>토큰 가지치기(Token Pruning):</strong> 여러 질의가 특정 토큰을 얼마나 참조했는지 누적한 어텐션 중요도로, 이후 단계에서 덜 필요한 토큰을 골라낸다. 입력 문장을 사용자가 직접 지우는 전처리와는 다르다.</li>
+<li><strong>헤드 가지치기(Head Pruning):</strong> 어텐션의 여러 계산 갈래 중 기여가 낮은 헤드를 생략한다. 하나의 헤드는 여러 토큰 관계를 계산하므로, 토큰 하나를 생략하는 것과 제거 단위가 다르다.</li>
+<li><strong>단계적 제거(Cascade Pruning):</strong> 층을 진행하면서 중요도를 보고 토큰·헤드를 줄인다. 앞에서 제거한 정보가 뒤에서 필요해질 가능성까지 품질 평가로 확인해야 한다.</li>
+</ul>
+<p>교안 p.59의 예시는 처음 11개 토큰·12개 헤드에서 더 적은 토큰·헤드로 진행되는 흐름이다. 계산량 감소 수치는 그 예시 조건이며 모든 입력의 결과는 아니다. <a href="https://efficient-nlp.mit.edu/assets/spatten/spatten_slides.pdf">SpAtten 연구진 발표 자료</a>는 이 선택을 실제로 활용하는 하드웨어 설계도 함께 다룬다.</p>
+<p><strong>Deja Vu: 희소성 예측기(Sparsity Predictor)와 선행 예측(Look-ahead) — p.60</strong></p>
+<p>본 연산을 전부 계산한 뒤 필요 없는 부분을 찾으면 이미 비용을 지불한 셈이다. Deja Vu는 어떤 어텐션 헤드와 다층 퍼셉트론(MLP, Multi-Layer Perceptron)의 내부 차원을 사용할지 작은 예측기로 먼저 추정한다. 이 예측기는 별도의 학습이 필요하며, 다음 토큰 자체를 제안하는 6장의 초안 모델과는 예측 대상이 다르다.</p>
+<p><strong>Deja Vu의 실행 아이디어</strong></p>
+<ol>
+<li>현재 계산보다 앞서 확보된 은닉 표현으로 다음 하위 블록에서 쓸 부분을 미리 예측한다. 예를 들어 어텐션에 들어가는 표현으로 뒤의 MLP를, MLP에 들어가는 표현으로 다음 층의 어텐션을 예측한다.</li>
+<li>본 계산을 진행하는 동안 예측을 비동기적으로 겹쳐 실행하여, 예측이 끝나기를 따로 기다리는 비용을 줄인다.</li>
+<li>필요한 부분만 읽어 희소 커널로 실행한다. 문맥에 따른 선택이므로 다음 입력에서는 다른 부분이 선택될 수 있다.</li>
+</ol>
+<p><strong>왜 미리 예측할 수 있을까?</strong> 인접한 층의 표현이 비교적 천천히 변한다는 관찰을 활용한다. 미래의 정답 토큰을 미리 아는 것이 아니라, 가까운 앞 단계의 표현에서 다음 계산에 필요한 부분을 추정하는 것이다. 예측 오차와 예측기·희소 커널의 추가 비용이 줄어든 계산량보다 작아야 실제로 빨라진다. <a href="https://proceedings.mlr.press/v202/liu23am.html">Deja Vu 원 논문</a>.</p>
+<p><strong>구분:</strong> 고정 가중치를 영구 제거하는 것과 입력마다 실행할 부분을 고르는 것은 다르다.</p>
+<h2 id="sec-53-kv-퇴거와-현재-query의-읽기-선택---p61-62">5.3 KV 퇴거와 현재 query의 읽기 선택 - p.61-62</h2>
+<p><strong>키·값 가지치기(KV Pruning, Key–Value Pruning)</strong>에서 퇴거(Eviction)는 저장한 캐시 항목을 제거하는 것이다. 가중치를 지우는 것이 아니라 과거 토큰에서 계산한 K·V 활성값을 보관할지 정한다.</p>
+<p>p.61의 <strong>H₂(Heavy Hitters, 중요 참조 토큰)</strong>는 누적 어텐션이 큰 토큰들을 뜻하고, <strong>H₂O(Heavy-Hitter Oracle)</strong>는 이 관찰을 활용한 캐시 정책 이름이다. “H2 and the Recent KV”는 <strong>자주 참조되는 과거 토큰 + 최근 토큰</strong>을 함께 남긴다는 뜻이다. 과거의 핵심 정보와 방금 이어진 문맥을 함께 유지하려는 것이다. 예를 들어 대화 초반의 중요한 이름은 오래되었어도 남기고, 직전 문장의 토큰은 아직 중요도가 충분히 쌓이지 않았어도 최근성 예산으로 보호할 수 있다. 두 기준이 겹치는 항목을 중복 저장하는 뜻은 아니다. <a href="https://arxiv.org/abs/2306.14048">H₂O 원 논문</a>.</p>
+<p><img alt="p.61 중요 token과 최근 token을 남기는 KV 정책" decoding="async" id="figure-2" loading="lazy" src="../resources/e80d12cd4989e507ccad-p061-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/e80d12cd4989e507ccad-p061-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/e80d12cd4989e507ccad-p061-source.png">원본 그림 크게 보기</a></p>
+<p>그림에서는 attention이 특정 열에 집중하는 모습과 최근 위치가 참조되는 모습을 본다. <strong>원문 주의:</strong> “5% KV로 같은 token을 생성”은 원문의 실험·관찰 맥락이다. 모든 요청·모델·길이에서 95%를 없애도 같은 응답이라는 보장이 아니다. 정확한 생성 분포 보존을 보장하는 알고리즘으로 해석하면 안 된다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>판단 시점·정보</th>
+<th>무엇을 줄이는가?</th>
+<th>다시 참조할 수 있는가?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H2O</td>
+<td>생성 중 누적 중요도와 최근성</td>
+<td>보존 KV 예산</td>
+<td>실제 버린 항목은 별도 복원 없이는 불가</td>
+</tr>
+<tr>
+<td>SnapKV</td>
+<td>prompt 관찰 window의 attention</td>
+<td>생성 전 prompt KV 선택·압축</td>
+<td>선택 제외분 보존 여부는 구현 설계에 달림</td>
+</tr>
+<tr>
+<td>Quest</td>
+<td>현재 query와 page별 key min/max</td>
+<td>해당 단계에서 읽을 KV page</td>
+<td>원 KV를 유지하므로 다음 query가 선택 가능</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>SnapKV의 정적(Static) 선택:</strong> 프롬프트 끝의 관찰 구간에서 어떤 위치를 주로 보는지 모으고, 생성 전에 보존할 프롬프트 KV를 헤드별로 선택·압축한다. 여기서 정적이라는 말은 프롬프트 선택을 매 디코드 질의마다 새로 하지 않는다는 뜻이다. 모든 입력에 같은 토큰을 남긴다는 뜻도, 생성 중 새 KV가 추가되지 않는다는 뜻도 아니다. <a href="https://arxiv.org/abs/2404.14469">SnapKV 원 논문</a>.</p>
+<p><strong>Quest의 동적(Dynamic) 선택:</strong> 매 디코드 단계의 현재 질의(Query)와 페이지별 키(Key) 최솟값·최댓값 메타데이터를 이용해 중요한 페이지를 추정하고, 선택한 페이지의 K·V를 읽는다. 원래 캐시는 유지하므로 이번에 읽지 않은 페이지도 나중의 질의가 선택할 수 있다. 아래 그림의 위쪽은 <strong>무엇을 보존할지</strong>, 아래쪽은 <strong>지금 무엇을 읽을지</strong>를 결정한다고 비교하면 차이가 분명해진다.</p>
+<p><img alt="원문 p.62: 생성 전 KV 압축과 query별 KV page 선택" decoding="async" id="figure-3" loading="lazy" src="../resources/88c083209967acfab577-p062-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/88c083209967acfab577-p062-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/88c083209967acfab577-p062-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>위 SnapKV: prompt를 관찰하고 생성 전에 보존할 KV를 선택하는 흐름.</li>
+<li>아래 Quest: 현재 query마다 읽을 page를 다시 고르는 흐름.</li>
+<li><strong>Page:</strong> 여러 토큰의 KV를 묶어 관리하는 단위.</li>
+<li>비교 질문: “이번에 읽지 않은 page”와 “저장 공간에서 없앤 page”는 어떻게 다른가?</li>
+</ul>
+<p><strong>정정·주의:</strong> p.62는 Quest를 eviction 절에 놓고 “evicted token을 나중에 볼 수 있다”고 적는다. 여기서는 <strong>영구 삭제</strong>와 <strong>이번 단계에서 읽지 않음</strong>을 구별한다. <a href="https://arxiv.org/abs/2406.10774">Quest 논문</a>은 query와 page별 key 최솟값·최댓값을 사용해 중요한 page를 선택하는 방법이다. 즉 원본 cache 저장량 감소와 읽기 대역폭 감소는 같은 목표가 아니다(대조일 2026-11-10).</p>
+<p><strong>교육용 선택 예제:</strong> 단일 query에서 page A·B·C의 중요도 추정이 <code>[0.8,0.1,0.6]</code>이고 읽기 예산이 2 page라면 A·C를 읽는다. 다음 query에서 <code>[0.1,0.9,0.2]</code>가 되면 B·C를 읽을 수 있어야 한다. B를 영구 삭제한 정책과는 다르다. 점수 추정이 완벽하지 않으면 실제 중요한 page를 놓칠 수 있다.</p>
+<h2 id="sec-54-kivi-k와-v의-묶는-축을-다르게---p63">5.4 KIVI: K와 V의 묶는 축을 다르게 - p.63</h2>
+<p><strong>KIVI의 질문:</strong> K와 V를 같은 방향으로 묶어 양자화해도 될까?</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>대상</th>
+<th>관찰한 특징</th>
+<th>통계를 공유하는 축</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Key</td>
+<td>특정 채널에 큰 값이 몰리는 경향</td>
+<td>Per-channel: 같은 채널의 여러 토큰</td>
+</tr>
+<tr>
+<td>Value</td>
+<td>토큰별 값 분포의 차이</td>
+<td>Per-token: 같은 토큰의 여러 채널</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>양자화 복습:</strong> 여러 실수 값을 소수의 대표값으로 표현하고, scale·zero point 등의 정보로 복원한다. 큰 이상값과 작은 값을 같은 범위로 묶으면 작은 값의 표현 오차가 커질 수 있다.</p>
+<p><img alt="p.63 Key와 Value의 서로 다른 값 분포" decoding="async" id="figure-4" loading="lazy" src="../resources/c0a09aac0a488a895809-p063-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/c0a09aac0a488a895809-p063-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/c0a09aac0a488a895809-p063-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기와 저장 비용</strong></p>
+<ul>
+<li><code>[token,channel]</code> 배열에서 K는 <strong>채널을 고정</strong>하고 토큰 방향을 본다.</li>
+<li>V는 <strong>토큰을 고정</strong>하고 채널 방향을 본다.</li>
+<li>원문 key의 특정 채널에 큰 값이 모이는 모양과 value의 토큰별 변화를 비교한다.</li>
+</ul>
+<p>실제 저장에는 그룹별 scale·zero point, 최근 토큰을 높은 정밀도로 남기는 <strong>residual buffer</strong> 등도 필요하다. 모든 KV가 정확히 2 bit/value만 차지하는 것은 아니다. 세부 조건은 <a href="https://arxiv.org/abs/2402.02750">KIVI 논문</a>을 참고한다.</p>
+<h2 id="sec-55-turboquant-회전-scalar-quantization-내적-오차---p64-65">5.5 TurboQuant: 회전, scalar quantization, 내적 오차 - p.64-65</h2>
+<p><strong>원리: 값의 편중을 완화한 뒤 양자화하기</strong></p>
+<ol>
+<li><strong>무작위 직교 회전:</strong> 벡터 길이는 보존하면서 특정 좌표에 몰린 큰 값을 분산한다.</li>
+<li><strong>좌표별 양자화:</strong> 회전 후 분포에 맞춘 대표값으로 각 좌표를 표현한다.</li>
+<li><strong>선택적 잔차 보정:</strong> 내적 오차를 줄이려는 변형에서는 양자화 후 남은 차이도 보정한다.</li>
+</ol>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>용어</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vector</td>
+<td>숫자를 한 줄로 모은 것</td>
+</tr>
+<tr>
+<td>Scalar quantization</td>
+<td>각 좌표의 숫자를 대표값으로 바꾸는 양자화</td>
+</tr>
+<tr>
+<td>Codebook</td>
+<td>사용할 대표값 목록</td>
+</tr>
+<tr>
+<td>Data-oblivious</td>
+<td>특정 데이터셋의 calibration으로 codebook을 학습하지 않음</td>
+</tr>
+</tbody>
+</table></div>
+<p>Data-oblivious는 입력을 보지 않는다는 뜻이 아니다. 벡터 norm 등의 부가 정보도 따로 필요하다.</p>
+<p><img alt="p.65 재구성 MSE와 내적 추정 오차를 구별하는 TurboQuant" decoding="async" id="figure-5" loading="lazy" src="../resources/cb7bfe826cf407bda2f6-p065-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-5" type="button">그림 확대</button><a href="../resources/cb7bfe826cf407bda2f6-p065-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/cb7bfe826cf407bda2f6-p065-source.png">원본 그림 크게 보기</a></p>
+<p>그림은 먼저 위의 단계 1·2·3을 읽고, 아래 그래프에서 <strong>MSE 최소화와 내적 오차 최소화가 서로 다른 목표</strong>임을 확인한다.</p>
+<ul>
+<li><span class="math-raw math-inline">$TQ_{mse}$</span>: 원본 K와 복원 <span class="math-raw math-inline">$\widehat K$</span> 사이 <span class="math-raw math-inline">$\|K-\widehat K\|_2^2$</span>를 줄이는 쪽에 초점을 둔다.</li>
+<li><span class="math-raw math-inline">$TQ_{prod}$</span>: 잔차에 1-bit QJL(Quantized Johnson-Lindenstrauss) 보정을 추가해 query와의 내적 추정 bias를 제어한다. 목표는 <span class="math-raw math-inline">$E[(q^TK-\widehat{q^TK})^2]$</span> 같은 내적 오차다.</li>
+</ul>
+<p><strong>주의:</strong> “Bias=0”은 이론의 무작위 추정기·가정 아래 기대값에 대한 성질이다. 개별 query의 오차가 0이거나 softmax와 최종 응답까지 무손실이라는 뜻이 아니다. 그림에서 어느 변형이 더 낮은 오차를 보이는지도 bit 예산·실험 조건에 따라 다르다. 원문의 2.5·3.5 bit는 혼합 정밀도 예시이며 metadata를 포함한 모든 실행 메모리가 그 비율로 감소하지는 않는다. <a href="https://arxiv.org/abs/2504.19874">TurboQuant 원 논문</a>으로 핵심 단계와 목표의 차이를 대조했다(2026-11-10).</p>
+<h2 id="sec-56-kv-용량을-계산하고-대상-고르기">5.6 KV 용량을 계산하고 대상 고르기</h2>
+<p><strong>계산식에 넣을 값</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기호</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$N_L$</span></td>
+<td>KV를 저장하는 층 수</td>
+</tr>
+<tr>
+<td>B</td>
+<td>한 번에 처리하는 입력 수</td>
+</tr>
+<tr>
+<td>L</td>
+<td>저장하는 문맥의 토큰 길이</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$H_{KV}$</span></td>
+<td>KV head 수</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_h$</span></td>
+<td>head 한 개의 벡터 차원</td>
+</tr>
+<tr>
+<td>b</td>
+<td>값 하나를 저장하는 byte 수</td>
+</tr>
+</tbody>
+</table></div>
+<p>K와 V 값 본체의 용량은 다음과 같다.</p>
+<div class="math-raw math-display">$$
+M_{KV}=2N_LBLH_{KV}d_hb
+$$</div><p><strong>식 읽기:</strong> 토큰 하나의 KV 크기에 길이·batch·층 수를 곱한다. 앞의 2는 K와 V를 각각 센 것이다.</p>
+<p>GQA·MQA처럼 여러 query head가 KV를 공유하는 구조에서는 query head 수가 아닌 <strong>KV head 수</strong>를 사용한다.</p>
+<p><strong>교육용 계산</strong></p>
+<p>조건: 32층, B=1, L=4096, KV head 8개, head 차원 128, FP16(2 byte).</p>
+<div class="math-raw math-display">$$2\times32\times1\times4096\times8\times128\times2
+=536,870,912\;byte=512\;MiB$$</div><p>MiB는 <span class="math-raw math-inline">$2^{20}$</span> byte다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>변경 조건</th>
+<th>값 본체</th>
+<th>바꾸는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>원래 FP16</td>
+<td>512 MiB</td>
+<td>기준</td>
+</tr>
+<tr>
+<td>길이는 유지, 4 bit로 변경</td>
+<td>128 MiB</td>
+<td>값의 정밀도</td>
+</tr>
+<tr>
+<td>FP16 유지, 길이를 1024로 축소</td>
+<td>128 MiB</td>
+<td>보존하는 문맥</td>
+</tr>
+<tr>
+<td>두 변경 결합</td>
+<td>32 MiB</td>
+<td>문맥과 정밀도</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>같은 용량도 같은 정보는 아니다.</strong> 문맥 제거와 값의 수치 근사는 품질에 미치는 영향이 다르다. Metadata·residual·padding·임시 공간·복원 비용을 제외한 계산이다.</p>
+<h2 id="sec-57-moe-총-파라미터와-활성-파라미터---p66">5.7 MoE: 총 파라미터와 활성 파라미터 - p.66</h2>
+<p><strong>Mixture of Experts(MoE)</strong>는 여러 expert(보통 FFN) 중 router가 token별로 일부를 선택하고, 출력을 routing 가중치로 합치는 구조다. 개념적으로 <span class="math-raw math-inline">$y=\sum_{e\in TopK(x)}a_e(x)f_e(x)$</span>다. <span class="math-raw math-inline">$f_e$</span>는 expert 함수, <span class="math-raw math-inline">$a_e$</span>는 선택된 expert의 혼합 비중이다. normalization·shared expert의 사용은 구조마다 다르다.</p>
+<p><img alt="원문 p.66: Router가 일부 expert를 고르는 MoE 구조" decoding="async" id="figure-6" loading="lazy" src="../resources/8f8e42f27a9e801905b9-p066-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-6" type="button">그림 확대</button><a href="../resources/8f8e42f27a9e801905b9-p066-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/8f8e42f27a9e801905b9-p066-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>Router: 입력 토큰에 사용할 경로를 선택하는 모듈.</li>
+<li>Expert: 선택 가능한 하위 신경망. 보통 FFN(특징을 변환하는 전방향 신경망)이다.</li>
+<li>선택된 expert의 출력은 가중합으로 결합한다.</li>
+<li>그림의 128개 중 8개 선택과 shared expert는 해당 모델의 예시다.</li>
+</ul>
+<p><strong>확인 질문:</strong> 이번 토큰이 사용하지 않은 expert도 다음 토큰을 위해 저장할 필요가 있을까?</p>
+<p><strong>총 파라미터와 활성 파라미터</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구분</th>
+<th>의미</th>
+<th>주로 관련된 비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>총 파라미터</td>
+<td>모델이 보유한 전체 가중치</td>
+<td>저장·적재</td>
+</tr>
+<tr>
+<td>활성 파라미터</td>
+<td>이번 토큰 계산에 사용한 가중치</td>
+<td>해당 단계의 계산</td>
+</tr>
+</tbody>
+</table></div>
+<p>8/128 expert만 사용한다고 전체 저장량이 1/16이 되는 것은 아니다. 다른 입력은 다른 expert를 선택할 수 있고, attention·공유 부분도 남는다.</p>
+<p><strong>실행 비용:</strong> 여러 장치에 나눠 둔 expert는 통신과 작업량 불균형을 만들 수 있다. 학습된 router를 쓰는 MoE와 dense 모델을 임의로 잘라 사용하는 것은 다르다.</p>
+<h2 id="sec-58-요약과-확인-질문">5.8 요약과 확인 질문</h2>
+<ol>
+<li>Quest에서 이번 query가 읽지 않은 page를 다음 query가 다시 선택할 수 있는 이유는?</li>
+<li>위 KV 예제에서 B만 2로 바꾸면 FP16 본체 용량은?</li>
+<li>KIVI에서 key와 value의 공유 통계 축은 어떻게 다른가?</li>
+<li>TurboQuant의 내적 추정이 unbiased이면 생성 응답도 항상 같은가?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>영구 삭제 대신 현재 읽기 집합을 고르는 방식이기 때문이다. 5.3의 저장·읽기 구분을 확인한다.</li>
+<li>1024 MiB=1 GiB다. B에 비례하며 총 실행 메모리는 더 크다. 5.6으로 돌아간다.</li>
+<li><code>[token,channel]</code>에서 key는 channel을 고정한 token 묶음, value는 token을 고정한 channel 묶음이다. 5.4를 확인한다.</li>
+<li>아니다. 기대 내적과 개별 오차, softmax와 최종 생성은 다르다. 5.5를 확인한다.</li>
+</ol>
+</details>
+<p><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">다음 장</a>은 KV를 줄이는 대신 큰 모델의 순차 호출을 줄이는 방법을 다룬다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-2/05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.md">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까? 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html"><small>이전 장</small>4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a><a rel="next" href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html"><small>다음 장</small>6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

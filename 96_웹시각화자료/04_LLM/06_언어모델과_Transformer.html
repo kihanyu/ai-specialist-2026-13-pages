@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html" aria-current="page">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>RNN 상태 전달과 Transformer 참조 구조를 비교한다.</li><li>BERT·GPT·T5의 구조와 학습 목표를 분리한다.</li></ul></details></header><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-규칙에서-학습된-표현으로">1. 규칙에서 학습된 표현으로</a></li><li><a href="#sec-2-rnn이-문맥을-기억하는-방법과-한계">2. RNN이 문맥을 기억하는 방법과 한계</a></li><li><a href="#sec-3-transformer는-어떤-의존성을-바꾸나">3. Transformer는 어떤 의존성을 바꾸나</a></li><li><a href="#sec-4-bertgptt5-구조와-과제를-같은-표에서-구별하기">4. BERT·GPT·T5: 구조와 과제를 같은 표에서 구별하기</a></li><li><a href="#sec-5-확인-질문">5. 확인 질문</a></li><li><a href="#sec-6-언어모델의-확률과-번역의-연결">6. 언어모델의 확률과 번역의 연결</a></li><li><a href="#sec-7-그림에서-읽는-정보의-통로">7. 그림에서 읽는 정보의 통로</a></li><li><a href="#sec-8-짧은-적용-활동과-해설">8. 짧은 적용 활동과 해설</a></li><li><a href="#sec-페이지별-원문-관찰">페이지별 원문 관찰</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-06-언어-모델의-발전-문맥을-어디에-담고-어떻게-전달할까">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">전체 학습 안내</a> · <a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">다음: 입력</a></p>
+<p>언어모델은 문맥을 바탕으로 토큰의 확률을 예측하는 모델입니다. 이 단원은 <strong>RNN의 순차 상태 전달과 Transformer의 Attention을 비교하고, Encoder·Decoder·학습 목표를 분리해 설명하는 것</strong>이 목표입니다. 먼저 ‘벡터는 숫자 목록’이라는 점만 알면 읽을 수 있습니다. 내적은 같은 길이 벡터의 좌표별 곱을 합하는 연산입니다.</p>
+<h2 id="sec-1-규칙에서-학습된-표현으로">1. 규칙에서 학습된 표현으로</h2>
+<p>68쪽의 규칙 기반 번역은 형태소·구문을 분석하고, 사람이 정한 변환 규칙으로 어순을 배열합니다. 예외 규칙의 설계와 유지에 비용이 듭니다. 학습 기반 모델은 데이터에서 표현과 변환을 학습하지만 데이터 편향과 보지 못한 입력의 오류가 생깁니다. ‘학습한다’는 말이 규칙이나 검증이 필요 없다는 뜻은 아닙니다.</p>
+<p>Encoder는 입력을 다른 처리에 사용할 표현으로 바꾸는 부분이고, Decoder는 그 표현 또는 앞선 출력 문맥을 사용해 결과를 만드는 부분입니다. 이 이름은 <strong>역할</strong>입니다. Encoder가 텍스트만 받거나 Decoder가 항상 별도 Encoder를 필요로 하는 것은 아닙니다.</p>
+<h2 id="sec-2-rnn이-문맥을-기억하는-방법과-한계">2. RNN이 문맥을 기억하는 방법과 한계</h2>
+<p>RNN(Recurrent Neural Network)은 이전 상태 <code>h_(t-1)</code>와 현재 입력 <code>x_t</code>로 새 상태 <code>h_t=f(h_(t-1),x_t)</code>를 계산합니다. 상태는 지금까지 읽은 정보의 요약입니다. 길이가 다른 입력에도 같은 계산을 반복할 수 있지만, 시점 t를 계산하려면 t-1이 필요합니다. 긴 경로로 기울기를 전달하는 학습도 어려워집니다.</p>
+<p>의존성만 보는 교육용 덧셈 RNN <code>h_t=h_(t-1)+x_t</code>, <code>h₀=0</code>, 입력 <code>[2,5,1]</code>이면 상태는 <code>2→7→8</code>입니다. 두 번째 입력을 6으로 바꾸면 상태는 <code>2→8→9</code>입니다. 단, 덧셈은 순서가 바뀌어도 최종 합이 같으므로 이 예시가 실제 언어 RNN의 표현 능력을 보여주는 것은 아닙니다. 실제 학습된 비선형 갱신은 순서에 민감할 수 있습니다.</p>
+<p>RNN Attention은 한 최종 요약 벡터에만 의존하지 않고 필요한 입력 위치의 상태를 골라 섞게 합니다. ‘앞 정보를 선택해서 참조할 수 있다’는 장점이 생기지만, 기반 RNN의 순차 상태 계산 자체가 사라지지는 않습니다.</p>
+<h2 id="sec-3-transformer는-어떤-의존성을-바꾸나">3. Transformer는 어떤 의존성을 바꾸나</h2>
+<p>Transformer는 같은 층에서 토큰들이 서로 참고할 관계를 Attention으로 계산합니다. FFN(Feed-Forward Network)은 각 위치의 벡터를 비선형 변환합니다. Attention이 위치 간 정보를 섞는 역할이라면 FFN은 각 위치의 특징을 가공합니다.</p>
+<p>훈련에서는 정답 시퀀스가 이미 있으므로 모든 위치의 계산을 행렬 연산으로 묶을 수 있습니다. GPT에서는 미래 정답을 훔쳐보지 않도록 causal mask가 필요합니다. 반면 생성할 때는 아직 다음 토큰을 모르므로, 한 토큰을 선택해 문맥에 추가한 뒤 다시 계산합니다. <strong>학습 위치의 병렬 계산과 생성 토큰의 순차성은 동시에 성립합니다.</strong> 병렬화가 모든 길이·장치에서 자동으로 빠르다는 뜻도 아닙니다.</p>
+<p>다음 비교도에서는 RNN의 <strong>상태 의존</strong>, Transformer 학습의 <strong>위치 계산</strong>, 생성의 <strong>새 토큰 의존</strong>을 서로 구별하세요. 각 행의 화살표는 그 행 안의 계산 의존성을 뜻합니다.</p>
+<p><img alt="RNN의 순차 상태와 Transformer의 병렬 학습 위치 계산을 비교하고 자기회귀 생성은 순차 반복함을 보여주는 도표" decoding="async" id="figure-1" loading="lazy" src="../resources/3ce5e2c4e1f7016ab6d4-03_architecture.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/3ce5e2c4e1f7016ab6d4-03_architecture.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p>따라서 ‘Transformer는 병렬’이라는 한 문장만으로 생성 절차까지 설명할 수 없습니다. 다음 토큰이 이전 선택에 의존하는지 질문하면 두 경우를 나눌 수 있습니다.</p>
+<h2 id="sec-4-bertgptt5-구조와-과제를-같은-표에서-구별하기">4. BERT·GPT·T5: 구조와 과제를 같은 표에서 구별하기</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>대표 구성</th>
+<th>입력 문맥을 보는 방식</th>
+<th>대표 사전학습 과제</th>
+<th>자연스러운 사용 예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BERT형 Encoder</td>
+<td>입력 안에서 양쪽 문맥 참조</td>
+<td>가린 토큰 예측(MLM)</td>
+<td>문장 표현·분류·검색 표현</td>
+</tr>
+<tr>
+<td>GPT형 Decoder-only</td>
+<td>해당 위치까지의 앞 문맥 참조</td>
+<td>다음 토큰 예측</td>
+<td>이어쓰기·자기회귀 생성</td>
+</tr>
+<tr>
+<td>T5형 Encoder–Decoder</td>
+<td>Encoder는 입력을 읽고 Decoder는 앞 출력과 입력 표현 참조</td>
+<td>손상된 연속 구간 복원</td>
+<td>입력 텍스트를 출력 텍스트로 변환</td>
+</tr>
+</tbody>
+</table></div>
+<p>교안 75쪽은 BERT와 T5를 빈칸 복원 계열로 묶습니다. <strong>보충 구분:</strong> T5의 대표 목적은 span corruption이며 BERT와 구조·출력 방식이 같은 것은 아닙니다. T5의 Decoder는 복원할 문자열을 순차 생성합니다. <a href="https://jmlr.org/papers/volume21/20-074/20-074.pdf">T5 원 논문, 3.3~3.5절</a>.</p>
+<p>이 표는 가능한 작업의 제한 목록이 아닙니다. 모델을 목적에 맞게 미세튜닝할 수 있습니다. ‘양방향이므로 더 우수’처럼 서로 다른 학습 조건의 모델을 한 순위로 매기지 않습니다.</p>
+<h2 id="sec-5-확인-질문">5. 확인 질문</h2>
+<ol>
+<li>Transformer로 학습했으니 100개 새 토큰도 언제나 한 번에 생성할 수 있나요?</li>
+<li>RNN에 Attention을 붙이면 RNN 상태 계산의 순차 의존도 없어지나요?</li>
+<li>빈칸 복원을 학습했다는 이유로 BERT와 T5의 구조가 같다고 말할 수 있나요?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>일반 자기회귀 생성에서는 앞에서 선택한 토큰이 다음 입력이므로 순차 반복합니다. 3절.</li>
+<li>참조할 정보 통로가 늘어나도 기반 상태 갱신은 순차적입니다. 2절.</li>
+<li>아닙니다. Encoder-only와 Encoder–Decoder의 차이가 있고 T5는 복원 문자열을 Decoder로 만듭니다. 4절.</li>
+</ol>
+</details>
+<p><strong>다음 연결:</strong> 어떤 구조든 먼저 문자열을 숫자 ID와 벡터로 바꿔야 합니다. 다음 단원에서 입력·정답이 만들어지는 경로를 추적합니다.</p>
+<h2 id="sec-6-언어모델의-확률과-번역의-연결">6. 언어모델의 확률과 번역의 연결</h2>
+<p>언어모델의 핵심 출력은 문장이 아니라 후보 토큰에 대한 조건부 확률입니다. 토큰열의 확률은 <code>P(w₁,…,wₙ)=∏ₜP(wₜ|w₁,…,wₜ₋₁)</code>로 분해합니다. 교육용 예로 시작 토큰 뒤 ‘나는’ 확률이 0.5, 그 뒤 ‘간다’가 0.4, 끝 토큰이 0.8이면 해당 완결 시퀀스 확률은 <code>0.5×0.4×0.8=0.16</code>입니다. 후보 확률 합은 각 위치에서 1이어야 합니다. 가장 높은 확률의 토큰을 매번 고르는 것과 전체 시퀀스 확률을 최대화하는 것은 같은 문제가 아닙니다.</p>
+<p>번역은 여기에 입력 문장이라는 조건을 더합니다. 원문 68쪽의 독일어 단어별 번역은 <code>Can you me help this sentence to translate</code>처럼 어순이 어긋나지만, 대응 화살표를 재배열하면 <code>Can you help me to translate this sentence</code>가 됩니다. 형태소는 단어의 작은 구성 단위, 구문은 단어 사이의 문장 구조입니다. 단어 사전만으로는 구조를 결정할 수 없어 분석과 변환 단계가 필요합니다.</p>
+<h2 id="sec-7-그림에서-읽는-정보의-통로">7. 그림에서 읽는 정보의 통로</h2>
+<p>먼저 한 마지막 상태만 넘길 때와 여러 상태를 선택할 때의 차이를 보세요.</p>
+<p><img alt="RNN Attention에서 현재 출력 you를 만들기 위해 여러 입력 은닉 상태를 연결하는 점선" decoding="async" id="figure-2" loading="lazy" src="../resources/0216dfe9c7185810590a-p071_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/0216dfe9c7185810590a-p071_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>아래쪽 입력 <code>Kannst, du, mir, …</code>에서 위쪽 은닉 상태로 정보가 올라가고, 선택된 입력 정보가 출력 <code>you</code>를 계산하는 현재 상태에 연결됩니다. 빨간 점선과 초록 점은 참조 통로를 강조하며 수치 확률의 눈금이 아닙니다. 모든 이전 상태를 보관하면 최종 상태 하나의 병목을 줄이지만 저장 비용이 늘어납니다. ‘가장 최근 정보가 가장 뚜렷하다’는 70쪽 문구는 가능한 장기 의존성 문제를 설명한 직관이지 모든 RNN의 기억에 대한 정리는 아닙니다.</p>
+<p>다음 그림에서 입력 쪽과 출력 쪽을 가로지르는 선이 어디에 도착하는지 추적하세요.</p>
+<p><img alt="원래 Transformer의 Encoder와 Decoder, 마스크된 self-attention과 Encoder 출력 참조 및 번역 반복 경로" decoding="async" id="figure-3" loading="lazy" src="../resources/a77d8abbe396b5d6bec3-p073_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/a77d8abbe396b5d6bec3-p073_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽 Encoder는 입력 임베딩에 위치 정보를 더하고 self-attention, FFN, 잔차 덧셈과 정규화를 반복합니다. 오른쪽 Decoder의 아래 attention은 앞 출력만 보도록 가리고, 가운데 attention은 Encoder 출력을 참조합니다. 이 두 attention을 구분해야 ‘Decoder-only’가 원래 Decoder의 모든 부분을 그대로 가져온다는 오해를 피합니다. 오른쪽 번역 예시의 초록색 귀환 화살표는 생성 결과를 다음 입력으로 돌리는 반복입니다. 위쪽 Linear는 벡터를 어휘별 점수로, Softmax는 점수를 확률로 바꿉니다. Nx는 블록 반복 횟수이며 토큰 수가 아닙니다.</p>
+<p>77쪽은 GPT의 입력→임베딩→반복 블록→출력 흐름을 확대합니다. Q와 K의 MatMul은 관련도 점수, Scale은 크기 조절, Mask는 참조 제한, Softmax는 가중치, 마지막 V와의 MatMul은 값의 가중합입니다. FFN 그림의 두 선형 변환 사이 GELU는 비선형성입니다. 이 장의 목표는 구성요소의 역할 구별이며 세부 계산은 이후 Attention 장에서 이어집니다.</p>
+<h2 id="sec-8-짧은-적용-활동과-해설">8. 짧은 적용 활동과 해설</h2>
+<p>활동 A: 번역 문장 앞부분을 읽던 RNN의 두 번째 입력만 바꾸면 어느 상태를 다시 계산해야 할까요? <strong>해설:</strong> 그 입력에 대응하는 상태와 이후 상태입니다. 이전 상태에는 변경된 입력이 없고 이후 상태는 변경된 상태에 의존합니다.</p>
+<p>활동 B: <code>나는 [빈칸] 먹었다</code>와 <code>나는</code> 뒤의 다음 토큰 예측에서 보이는 문맥을 쓰세요. <strong>해설:</strong> 빈칸 복원은 ‘먹었다’도 볼 수 있지만 causal 예측은 미래 토큰을 볼 수 없습니다. MLM은 Masked Language Modeling, CLM은 Causal Language Modeling입니다. 빈칸 정답은 문맥과 데이터에 따라 여러 개일 수 있습니다.</p>
+<p>활동 C: 문장 분류·번역·이어쓰기에 각각 자연스러운 구조를 고르고 이유를 말하세요. <strong>해설:</strong> 전체 입력 표현을 쓰는 Encoder, 입력을 읽고 다른 문자열을 내는 Encoder–Decoder, 앞 문맥을 이어가는 Decoder-only를 고를 수 있습니다. 이는 사용 금지 규칙이나 성능 순위가 아닙니다.</p>
+<p><strong>보충 근거:</strong> 구조와 병렬화는 <a href="https://arxiv.org/abs/1706.03762">Transformer 원 논문</a>, T5의 span 복원과 text-to-text 구성은 <a href="https://jmlr.org/papers/v21/20-074.html">T5 원 논문</a>을 기준으로 구분했습니다. 본문의 수치 활동은 교육용이며 실제 모델 측정값이 아닙니다.</p>
+<h2 id="sec-페이지별-원문-관찰">페이지별 원문 관찰</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p067.html">67쪽 언어 모델의 발전</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p068.html">68쪽 규칙기반 번역</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p069.html">69쪽 Encoders와 Decoders</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p070.html">70쪽 RNN</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p071.html">71쪽 RNN Attention</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p072.html">72쪽 Transformer 비교</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p073.html">73쪽 Transformer 구조</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p074.html">74쪽 BERT GPT T5 구조</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p075.html">75쪽 MLM과 CLM</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p076.html">76쪽 언어 모델 비교</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p077.html">77쪽 GPT 확대 구조</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.md">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html"><small>이전 장</small>05. 조건부확률과 베이즈</a><a rel="next" href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html"><small>다음 장</small>07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

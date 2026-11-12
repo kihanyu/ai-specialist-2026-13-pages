@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="700" viewBox="0 0 960 700" role="img" aria-labelledby="title desc"><title id="title">Causal Attention: 가중치와 전달 정보를 분리</title><desc id="desc">위에서 아래로 읽는 네 단계 추적도. 모든 값은 교육용이며 실제 성능 측정이 아니다.</desc><rect width="960" height="700" fill="#f8fafc"/><style>text{font-family:Malgun Gothic,Arial,sans-serif;fill:#142536} .title{font-size:27px;font-weight:700} .main{font-size:25px;font-weight:600} .sub{font-size:22px} .note{font-size:19px;fill:#40566b}</style>
+<text x="38" y="47" class="title">Causal Attention: 가중치와 전달 정보를 분리</text>
+<rect x="38" y="77" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="77" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="109" class="sub">① 스케일한 점수: query행 × key열</text>
+<text x="65" y="147" class="main">S = [[1, 0], [0, 1]]</text>
+<text x="65" y="182" class="note">한 head · d_k=2 · 교육용 Q·K</text>
+<path d="M480 207v13m-7 -7 7 7 7 -7" fill="none" stroke="#142536" stroke-width="2"/>
+<rect x="38" y="225" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="225" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="257" class="sub">② softmax 전 미래 차단</text>
+<text x="65" y="295" class="main">S_mask = [[1, -∞], [0, 1]]</text>
+<text x="65" y="330" class="note">첫 query는 두 번째 key를 볼 수 없음</text>
+<path d="M480 355v13m-7 -7 7 7 7 -7" fill="none" stroke="#142536" stroke-width="2"/>
+<rect x="38" y="373" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="373" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="405" class="sub">③ 각 행을 열 방향으로 정규화</text>
+<text x="65" y="443" class="main">A = [[1, 0], [0.2689, 0.7311]]</text>
+<text x="65" y="478" class="note">각 행의 합 1 · 소수 넷째 자리 반올림</text>
+<path d="M480 503v13m-7 -7 7 7 7 -7" fill="none" stroke="#142536" stroke-width="2"/>
+<rect x="38" y="521" width="884" height="127" rx="12" fill="white" stroke="#58748b" stroke-width="2"/>
+<rect x="38" y="521" width="9" height="127" rx="4" fill="#2563a6"/>
+<text x="65" y="553" class="sub">④ Value를 가중합</text>
+<text x="65" y="591" class="main">AV = [[2, 0], [0.5379, 2.9242]]</text>
+<text x="65" y="626" class="note">V = [[2,0],[0,4]] · 출력은 확률이 아님</text>
+<text x="38" y="686" class="note">읽는 방향: 위 → 아래 · 관계는 각 행의 설명과 화살표로 구분</text></svg>

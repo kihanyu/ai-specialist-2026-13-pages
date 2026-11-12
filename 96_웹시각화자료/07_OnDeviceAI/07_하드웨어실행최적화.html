@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/ondevice-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">On-Device AI 전체 흐름</a></li><li><a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">1장. AI 연산과 성능·메모리 병목</a></li><li><a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">2장. 온디바이스 AI 실행 환경</a></li><li><a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">3장. 수 표현과 선형 양자화의 원리</a></li><li><a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">4장. 비균일 양자화와 PTQ 오차 제어</a></li><li><a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html">5. QAT와 정수 추론</a></li><li><a href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html">6. 고급 LLM 양자화와 적용 판단</a></li><li><a href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html">부록 — 개념 사이의 연결과 종합 복습</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</a></li><li><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></li><li><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a></li><li><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></li><li><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></li><li><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</a></li><li><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></li><li><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html" aria-current="page">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a></li><li><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">8. 종합 복습: 조건에 맞는 수단을 선택하기</a></li><li><a href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html">LLM 양자화 실무 의사결정 가이드</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">On-Device AI</p><h1>7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>Compiler의 상수 접기·메모리 계획·fusion이 줄이는 비용을 설명한다.</li><li>FlashAttention의 dense IO 최적화와 희소 attention을 구분한다.</li><li>타일별 최대값·지수합·value 가중합을 같은 기준으로 병합한다.</li><li>Patch 실행의 activation peak와 halo·수용영역 중복 비용을 구분한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="od-tiled-softmax" id="lab-od-tiled-softmax"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="od-roofline" id="lab-od-roofline"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-시작-전-준비-계산과-메모리는-다른-자원이다">시작 전 준비: 계산과 메모리는 다른 자원이다</a></li><li><a href="#sec-71-compiler-최적화는-무엇을-바꾸는가---p76">7.1 Compiler 최적화는 무엇을 바꾸는가? - p.76</a></li><li><a href="#sec-72-operatorkernel-fusion---p77-78">7.2 Operator/kernel fusion - p.77-78</a></li><li><a href="#sec-73-flashattention은-attention을-생략하는가---p79">7.3 FlashAttention은 attention을 생략하는가? - p.79</a></li><li><a href="#sec-74-타일별-softmax를-정확히-병합하기---p80">7.4 타일별 softmax를 정확히 병합하기 - p.80</a></li><li><a href="#sec-75-patch-based-inference와-halo---p81-84">7.5 Patch-based inference와 halo - p.81-84</a></li><li><a href="#sec-76-요약과-확인-질문">7.6 요약과 확인 질문</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-7-하드웨어-실행-최적화-같은-계산을-덜-이동하며-수행하기">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">이전</a> · <a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">다음: 종합 복습</a></p>
+<p><strong>원본 범위:</strong> p.76-84</p>
+<p><strong>학습 목표</strong></p>
+<ul>
+<li>연산량 감소와 데이터 이동 감소 구분하기</li>
+<li>Fusion·FlashAttention·patch 실행의 메모리 절감 대상 설명하기</li>
+<li>타일 softmax와 경계 중복 계산을 작은 예제로 확인하기</li>
+</ul>
+<h2 id="sec-시작-전-준비-계산과-메모리는-다른-자원이다">시작 전 준비: 계산과 메모리는 다른 자원이다</h2>
+<p>계산기가 빨라도 숫자를 가져오는 시간이 길면 기다려야 한다. 장치의 속도는 연산 성능뿐 아니라 데이터 이동에도 좌우된다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>용어</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tensor</td>
+<td>벡터·행렬 등을 포함한 다차원 숫자 배열</td>
+</tr>
+<tr>
+<td>연산 그래프</td>
+<td>계산과 데이터 연결을 나타낸 구조</td>
+</tr>
+<tr>
+<td>HBM·전역 메모리</td>
+<td>GPU에서 비교적 큰 데이터를 보관하는 메모리</td>
+</tr>
+<tr>
+<td>SRAM·register</td>
+<td>계산 장치 가까이의 작고 빠른 저장 공간</td>
+</tr>
+<tr>
+<td>메모리 대역폭</td>
+<td>일정 시간에 이동할 수 있는 데이터의 양</td>
+</tr>
+<tr>
+<td>Memory-bound</td>
+<td>데이터 이동 때문에 성능이 제한되는 상태</td>
+</tr>
+<tr>
+<td>Compute-bound</td>
+<td>산술 연산 처리 능력 때문에 성능이 제한되는 상태</td>
+</tr>
+<tr>
+<td>Peak 메모리</td>
+<td>실행 도중 가장 많이 동시에 사용한 메모리</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>비유:</strong> 큰 창고와 작은 작업대를 떠올리면 된다. 작업대는 빠르게 사용할 수 있지만 모든 물건을 한꺼번에 올려둘 수는 없다.</p>
+<h2 id="sec-71-compiler-최적화는-무엇을-바꾸는가---p76">7.1 Compiler 최적화는 무엇을 바꾸는가? - p.76</h2>
+<p>**Compiler(컴파일러)**는 모델의 연산 그래프를 실행 가능한 장치별 연산으로 변환하고 최적화한다. 원문 p.76의 여러 그림은 그래프 단순화, constant folding, 메모리 계획, 중복 연산 제거 등 서로 다른 최적화 영역을 모아 보여준다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>최적화</th>
+<th>교육용 예</th>
+<th>기대 이득과 주의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상수 접기</td>
+<td>실행 중 변하지 않는 상수 표현 미리 계산</td>
+<td>입력·상태에 의존하면 상수가 아님</td>
+</tr>
+<tr>
+<td>공통 부분 제거</td>
+<td>같은 입력의 같은 순수 연산 결과 재사용</td>
+<td>random·상태 변화 연산에 무조건 적용 불가</td>
+</tr>
+<tr>
+<td>layout·연산 선택</td>
+<td>장치가 잘 처리하는 배열 순서·커널 선택</td>
+<td>변환 비용이 이득을 상쇄할 수 있음</td>
+</tr>
+<tr>
+<td>메모리 계획</td>
+<td>수명 끝난 tensor 공간 재사용</td>
+<td>동시에 필요한 값을 덮어쓰면 안 됨</td>
+</tr>
+<tr>
+<td>fusion</td>
+<td>여러 연산을 한 kernel에서 처리</td>
+<td>지원 패턴·수치·자원 제약</td>
+</tr>
+</tbody>
+</table></div>
+<p>이들은 원칙적으로 모델의 수학적 의미를 보존하도록 설계하지만, 부동소수점 연산 순서 변경으로 bit 단위 결과는 달라질 수 있다. 그래프가 최적화되었다는 보고와 실제 장치의 지연시간·메모리 개선은 별도로 확인한다.</p>
+<h2 id="sec-72-operatorkernel-fusion---p77-78">7.2 Operator/kernel fusion - p.77-78</h2>
+<p>**Operator(연산자)**는 그래프의 수학적 작업, **kernel(커널)**은 장치에서 실행하는 코드 단위다. fusion은 여러 연산을 묶어 중간 tensor의 전역 메모리 저장·재로드와 kernel launch 비용을 줄이는 방법이다.</p>
+<p><img alt="p.77 선형 연산과 활성화 fusion 및 병목별 효과" decoding="async" id="figure-1" loading="lazy" src="../resources/8c85ca37daff43e60850-p077-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/8c85ca37daff43e60850-p077-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/8c85ca37daff43e60850-p077-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>왼쪽: 따로 실행하던 연산을 한 커널로 묶는 경로.</li>
+<li>오른쪽: 데이터 이동과 산술 연산 중 무엇이 병목인지에 따른 효과 차이.</li>
+</ul>
+<p><strong>작은 예제:</strong> <span class="math-raw math-inline">$y=ReLU(x+b)$</span>에서 <span class="math-raw math-inline">$ReLU(a)=max(0,a)$</span>다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>별도 실행</th>
+<th>결합 실행</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x 읽기 → 더하기 → 중간값 쓰기</td>
+<td>x 읽기 → 더하기·ReLU → y 쓰기</td>
+</tr>
+<tr>
+<td>중간값 다시 읽기 → ReLU → y 쓰기</td>
+<td>중간값은 가까운 register 등에 유지</td>
+</tr>
+</tbody>
+</table></div>
+<p>가중치를 사용하는 선형 연산은 가중치 접근 비용도 추가로 고려해야 한다.</p>
+<p><strong>교육용 계산: 중간값 왕복을 없애면?</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>조건·계산</th>
+<th>값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>중간 tensor의 원소 수</td>
+<td>N개</td>
+</tr>
+<tr>
+<td>Float32 원소 1개</td>
+<td>4 byte</td>
+</tr>
+<tr>
+<td>쓰기 1번 + 읽기 1번 생략</td>
+<td><span class="math-raw math-inline">$2\times N\times4=8N$</span> byte 절감</td>
+</tr>
+<tr>
+<td>N=1,000,000</td>
+<td>8,000,000 byte = 8 MB</td>
+</tr>
+</tbody>
+</table></div>
+<p>이상적인 전송량 계산이며 시간 절감의 실측값은 아니다. 유효 대역폭, 다른 계산과의 겹침, register 사용 증가에 따른 병렬 실행 여유 감소 등을 함께 확인한다.</p>
+<p><img alt="원문 p.78: 여러 연산을 묶어 중간값의 메모리 왕복 줄이기" decoding="async" id="figure-2" loading="lazy" src="../resources/230ab8c96a60593b0987-p078-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/230ab8c96a60593b0987-p078-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/230ab8c96a60593b0987-p078-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>위: 각 연산 사이에서 HBM으로 값을 쓰고 다시 읽는 경로.</li>
+<li>아래: fused kernel 안에서 연산을 이어 처리하는 경로.</li>
+<li>오른쪽 중간 행렬: 전역 메모리에 따로 저장할 필요가 줄어드는 값.</li>
+<li>핵심 질문: <strong>연산 수가 비슷한데도 빨라질 수 있는 이유는 무엇인가?</strong></li>
+</ul>
+<p>Fusion은 중간값 이동과 실행 호출 비용을 줄일 수 있다. 자원 요구가 커져 느려지는 경우도 있으므로 실제 시간을 측정한다.</p>
+<h2 id="sec-73-flashattention은-attention을-생략하는가---p79">7.3 FlashAttention은 attention을 생략하는가? - p.79</h2>
+<p><strong>큰 중간 행렬이 만드는 비용</strong></p>
+<div class="math-raw math-display">$$S=QK^T/\sqrt{d_k},\qquad P=softmax(S),\qquad O=PV$$</div><div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>중간값</th>
+<th>역할</th>
+<th>전체 길이가 L일 때</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S</td>
+<td>query-key 관련성 점수</td>
+<td>대략 <span class="math-raw math-inline">$L\times L$</span></td>
+</tr>
+<tr>
+<td>P</td>
+<td>softmax 후 비중</td>
+<td>대략 <span class="math-raw math-inline">$L\times L$</span></td>
+</tr>
+<tr>
+<td>O</td>
+<td>value의 가중합</td>
+<td>최종 attention 출력</td>
+</tr>
+</tbody>
+</table></div>
+<p>S와 P 전체를 HBM에 저장하고 읽으면 이동량이 크다. SRAM은 가깝고 빠르지만 이 큰 행렬을 통째로 두기에는 작다.</p>
+<p><strong>FlashAttention의 실행 순서</strong></p>
+<ol>
+<li>Q·K·V의 일부를 작은 **타일(tile)**로 읽는다.</li>
+<li>해당 타일의 점수와 softmax 통계를 계산한다.</li>
+<li>지금까지의 통계·출력 누적값과 합친다.</li>
+<li>다음 타일로 진행한다.</li>
+</ol>
+<p><img alt="원문 p.79: 메모리 계층과 타일별 attention 계산" decoding="async" id="figure-3" loading="lazy" src="../resources/62441aebd63fcea94d5f-p079-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/62441aebd63fcea94d5f-p079-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/62441aebd63fcea94d5f-p079-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>왼쪽: 작은 고속 메모리와 큰 전역 메모리의 차이.</li>
+<li>가운데·오른쪽: 타일을 읽고 attention 출력에 누적하는 경로.</li>
+<li>볼 점: 전체 score·확률 행렬을 HBM에 한꺼번에 저장하는 과정을 피한다.</li>
+</ul>
+<p><strong>기본형의 성격:</strong> 같은 dense attention을 다른 계산 순서로 구한다. 연결을 삭제하는 sparse attention과 다르며, 실수 연산 관점에서는 같은 결과를 목표로 한다. 부동소수점 연산 순서에 따른 작은 차이는 가능하다.</p>
+<p><strong>계산량과 메모리 이동량 구분</strong></p>
+<ul>
+<li>기본 FlashAttention의 dense 연산량은 길이 L에 대해 여전히 대체로 2차로 증가한다.</li>
+<li>줄이는 핵심 비용은 큰 중간 행렬의 저장·이동이다.</li>
+<li>학습의 backward(역전파)에서는 일부 값을 재계산해 저장량을 줄일 수도 있다.</li>
+</ul>
+<p>재계산이 추가돼도 비싼 메모리 왕복을 더 많이 줄이면 전체 실행이 유리할 수 있다. 원리와 조건은 <a href="https://arxiv.org/abs/2205.14135">FlashAttention 원 논문</a>을 참고한다.</p>
+<h2 id="sec-74-타일별-softmax를-정확히-병합하기---p80">7.4 타일별 softmax를 정확히 병합하기 - p.80</h2>
+<h3 id="sec-왜-타일별-확률을-그냥-이어-붙일-수-없을까">왜 타일별 확률을 그냥 이어 붙일 수 없을까?</h3>
+<p>두 타일을 각각 softmax하면 각 타일의 확률 합은 1이다. 이를 붙이면 합이 2가 되어 전체 확률분포가 아니다.</p>
+<p><strong>필요한 작업:</strong> 각 타일의 통계를 <strong>같은 최대값·같은 분모 기준</strong>으로 바꿔 합친다.</p>
+<h3 id="sec-심화-식-최대값과-지수합-병합">심화 식: 최대값과 지수합 병합</h3>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기호</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$x_i$</span></td>
+<td>i번째 관련성 점수</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$m=\max_i x_i$</span></td>
+<td>전체 최대 점수</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$l=\sum_i e^{x_i-m}$</span></td>
+<td>최대값을 뺀 지수값의 전체 합</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$softmax(x)_i=e^{x_i-m}/l$</span></td>
+<td>해당 점수의 최종 확률</td>
+</tr>
+</tbody>
+</table></div>
+<p>최대값을 빼면 지수 계산의 overflow를 줄인다. 두 타일 a·b의 통계를 합치는 식은 다음과 같다.</p>
+<div class="math-raw math-display">$$
+m=\max(m_a,m_b),\qquad
+l=e^{m_a-m}l_a+e^{m_b-m}l_b
+$$</div><p>두 타일의 통계는 위 식으로 병합한다. <strong>각 타일의 softmax를 따로 정규화해 이어 붙이는 것은 틀리다.</strong> 전체 분모와 최대값을 공유해야 한다.</p>
+<p><img alt="p.80 표준 softmax와 타일별 최대·지수합의 병합" decoding="async" id="figure-4" loading="lazy" src="../resources/9536c415ff7dabeca193-p080-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/9536c415ff7dabeca193-p080-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/9536c415ff7dabeca193-p080-source.png">원본 그림 크게 보기</a></p>
+<p>원문 입력 <span class="math-raw math-inline">$x=[1,4,2,2,3,5]$</span>를 <code>[1,4,2]</code>, <code>[2,3,5]</code>로 나눠 계산한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>첫 타일</td>
+<td><span class="math-raw math-inline">$m_a=4$</span>, <span class="math-raw math-inline">$l_a=e^{-3}+1+e^{-2}\approx1.185122$</span></td>
+</tr>
+<tr>
+<td>둘째 타일</td>
+<td><span class="math-raw math-inline">$m_b=5$</span>, <span class="math-raw math-inline">$l_b=e^{-3}+e^{-2}+1\approx1.185122$</span></td>
+</tr>
+<tr>
+<td>전체 최대</td>
+<td><span class="math-raw math-inline">$m=5$</span></td>
+</tr>
+<tr>
+<td>첫 타일 보정</td>
+<td><span class="math-raw math-inline">$e^{-1}l_a\approx0.435982$</span></td>
+</tr>
+<tr>
+<td>전체 지수합</td>
+<td><span class="math-raw math-inline">$l\approx0.435982+1.185122=1.621105$</span></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>계산 결과와 원문 정정</strong></p>
+<pre><code class="language-text">전체 softmax ≈ [0.011298, 0.226931, 0.030712,
+                0.030712, 0.083483, 0.616863]
+</code></pre>
+<ul>
+<li>그림의 두 번째 확률 <code>0.27</code>은 주어진 입력과 맞지 않는다.</li>
+<li>올바른 계산: <span class="math-raw math-inline">$e^{-1}/1.621105\approx0.226931$</span>.</li>
+<li>소수 둘째 자리로 반올림: <strong>0.23</strong>.</li>
+</ul>
+<p>원문 이미지는 보존하고 본문에서 정정한다. 이미지 숫자를 그대로 답으로 사용하지 않는다.</p>
+<p><strong>출력 O까지 구하려면?</strong></p>
+<p>Softmax 통계뿐 아니라 value의 가중합도 누적해야 한다.</p>
+<div class="math-raw math-display">$$u_a=\sum_{i\in a}e^{x_i-m_a}v_i,\qquad
+u=e^{m_a-m}u_a+e^{m_b-m}u_b,\qquad O=u/l$$</div><ul>
+<li><span class="math-raw math-inline">$v_i$</span>: 해당 위치의 value.</li>
+<li><span class="math-raw math-inline">$u_a,u_b$</span>: 각 타일에서 아직 전체 분모로 나누지 않은 가중합.</li>
+<li>보정 계수: 지수합과 출력 누적값에 <strong>같은 최대값 기준 변경</strong>을 적용한다.</li>
+</ul>
+<p><strong>교육용 Python 3 코드:</strong> 표준 라이브러리만으로 전체 softmax와 타일 병합이 일치하는지 확인한다. 실제 FlashAttention kernel 구현이나 속도 시험은 아니다. 값이 모두 유한한 비어 있지 않은 입력을 가정하며, 전부 masked된 행은 별도 처리가 필요하다.</p>
+<pre><code class="language-python">import math
+x = [1, 4, 2, 2, 3, 5]
+a, b = x[:3], x[3:]
+ma, mb = max(a), max(b)
+la = sum(math.exp(v - ma) for v in a)
+lb = sum(math.exp(v - mb) for v in b)
+m = max(ma, mb)
+denom = math.exp(ma - m) * la + math.exp(mb - m) * lb
+tiled = [math.exp(v - m) / denom for v in x]
+direct_denom = sum(math.exp(v - max(x)) for v in x)
+direct = [math.exp(v - max(x)) / direct_denom for v in x]
+assert all(abs(u - v) &lt; 1e-12 for u, v in zip(tiled, direct))
+assert abs(sum(tiled) - 1) &lt; 1e-12
+print([round(v, 6) for v in tiled])
+</code></pre>
+<h2 id="sec-75-patch-based-inference와-halo---p81-84">7.5 Patch-based inference와 halo - p.81-84</h2>
+<p><strong>모델은 저장되는데 왜 실행 중 메모리가 부족할까?</strong></p>
+<p>가중치 외에도 중간 활성값을 보관해야 하기 때문이다. 초기 층의 공간 크기가 크면 feature map이 메모리의 큰 부분을 차지할 수 있다.</p>
+<p><img alt="원문 p.81: MobileNetV2 블록별 SRAM 사용량과 장치 한계" decoding="async" id="figure-5" loading="lazy" src="../resources/122107d4e7c4bd9a7a51-p081-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-5" type="button">그림 확대</button><a href="../resources/122107d4e7c4bd9a7a51-p081-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/122107d4e7c4bd9a7a51-p081-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>가로축: 신경망 블록 번호.</li>
+<li>세로축: SRAM 사용량.</li>
+<li>수평선: 원문 예제의 MCU 메모리 한계. MCU는 작은 임베디드 제어 장치다.</li>
+<li>볼 점: 초반 블록의 큰 중간값이 한계를 넘고, 뒤쪽 블록은 상대적으로 작다.</li>
+</ul>
+<p><strong>Patch-based inference:</strong> 공간을 작은 patch로 나누어 여러 층을 진행한 뒤 다음 영역으로 이동한다. 동시에 보관하는 중간값 범위를 줄이는 전략이다.</p>
+<p><img alt="p.82 layer 전체 실행과 patch별 실행의 메모리 유지 범위" decoding="async" id="figure-6" loading="lazy" src="../resources/ce1ee45669323d7875d5-p082-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-6" type="button">그림 확대</button><a href="../resources/ce1ee45669323d7875d5-p082-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/ce1ee45669323d7875d5-p082-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>층별 실행: 한 층의 넓은 공간 출력을 보관하고 다음 층으로 이동.</li>
+<li>Patch별 실행: 작은 공간 영역을 여러 연산에 걸쳐 처리.</li>
+<li>주의: 최종 출력·연결에 필요한 값은 보관해야 하므로 메모리가 단순히 patch 개수의 역수로 줄지는 않는다.</li>
+</ul>
+<p><img alt="원문 p.83: Patch 실행 전후 블록별 SRAM 사용량" decoding="async" id="figure-7" loading="lazy" src="../resources/f3948a215e71a92274cf-p083-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-7" type="button">그림 확대</button><a href="../resources/f3948a215e71a92274cf-p083-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/f3948a215e71a92274cf-p083-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li>원래 peak와 변경 후 peak를 구분한다.</li>
+<li>초기 블록의 메모리를 줄인 뒤 <strong>최대값의 위치가 바뀔 수 있음</strong>을 확인한다.</li>
+<li>원문 MobileNetV2의 실행 계획에 대한 결과다. 다른 모델의 감소율을 보장하지 않는다.</li>
+</ul>
+<p>합성곱은 주변 입력을 함께 참조한다. <strong>Halo</strong>는 patch 경계의 출력을 계산하기 위해 추가로 읽는 인접 영역이다. patch마다 halo를 다시 처리하면 중복 계산이 생긴다.</p>
+<p><img alt="p.84 합성곱 경계의 halo와 반복 계산" decoding="async" id="figure-8" loading="lazy" src="../resources/ac08a92d53668033bed9-p084-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-8" type="button">그림 확대</button><a href="../resources/ac08a92d53668033bed9-p084-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/ac08a92d53668033bed9-p084-source.png">원본 그림 크게 보기</a></p>
+<p>그림의 겹치는 색 영역은 경계를 넘는 의존성을 나타낸다. 경계에서 임의의 0을 채우면 원래 전체 이미지의 내부 위치와 다른 출력을 만들 수 있다. 원래 padding은 전체 이미지 외곽 조건이며 patch 내부 경계에 무조건 적용하는 규칙이 아니다.</p>
+<p><strong>교육용 1차원 예제: 겹치는 입력 세기</strong></p>
+<p>조건: 한 출력에 인접 입력 3개를 쓰는 합성곱, stride=1, dilation=1, padding 없는 valid 방식.</p>
+<pre><code class="language-text">전체 입력:       a b c d e f
+첫 출력 patch:   a b c d       → 출력 2개
+둘째 출력 patch:     c d e f   → 출력 2개
+중복 영역:           c d
+</code></pre>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>실행</th>
+<th>읽는 입력 개수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>출력 4개를 한 번에 계산</td>
+<td>6개</td>
+</tr>
+<tr>
+<td>출력 2개씩 두 patch로 계산</td>
+<td><span class="math-raw math-inline">$4+4=8$</span>개</td>
+</tr>
+<tr>
+<td>겹쳐 읽는 부분</td>
+<td>가운데 2개</td>
+</tr>
+</tbody>
+</table></div>
+<p>Stride는 필터를 옮기는 간격, dilation은 필터 원소 사이의 간격이다. 2차원·다층에서는 한 출력이 의존하는 입력 범위인 **receptive field(수용영역)**가 커져 겹침이 늘 수 있다.</p>
+<p><strong>Patch 크기의 절충</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>작게 나눌 때의 이점</th>
+<th>함께 늘 수 있는 비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>동시에 보관할 activation 감소</td>
+<td>Halo의 상대 비중·중복 계산 증가</td>
+</tr>
+</tbody>
+</table></div>
+<p>Kernel 크기·stride·dilation, 층 경계, skip 연결, 최종 출력 조립을 포함해 실행 계획을 정한다. 여기서 kernel은 <strong>합성곱 필터의 크기</strong>를 뜻하며, 실행 코드 단위를 뜻하는 앞 절의 커널과 문맥이 다르다.</p>
+<h2 id="sec-76-요약과-확인-질문">7.6 요약과 확인 질문</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>주로 줄이는 비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fusion</td>
+<td>중간값 왕복·커널 실행 호출</td>
+</tr>
+<tr>
+<td>FlashAttention</td>
+<td>큰 attention 중간 행렬의 저장·이동</td>
+</tr>
+<tr>
+<td>Patch 실행</td>
+<td>동시에 보관하는 공간 범위의 활성값</td>
+</tr>
+</tbody>
+</table></div>
+<p>각 방법의 대상이 다르므로 먼저 어떤 자원이 병목인지 확인한다.</p>
+<ol>
+<li>각 타일 softmax를 따로 계산해 이어 붙이면 합은 얼마가 되는가? 왜 잘못인가?</li>
+<li>위 첫 타일의 최대값 4를 전체 최대 5로 바꿀 때 지수합에 무엇을 곱하는가?</li>
+<li>FlashAttention은 모든 긴 context attention을 선형 연산량으로 바꾸는가?</li>
+<li>patch를 작게 하면 메모리와 중복 계산은 각각 어떻게 바뀔 수 있는가?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>두 타일이 각각 1로 정규화되어 합이 2다. 전체 벡터의 분모를 공유해야 한다. 7.4로 돌아간다.</li>
+<li><span class="math-raw math-inline">$e^{4-5}=e^{-1}$</span>을 곱한다. 다른 최대값 기준으로 구한 지수합을 같은 기준으로 바꾸는 과정이다.</li>
+<li>아니다. 기본형은 dense exact attention의 IO를 줄이는 알고리즘이다. 연산량 감소를 위한 희소 attention과 구별한다. 7.3을 확인한다.</li>
+<li>peak activation을 줄일 여지가 있지만 경계 halo의 상대 비중·중복 연산이 커질 수 있다. 7.5 예제를 확인한다.</li>
+</ol>
+</details>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-2/07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.md">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html"><small>이전 장</small>6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a><a rel="next" href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html"><small>다음 장</small>8. 종합 복습: 조건에 맞는 수단을 선택하기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

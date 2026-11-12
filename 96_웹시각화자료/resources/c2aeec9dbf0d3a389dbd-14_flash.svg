@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="516.6pt" height="291.6pt" viewBox="0 0 516.6 291.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-09T12:12:48.867164</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 291.6
+L 516.6 291.6
+L 516.6 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 19.755 133.0488
+L 120.195 133.0488
+Q 121.1994 133.0488 121.1994 131.94
+L 121.1994 76.5
+Q 121.1994 75.3912 120.195 75.3912
+L 19.755 75.3912
+Q 18.7506 75.3912 18.7506 76.5
+L 18.7506 131.94
+Q 18.7506 133.0488 19.755 133.0488
+z
+" clip-path="url(#p9a67c13ec6)" style="fill: #e8f1f8; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 162.882 133.0488
+L 313.542 133.0488
+Q 314.5464 133.0488 314.5464 131.94
+L 314.5464 76.5
+Q 314.5464 75.3912 313.542 75.3912
+L 162.882 75.3912
+Q 161.8776 75.3912 161.8776 76.5
+L 161.8776 131.94
+Q 161.8776 133.0488 162.882 133.0488
+z
+" clip-path="url(#p9a67c13ec6)" style="fill: #fff0da; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 363.762 133.0488
+L 491.823 133.0488
+Q 492.8274 133.0488 492.8274 131.94
+L 492.8274 76.5
+Q 492.8274 75.3912 491.823 75.3912
+L 363.762 75.3912
+Q 362.7576 75.3912 362.7576 76.5
+L 362.7576 131.94
+Q 362.7576 133.0488 363.762 133.0488
+z
+" clip-path="url(#p9a67c13ec6)" style="fill: #e8f1f8; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 19.755 232.8408
+L 120.195 232.8408
+Q 121.1994 232.8408 121.1994 231.732
+L 121.1994 176.292
+Q 121.1994 175.1832 120.195 175.1832
+L 19.755 175.1832
+Q 18.7506 175.1832 18.7506 176.292
+L 18.7506 231.732
+Q 18.7506 232.8408 19.755 232.8408
+z
+" clip-path="url(#p9a67c13ec6)" style="fill: #e8f1f8; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 162.882 232.8408
+L 313.542 232.8408
+Q 314.5464 232.8408 314.5464 231.732
+L 314.5464 176.292
+Q 314.5464 175.1832 313.542 175.1832
+L 162.882 175.1832
+Q 161.8776 175.1832 161.8776 176.292
+L 161.8776 231.732
+Q 161.8776 232.8408 162.882 232.8408
+z
+" clip-path="url(#p9a67c13ec6)" style="fill: #e9f3e9; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 363.762 232.8408
+L 491.823 232.8408
+Q 492.8274 232.8408 492.8274 231.732
+L 492.8274 176.292
+Q 492.8274 175.1832 491.823 175.1832
+L 363.762 175.1832
+Q 362.7576 175.1832 362.7576 176.292
+L 362.7576 231.732
+Q 362.7576 232.8408 363.762 232.8408
+z
+" clip-path="url(#p9a67c13ec6)" style="fill: #e8f1f8; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'Malgun Gothic'; text-anchor: start" x="17.244" y="23.832" transform="rotate(-0 17.244 23.832)">FlashAttention: 같은 결과를 위해 옮기는 데이터 줄이기</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'; text-anchor: start" x="17.244" y="54.324" transform="rotate(-0 17.244 54.324)">위: 단순 구현 / 아래: 타일 + 누적 softmax</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(53.768438 101.817656)">Q K V</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(56.624063 113.817656)">HBM</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(192.072 101.864531)">큰 T×T 점수·확률</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(186.157312 114.515625)">HBM 쓰기 / 재읽기</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(415.7925 102.221953)">출력</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(414.441563 114.221953)">HBM</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 124.706034 104.22
+Q 141.539358 104.22 156.360221 104.22
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 151.560221 101.82
+L 156.360221 104.22
+L 151.560221 106.62
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 318.053034 104.22
+Q 338.651429 104.22 357.237363 104.22
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 352.437363 101.82
+L 357.237363 104.22
+L 352.437363 106.62
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(39.659063 201.935203)">Q K V 타일</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(30.335625 213.935203)">HBM → SRAM</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(187.243875 201.609656)">SRAM: m, l, u 누적</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(197.99325 214.26075)">타일 단위 연산</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(392.252813 201.688406)">최종 출력 u/l</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(400.332188 214.3395)">HBM 기록</text>
+   </g>
+   <g id="patch_10">
+    <path d="M 124.706034 204.012
+Q 141.539358 204.012 156.360221 204.012
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 151.560221 201.612
+L 156.360221 204.012
+L 151.560221 206.412
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 318.053034 204.012
+Q 338.651429 204.012 357.237363 204.012
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 352.437363 201.612
+L 357.237363 204.012
+L 352.437363 206.412
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 11px; font-family: 'Malgun Gothic'; text-anchor: start" x="22.266" y="273.312" transform="rotate(-0 22.266 273.312)">HBM: 큰 주 메모리 / SRAM: 작은 고속 저장 / full attention의 쌍별 연산은 유지</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p9a67c13ec6">
+   <rect x="7.2" y="7.2" width="502.2" height="277.2"/>
+  </clipPath>
+ </defs>
+</svg>

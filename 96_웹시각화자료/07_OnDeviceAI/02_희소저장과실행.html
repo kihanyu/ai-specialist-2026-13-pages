@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가? | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/ondevice-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">On-Device AI 전체 흐름</a></li><li><a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">1장. AI 연산과 성능·메모리 병목</a></li><li><a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">2장. 온디바이스 AI 실행 환경</a></li><li><a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">3장. 수 표현과 선형 양자화의 원리</a></li><li><a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">4장. 비균일 양자화와 PTQ 오차 제어</a></li><li><a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html">5. QAT와 정수 추론</a></li><li><a href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html">6. 고급 LLM 양자화와 적용 판단</a></li><li><a href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html">부록 — 개념 사이의 연결과 종합 복습</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</a></li><li><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></li><li><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html" aria-current="page">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a></li><li><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></li><li><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></li><li><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</a></li><li><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></li><li><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a></li><li><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">8. 종합 복습: 조건에 맞는 수단을 선택하기</a></li><li><a href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html">LLM 양자화 실무 의사결정 가이드</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">On-Device AI</p><h1>2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>CSR/CSC의 values·indices·pointer를 추적하고 빈 행의 내적을 계산한다.</li><li>Payload·위치·행 포인터를 포함한 저장량과 dense 대비 손익을 계산한다.</li><li>활성값 희소성·불균형·채널 순열·N:M 지역 제약과 커널 지원을 구분한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="od-sparse" id="lab-od-sparse"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-시작-전-준비">시작 전 준비</a></li><li><a href="#sec-21-값과-위치를-따로-저장하기---p17-20">2.1 값과 위치를 따로 저장하기 - p.17-20</a></li><li><a href="#sec-22-csc는-무엇을-바꿀까---p21-22">2.2 CSC는 무엇을 바꿀까? - p.21-22</a></li><li><a href="#sec-23-압축이-손해가-되는-조건도-있다---p23-25">2.3 압축이 손해가 되는 조건도 있다 - p.23-25</a></li><li><a href="#sec-24-vector-wise와-채널-재배열---p26">2.4 Vector-wise와 채널 재배열 - p.26</a></li><li><a href="#sec-25-nm-패턴과-실제-커널---p27-28">2.5 N:M 패턴과 실제 커널 - p.27-28</a></li><li><a href="#sec-26-요약과-확인-질문">2.6 요약과 확인 질문</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-2-희소-저장과-실행-0을-만든-뒤-무엇이-더-필요한가">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">이전</a> · <a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">다음: LLM 가지치기</a></p>
+<p><strong>원본 범위:</strong> p.17-28</p>
+<p><strong>학습 목표</strong></p>
+<ul>
+<li>CSR·CSC 배열을 작은 행렬로 직접 만들기</li>
+<li>0을 없애도 위치 정보가 필요한 이유 설명하기</li>
+<li>전체 희소성과 N:M의 묶음별 조건 구분하기</li>
+</ul>
+<h2 id="sec-시작-전-준비">시작 전 준비</h2>
+<ul>
+<li><strong>Dense(밀집) 저장:</strong> 0을 포함한 모든 칸의 값을 저장한다.</li>
+<li><strong>Sparse(희소) 저장:</strong> 0이 아닌 값과 그 위치를 저장한다.</li>
+<li><strong>인덱스(index):</strong> 배열의 위치를 나타내는 번호. 이 장은 0부터 센다.</li>
+<li><strong>Byte:</strong> 8 bit. FP16 값 하나는 2 byte, 32비트 정수 하나는 4 byte다.</li>
+<li><strong>행렬·벡터곱:</strong> 각 행의 값과 입력을 곱해 더하면 출력 한 개가 된다.</li>
+</ul>
+<h2 id="sec-21-값과-위치를-따로-저장하기---p17-20">2.1 값과 위치를 따로 저장하기 - p.17-20</h2>
+<p>0을 포함한 모든 원소를 저장하면 가중치의 숫자만 바뀌고 배열 크기는 그대로다. <strong>CSR(Compressed Sparse Row, 압축 희소 행)</strong>은 행을 차례대로 보면서 0이 아닌 값만 저장하고 위치를 별도 기록한다.</p>
+<p>원문 p.17의 세 배열은 위에서부터 행 경계, 열 위치, 값이다. 행 포인터의 <strong>인접한 두 값 사이 구간</strong>을 읽어 해당 행의 데이터를 찾는다. p.18-19는 첫 행과 둘째 행을 순서대로 강조한 반복 설명이며, p.20은 그 열 위치로 입력 벡터를 읽는 단계다.</p>
+<p><img alt="p.17 CSR의 행 포인터·열 인덱스·값 배열" decoding="async" id="figure-1" loading="lazy" src="../resources/ca53001bc1bf271a02f4-p017-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/ca53001bc1bf271a02f4-p017-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/ca53001bc1bf271a02f4-p017-source.png">원본 그림 크게 보기</a></p>
+<p><strong>교육용 예제:</strong> 원문의 문자 행렬보다 작은 3×4 행렬로 같은 절차를 추적한다. 인덱스는 모두 0부터 시작한다.</p>
+<pre><code class="language-text">A = [[0, 5, 0, 2],
+     [0, 0, 0, 0],
+     [7, 0, 3, 0]]
+
+values  = [5, 2, 7, 3]
+col_idx = [1, 3, 0, 2]
+row_ptr = [0, 2, 2, 4]
+</code></pre>
+<p><strong>행 포인터 해석하기</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>행</th>
+<th>시작·끝 포인터</th>
+<th>읽을 구간</th>
+<th>값 개수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0번</td>
+<td>0, 2</td>
+<td><code>values[0:2]</code> → <code>[5,2]</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td>1번</td>
+<td>2, 2</td>
+<td>빈 구간</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2번</td>
+<td>2, 4</td>
+<td><code>values[2:4]</code> → <code>[7,3]</code></td>
+<td>2</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><code>a:b</code>는 a번부터 b번 <strong>직전까지</strong>의 구간이다.</li>
+<li>마지막 포인터 <code>4</code>: 비영 원소의 전체 개수인 <strong>nnz(number of nonzeros)</strong>.</li>
+<li>R개 행의 경계를 표시하려면 포인터는 <strong>R+1개</strong> 필요하다.</li>
+</ul>
+<p>입력 <span class="math-raw math-inline">$x=[1,2,3,4]^T$</span>에 대해 <span class="math-raw math-inline">$y=Ax$</span>를 계산하면 다음과 같다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>출력</th>
+<th>읽는 값·입력</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$y_0$</span></td>
+<td><span class="math-raw math-inline">$5x_1+2x_3=5\times2+2\times4$</span></td>
+<td>18</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$y_1$</span></td>
+<td>빈 합</td>
+<td>0</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$y_2$</span></td>
+<td><span class="math-raw math-inline">$7x_0+3x_2=7\times1+3\times3$</span></td>
+<td>16</td>
+</tr>
+</tbody>
+</table></div>
+<p>다음은 Python 3 표준 라이브러리만 사용하는 <strong>실행 가능한 교육용 코드</strong>다. 저장 구조와 수치만 확인하며 최적화된 sparse 커널은 아니다. 빈 행을 허용하고 모양은 <code>rows=3, cols=4</code>로 고정했다.</p>
+<pre><code class="language-python">values = [5, 2, 7, 3]
+col_idx = [1, 3, 0, 2]
+row_ptr = [0, 2, 2, 4]
+x = [1, 2, 3, 4]
+y = []
+for r in range(len(row_ptr) - 1):
+    total = 0
+    for k in range(row_ptr[r], row_ptr[r + 1]):
+        total += values[k] * x[col_idx[k]]
+    y.append(total)
+assert y == [18, 0, 16]
+print(y)  # [18, 0, 16]
+</code></pre>
+<h2 id="sec-22-csc는-무엇을-바꿀까---p21-22">2.2 CSC는 무엇을 바꿀까? - p.21-22</h2>
+<p><strong>CSC(Compressed Sparse Column)</strong>는 열을 기준으로 모은 압축 형식이다.</p>
+<p><strong>같은 3×4 예제를 CSC로 바꾸기</strong></p>
+<pre><code class="language-text">values  = [7, 5, 3, 2]
+row_idx = [2, 0, 2, 0]
+col_ptr = [0, 1, 2, 3, 4]
+</code></pre>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>순서</th>
+<th>읽는 열</th>
+<th>출력에 더하는 값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0번 열의 7</td>
+<td><span class="math-raw math-inline">$y_2$</span>에 <span class="math-raw math-inline">$7x_0$</span></td>
+</tr>
+<tr>
+<td>2</td>
+<td>1번 열의 5</td>
+<td><span class="math-raw math-inline">$y_0$</span>에 <span class="math-raw math-inline">$5x_1$</span></td>
+</tr>
+<tr>
+<td>3</td>
+<td>2번 열의 3</td>
+<td><span class="math-raw math-inline">$y_2$</span>에 <span class="math-raw math-inline">$3x_2$</span></td>
+</tr>
+<tr>
+<td>4</td>
+<td>3번 열의 2</td>
+<td><span class="math-raw math-inline">$y_0$</span>에 <span class="math-raw math-inline">$2x_3$</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>결과는 CSR과 같은 <code>[18,0,16]</code>이다. <strong>행렬을 바꾸지 않고 저장·방문 순서를 바꾼다.</strong></p>
+<p><img alt="원문 p.21: 원문 문자 행렬의 열 중심 압축 저장" decoding="async" id="figure-2" loading="lazy" src="../resources/c97f576647315275a254-p021-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/c97f576647315275a254-p021-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/c97f576647315275a254-p021-source.png">원본 그림 크게 보기</a></p>
+<p><strong>그림 읽기</strong></p>
+<ul>
+<li><code>Column Pointer</code>: 각 열 데이터의 시작·끝 경계.</li>
+<li><code>Row Indices</code>: 남은 값이 원래 있던 행 번호.</li>
+<li><code>Values</code>: 0이 아닌 값.</li>
+<li>원문 첫 열은 C·K를 저장한다. CSR의 첫 행 A·B와 시작 묶음이 다름을 확인한다.</li>
+</ul>
+<p>아래 비교표는 이 순서 차이가 입력 재사용과 출력 갱신에 미치는 영향을 정리한 것이다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>관점</th>
+<th>CSR 방식의 행렬·벡터곱</th>
+<th>CSC 방식의 행렬·벡터곱</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>모아 놓은 축</td>
+<td>출력 행</td>
+<td>입력 열</td>
+</tr>
+<tr>
+<td>자연스러운 계산</td>
+<td>한 출력 행의 내적</td>
+<td>한 입력 성분의 여러 출력 기여</td>
+</tr>
+<tr>
+<td>재사용</td>
+<td>같은 행의 출력을 누산</td>
+<td>같은 입력 성분을 재사용</td>
+</tr>
+<tr>
+<td>주의</td>
+<td>입력 성분을 불규칙하게 읽음</td>
+<td>여러 열이 같은 출력을 갱신해 동기화 필요</td>
+</tr>
+</tbody>
+</table></div>
+<p>이는 대표적인 순회 방식이다. 실제 커널은 배치·타일링·캐시·병렬화를 함께 쓰므로 어느 형식이 항상 빠르다고 단정하지 않는다.</p>
+<h2 id="sec-23-압축이-손해가-되는-조건도-있다---p23-25">2.3 압축이 손해가 되는 조건도 있다 - p.23-25</h2>
+<p>비영 값 1개마다 위치 정보도 저장해야 한다. <span class="math-raw math-inline">$R\times C$</span> 행렬에서 값은 <span class="math-raw math-inline">$b_v$</span> byte, 인덱스는 <span class="math-raw math-inline">$b_i$</span> byte라고 하자. 단순 CSR 저장량은 다음과 같다.</p>
+<div class="math-raw math-display">$$
+M_{CSR}=nnz(b_v+b_i)+(R+1)b_i,\qquad M_{dense}=RCb_v.
+$$</div><p><strong>교육용 계산: 희소 저장이 더 커지는 경우</strong></p>
+<p>조건: 위 3×4 행렬, 남은 값 4개, FP16 값 2 byte, 인덱스 4 byte.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>저장 항목</th>
+<th>계산</th>
+<th>용량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dense 값 전체</td>
+<td><span class="math-raw math-inline">$12\times2$</span></td>
+<td>24 byte</td>
+</tr>
+<tr>
+<td>CSR 비영 값</td>
+<td><span class="math-raw math-inline">$4\times2$</span></td>
+<td>8 byte</td>
+</tr>
+<tr>
+<td>CSR 열 인덱스</td>
+<td><span class="math-raw math-inline">$4\times4$</span></td>
+<td>16 byte</td>
+</tr>
+<tr>
+<td>CSR 행 포인터</td>
+<td><span class="math-raw math-inline">$(3+1)\times4$</span></td>
+<td>16 byte</td>
+</tr>
+<tr>
+<td>CSR 합계</td>
+<td><span class="math-raw math-inline">$8+16+16$</span></td>
+<td><strong>40 byte</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>해석:</strong> 2/3가 0이어도 위치 비용 때문에 더 크다. 큰 행렬은 행 포인터의 상대 비용이 작아지지만 개별 인덱스 비용은 남는다.</p>
+<p>배열 자체의 관리 정보, 정렬, 실행 중 임시 공간은 제외한 계산이다.</p>
+<p><strong>입력의 0을 활용하기 — p.23</strong></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구성</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ReLU</td>
+<td>음수를 0으로 바꾸는 함수: <span class="math-raw math-inline">$max(0,x)$</span></td>
+</tr>
+<tr>
+<td>Run-length 저장</td>
+<td>연속된 0의 길이를 기록해 압축</td>
+</tr>
+<tr>
+<td>Zero detection</td>
+<td>입력이 0인지 확인해 곱셈을 생략할 후보 탐색</td>
+</tr>
+<tr>
+<td>PE gating</td>
+<td>연산 처리 요소(Processing Element)의 불필요한 동작 차단</td>
+</tr>
+</tbody>
+</table></div>
+<p>입력에 따라 달라지는 <strong>활성값 희소성</strong>이다. 학습 후 고정한 가중치의 희소성과 구분한다. 모든 활성화 함수가 ReLU처럼 정확한 0을 만드는 것은 아니다.</p>
+<p><strong>가중치의 0을 활용할 때 생기는 비용 — p.24-25</strong></p>
+<ol>
+<li><strong>위치 해석:</strong> 압축된 값이 원래 어디에 있었는지 찾는다.</li>
+<li><strong>입력 접근:</strong> 해당 위치의 활성값을 읽는다.</li>
+<li><strong>작업 배분:</strong> PE마다 계산량이 다르면 먼저 끝난 PE가 기다린다.</li>
+</ol>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>실행 조건</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0이 많지만 dense 커널 사용</td>
+<td>원래 크기대로 계산할 수 있음</td>
+</tr>
+<tr>
+<td>sparse 커널이지만 위치·접근 비용이 큼</td>
+<td>압축 효과보다 부가 비용이 클 수 있음</td>
+</tr>
+<tr>
+<td>규칙적 패턴과 지원 커널 사용</td>
+<td>계산 생략의 이득을 얻을 가능성</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>확인할 연결:</strong> 희소 패턴 → 저장 형식 → 커널 → 목표 장치의 실측.</p>
+<h2 id="sec-24-vector-wise와-채널-재배열---p26">2.4 Vector-wise와 채널 재배열 - p.26</h2>
+<p>원문은 <strong>IVW(intra-vector)</strong>를 벡터 내부 일부를 제거하는 방식, <strong>OVW(원문의 inter-vector 방식)</strong>를 벡터 전체를 제거하는 방식으로 비교한다. 행렬을 어떤 축으로 묶었는지 먼저 확인해야 한다. 원소 가지치기와 채널 전체 제거 사이에 벡터·블록 같은 중간 단위를 두어 규칙성과 선택 자유도를 조절한다.</p>
+<p><img alt="p.26 벡터 단위 희소성과 연결된 채널 순서 변경" decoding="async" id="figure-3" loading="lazy" src="../resources/f7ab062dccd7d6fdf8d5-p026-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/f7ab062dccd7d6fdf8d5-p026-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/f7ab062dccd7d6fdf8d5-p026-source.png">원본 그림 크게 보기</a></p>
+<p><strong>채널 순서를 바꾸어도 출력을 유지하려면?</strong></p>
+<p><strong>채널 순열·재배열(Channel Permutation / Reordering)</strong>은 채널의 의미를 지우는 것이 아니라 저장·연산 순서를 바꾸는 것이다. 그림 오른쪽은 희소 패턴을 실행하기 좋은 순서로 모으는 아이디어를 보여 준다. 재배열만으로 0의 개수가 늘어나는 것은 아니지만, 벡터·블록 단위로 처리하기 좋은 배치를 찾는 데 도움이 될 수 있다.</p>
+<ul>
+<li>현재 층의 출력 채널 순서를 바꾼다.</li>
+<li>다음 층의 입력 채널 순서도 함께 맞춘다.</li>
+<li>분기 경로와 채널별 상수도 같은 규칙으로 조정한다.</li>
+</ul>
+<p><strong>교육용 예제:</strong> 현재 층의 출력이 <code>[고양이 특징, 윤곽 특징, 색상 특징]</code> 순서였는데 <code>[색상 특징, 고양이 특징, 윤곽 특징]</code>으로 옮겼다고 하자. 다음 층도 각 특징에 곱할 가중치를 같은 대응으로 옮겨야 원래 계산을 유지한다. 현재 층만 바꾸면 “색상 특징”에 “고양이 특징용 가중치”를 곱하는 오류가 생긴다.</p>
+<p>그림의 <strong>출력 채널(OC, Output Channel)</strong> 순서와 다음 층의 <strong>입력 채널(IC, Input Channel)</strong> 순서를 맞춘다는 문구가 이 조건이다. 채널별 정규화 파라미터와 분기 연결까지 맞춰야 하며, 실제 이득은 커널이 재배열한 패턴을 활용하는지에 달려 있다.</p>
+<p><strong>심화: 순열행렬로 확인</strong></p>
+<p>행벡터 표기에서 <span class="math-raw math-inline">$h=xW_1$</span>, <span class="math-raw math-inline">$y=hW_2$</span>라 하자. 순서를 바꾸는 행렬 <span class="math-raw math-inline">$P$</span>에 대해</p>
+<div class="math-raw math-display">$$h'=hP,\qquad W_2'=P^TW_2$$</div><p>위와 같이 바꾸면 <span class="math-raw math-inline">$h'W_2'=hPP^TW_2=hW_2=y$</span>다. <span class="math-raw math-inline">$P^T$</span>는 순서를 되돌리는 역할을 한다. 모든 구조에서 임의의 재배열이 가능한 것은 아니다.</p>
+<h2 id="sec-25-nm-패턴과-실제-커널---p27-28">2.5 N:M 패턴과 실제 커널 - p.27-28</h2>
+<p><strong>N:M 희소성:</strong> 지정된 M개 묶음마다 남길 개수 또는 제거할 개수를 제한한다.</p>
+<p><strong>표기 주의</strong></p>
+<ul>
+<li>원문 p.27: N을 <strong>제거하는 개수</strong>로 사용한다.</li>
+<li>다른 문헌·커널 문서: N을 <strong>유지하는 개수</strong>로 쓰기도 한다.</li>
+<li>2:4: 두 관례 모두 <strong>4개 중 2개 유지·2개 제거</strong>, 밀도 50%다.</li>
+</ul>
+<p>N과 M만 외우기보다 해당 문서의 “몇 개 유지” 조건을 확인한다.</p>
+<p>예를 들어 <code>[3,0,-2,0]</code>은 4개 중 2개가 비영이라 2:4 유지 패턴에 맞는다. <code>[3,1,-2,0]</code>은 3개가 남아 맞지 않는다. 전체 50% 희소성만으로는 충분하지 않으며 <strong>모든 지정 묶음</strong>에서 조건을 지켜야 한다.</p>
+<p><img alt="p.28 희소 행렬과 metadata를 Tensor Core에 매핑하는 원문 그림" decoding="async" id="figure-4" loading="lazy" src="../resources/0a5980ed3072420b9046-p028-source.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/0a5980ed3072420b9046-p028-source.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/0a5980ed3072420b9046-p028-source.png">원본 그림 크게 보기</a></p>
+<p>그림은 0을 없앤 값만 보내는 것이 아니라 <strong>남은 위치 metadata도 커널에 전달한다</strong>는 점을 본다. 원문의 Ampere 예시는 특정 구조적 희소 행렬곱 경로를 가리킨다. 실제 사용에는 dtype, 행렬 크기, 축, 정렬, 라이브러리·장치 지원을 확인해야 한다. 이 자료에서는 현재 장치의 지원 여부나 end-to-end 가속률을 실측하지 않았다.</p>
+<h2 id="sec-26-요약과-확인-질문">2.6 요약과 확인 질문</h2>
+<p>CSR·CSC는 같은 행렬의 저장·순회 방식을 바꾼다. N:M은 저장 형식과 별도로 <strong>어떤 위치 패턴을 허용할지</strong> 제한한다. 다음 장에서는 이런 패턴을 만들 때 중요한 정보를 덜 잃는 점수와 보상 방법을 배운다.</p>
+<ol>
+<li><code>row_ptr=[0,2,2,4]</code>에서 두 번째 행의 값 개수는?</li>
+<li>FP16 값 1000개만 남겼고 인덱스가 32비트라면 값·개별 인덱스 합계는 몇 byte인가? 행 포인터는 제외한다.</li>
+<li>4개씩 두 묶음에서 각각 비영 원소가 3개와 1개라면 전체 밀도는 50%다. 2:4인가?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li><span class="math-raw math-inline">$2-2=0$</span>개다. 포인터 값은 행 번호가 아니라 values 배열의 경계다. 2.1을 확인한다.</li>
+<li><span class="math-raw math-inline">$1000\times(2+4)=6000$</span> byte다. 값 본체만 보면 2000 byte지만 위치 비용이 더해진다. 2.3을 확인한다.</li>
+<li>아니다. 각 묶음이 각각 2개 유지여야 한다. 2.5의 지역 제약을 확인한다.</li>
+</ol>
+</details>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-2/02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.md">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가? 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html"><small>이전 장</small>1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a><a rel="next" href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html"><small>다음 장</small>3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

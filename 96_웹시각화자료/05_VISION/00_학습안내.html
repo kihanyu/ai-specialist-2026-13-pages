@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Vision 자습 교재: 이미지에서 예측과 영역까지 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">VISION 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html" aria-current="page">Vision 자습 교재: 이미지에서 예측과 영역까지</a></li><li><a href="01_%EB%B9%84%EC%A0%84_%EC%9E%85%EB%AC%B8.html">비전 입문: 사진을 숫자로 표현하고 예측을 평가하기</a></li><li><a href="02_01_DNN_Note.html">DNN: 예측 확률에서 손실과 가중치 업데이트까지</a></li><li><a href="02_02_CNN_Note.html">CNN</a></li><li><a href="02_03_CNN_ResNet_18Layer.html">ResNet-18: 잔차를 이해하고 차원을 추적하며 구현하기</a></li><li><a href="03_01_Attention_Note.html">Attention 학습 지도</a></li><li><a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT: 관계 계산에서 이미지 분류까지</a></li><li><a href="03_03_DeiT%EC%99%80_Swin.html">DeiT와 Swin: 데이터 효율과 계산 효율</a></li><li><a href="03_04_CLIP%EA%B3%BC_DINO.html">CLIP과 DINO: 정답 신호를 어디서 얻을까</a></li><li><a href="04_01_Application_note.html">Vision Applications: 검출·추적·분할 학습 안내</a></li><li><a href="04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.html">객체 검출: 박스를 만들고, 중복을 줄이고, 성능을 판단하기</a></li><li><a href="04_03_%EA%B0%9D%EC%B2%B4_%EC%B6%94%EC%A0%81.html">객체 추적 — 위치를 갱신하면서 같은 ID를 유지하기</a></li><li><a href="04_04_%EC%98%81%EC%83%81_%EB%B6%84%ED%95%A0.html">영상 분할 — 픽셀의 의미와 개체의 경계를 예측하기</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">VISION</p><h1>Vision 자습 교재: 이미지에서 예측과 영역까지</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>분류·검출·추적·분할의 출력과 학습 목표를 구별한다.</li><li>선수 개념에 따라 본문·계산 실험·확인 질문으로 이동한다.</li></ul></details></header><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-준비할-지식과-읽는-방법">1. 준비할 지식과 읽는 방법</a></li><li><a href="#sec-2-전체-학습-순서">2. 전체 학습 순서</a></li><li><a href="#sec-3-앞에서-배운-것이-다음-장에-쓰이는-방식">3. 앞에서 배운 것이 다음 장에 쓰이는 방식</a></li><li><a href="#sec-4-막히는-지점에-따른-복습-경로">4. 막히는 지점에 따른 복습 경로</a></li><li><a href="#sec-5-전체-흐름-확인-문제">5. 전체 흐름 확인 문제</a></li><li><a href="#sec-6-원본-범위와-자료의-역할">6. 원본 범위와 자료의 역할</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-vision-자습-교재-이미지에서-예측과-영역까지">Vision 자습 교재: 이미지에서 예측과 영역까지</h1>
+<p>이미지는 숫자 배열이지만, 우리가 얻고 싶은 답은 종류·위치·영역·시간에 따른 동일성입니다. 이 교재는 <strong>입력과 정답을 정의하고 → 특징을 학습하고 → 목적에 맞는 출력을 만들고 → 결과를 평가하는 과정</strong>을 설명합니다. 교안을 옆에 펼쳐 두지 않고 본문과 예제, 확인 문제를 따라 읽는 것을 기본 경로로 삼습니다. 원본 PDF는 출처와 그림의 상세를 확인할 때 사용하는 참고 자료입니다.</p>
+<h2 id="sec-1-준비할-지식과-읽는-방법">1. 준비할 지식과 읽는 방법</h2>
+<p>Python의 변수·함수·반복문과 배열의 기본 사용을 알고 있다고 가정합니다. 텐서는 숫자를 여러 축으로 배열한 것이며, shape는 각 축의 길이입니다. 예를 들어 이미지 한 장의 높이·너비·색 채널을 각각 32·32·3으로 두면 숫자 3,072개를 담습니다. 여러 장을 한꺼번에 처리하는 배치 축과 채널 축의 위치는 구현에 따라 달라지므로 각 예제의 표기를 먼저 확인합니다.</p>
+<p>처음에는 아래 순서대로 읽고, 각 문서의 작은 계산을 직접 따라 하세요. 확인 문제는 해설을 보기 전에 풀고, 틀리면 해당 정의나 중간 계산으로 돌아갑니다. 논문별 변형과 구현 상세는 기본 원리를 설명할 수 있게 된 뒤 읽어도 됩니다. 도표나 수식 렌더러를 사용할 수 없을 때도 인접한 설명·표·계산 과정을 함께 읽습니다.</p>
+<p>실습 코드는 실행 환경과 입력 크기를 확인한 후 실행합니다. 예제에 적힌 예상 결과와 실제로 검증한 결과는 구분하며, 실행 여부는 해당 본문 또는 검토 기록에서 확인합니다.</p>
+<h2 id="sec-2-전체-학습-순서">2. 전체 학습 순서</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>읽을 문서</th>
+<th>중심 질문</th>
+<th>읽고 나서 할 일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="01_%EB%B9%84%EC%A0%84_%EC%9E%85%EB%AC%B8.html">비전 입문</a></td>
+<td>이미지로 어떤 문제를 풀며 무엇을 정답으로 쓰는가?</td>
+<td>과업·입력·정답·평가를 연결한다.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="02_01_DNN_Note.html">DNN</a></td>
+<td>숫자 입력에서 예측과 학습은 어떻게 이어지는가?</td>
+<td>출력·확률·손실·가중치 갱신을 설명한다.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="02_02_CNN_Note.html">CNN</a></td>
+<td>이미지의 공간 구조를 어떻게 활용하는가?</td>
+<td>합성곱 출력 크기와 파라미터 수를 계산한다.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="02_03_CNN_ResNet_18Layer.html">ResNet-18</a></td>
+<td>잔차 연결을 실제 네트워크에 어떻게 구현하는가?</td>
+<td>단계별 shape와 덧셈 조건을 확인한다.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT</a></td>
+<td>토큰 사이의 관계를 어떻게 이미지 표현으로 만드는가?</td>
+<td>Q·K·V와 패치 토큰의 흐름을 추적한다.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="03_03_DeiT%EC%99%80_Swin.html">DeiT와 Swin</a></td>
+<td>학습 데이터와 계산량의 문제에 어떻게 대응하는가?</td>
+<td>증류와 이동 윈도의 목적을 구분한다.</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="03_04_CLIP%EA%B3%BC_DINO.html">CLIP과 DINO</a></td>
+<td>다른 형태의 학습 신호로 표현을 어떻게 학습하는가?</td>
+<td>이미지·텍스트 대조와 학생·교사 학습을 비교한다.</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a href="04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.html">객체 검출</a></td>
+<td>무엇이 어디에 있는가?</td>
+<td>박스·점수·중복 제거·평가를 연결한다.</td>
+</tr>
+<tr>
+<td>9</td>
+<td><a href="04_03_%EA%B0%9D%EC%B2%B4_%EC%B6%94%EC%A0%81.html">객체 추적</a></td>
+<td>다음 프레임에서도 같은 물체인가?</td>
+<td>검출과 연관, ID 유지의 차이를 설명한다.</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="04_04_%EC%98%81%EC%83%81_%EB%B6%84%ED%95%A0.html">영상 분할</a></td>
+<td>각 픽셀은 어떤 영역에 속하는가?</td>
+<td>의미·인스턴스 분할과 공간 해상도 복원을 구분한다.</td>
+</tr>
+</tbody>
+</table></div>
+<p><a href="03_01_Attention_Note.html">Attention 계열 안내</a>와 <a href="04_01_Application_note.html">응용 과제 안내</a>는 해당 묶음의 비교와 탐색을 위한 진입점입니다. 상세 본문은 위 표의 개별 문서를 기준으로 읽습니다.</p>
+<h2 id="sec-3-앞에서-배운-것이-다음-장에-쓰이는-방식">3. 앞에서 배운 것이 다음 장에 쓰이는 방식</h2>
+<p>DNN에서는 입력을 예측으로 바꾸고 손실을 줄이는 학습 구조를 배웁니다. CNN은 이 구조 안에서 이미지의 가까운 위치를 함께 처리하고 같은 필터를 여러 위치에서 사용하는 방법입니다. ResNet은 CNN을 깊게 쌓을 때 입력을 더해 전달하는 경로를 추가합니다.</p>
+<p>Attention은 토큰 간 관계에 따라 정보를 모읍니다. ViT는 이미지를 작은 패치로 나누어 이 계산에 넣고, DeiT·Swin은 학습과 구조의 조건을 바꿉니다. CLIP·DINO에서는 어떤 학습 신호로 표현을 만들지에 주목합니다. 이 방법들은 모두 서로 배타적인 모델 분류가 아니므로 구조와 학습 목적을 구분해서 읽습니다.</p>
+<p>응용에서는 학습한 특징을 이용하되 답의 형식이 달라집니다. 검출은 위치와 종류, 추적은 시간에 걸친 ID, 분할은 픽셀 단위의 결과를 요구합니다. 따라서 네트워크 이름보다 먼저 <strong>출력 형식과 정답, 평가 기준</strong>을 정해야 합니다.</p>
+<h2 id="sec-4-막히는-지점에-따른-복습-경로">4. 막히는 지점에 따른 복습 경로</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>증상</th>
+<th>돌아갈 곳</th>
+<th>다시 확인할 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>손실과 정확도가 같은 값처럼 느껴진다</td>
+<td>DNN</td>
+<td>학습에서 줄이는 값과 결과를 보고하는 값은 무엇인가?</td>
+</tr>
+<tr>
+<td>층을 지나면서 크기가 어떻게 변하는지 모르겠다</td>
+<td>CNN → ResNet-18</td>
+<td>공간 크기와 채널 수 중 어떤 축이 바뀌는가?</td>
+</tr>
+<tr>
+<td>잔차 연결은 항상 그냥 더하면 된다고 생각한다</td>
+<td>ResNet-18</td>
+<td>두 텐서의 shape가 다르면 무엇이 필요한가?</td>
+</tr>
+<tr>
+<td>Attention 수식의 행과 열이 혼동된다</td>
+<td>Attention과 ViT</td>
+<td>각 query가 어느 key에 얼마의 가중치를 주는가?</td>
+</tr>
+<tr>
+<td>모든 ViT 변형이 같은 문제를 해결한다고 생각한다</td>
+<td>DeiT와 Swin → CLIP과 DINO</td>
+<td>바뀐 것이 구조인가, 학습 신호인가, 둘 다인가?</td>
+</tr>
+<tr>
+<td>검출이 잘되면 추적도 자동으로 잘된다고 생각한다</td>
+<td>객체 추적</td>
+<td>가려짐과 재등장 때 같은 ID를 어떻게 판단하는가?</td>
+</tr>
+<tr>
+<td>검출과 분할의 평가를 그대로 바꿔 써도 될 것 같다</td>
+<td>객체 검출 → 영상 분할</td>
+<td>박스 겹침과 픽셀 겹침이 같은 정보를 측정하는가?</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-5-전체-흐름-확인-문제">5. 전체 흐름 확인 문제</h2>
+<ol>
+<li>공장 영상에서 불량품의 종류만 고르는 경우, 위치까지 표시하는 경우, 불량 영역의 면적을 구하는 경우에 필요한 출력은 어떻게 다른가?</li>
+<li>RGB 이미지의 높이와 너비를 각각 두 배로 늘리면 입력 숫자 개수는 몇 배가 되는가? 채널 수는 그대로라고 가정한다.</li>
+<li>같은 프레임의 물체 위치를 잘 찾았지만 다음 프레임에서 ID가 뒤바뀌었다. 어떤 과업의 문제가 남았는가?</li>
+</ol>
+<details>
+<summary>해설과 복습 위치</summary>
+<ol>
+<li>종류만 고르면 분류 결과, 위치까지 표시하면 클래스와 박스, 면적을 구하려면 픽셀 단위 영역이 필요합니다. 실제 면적 단위로 바꾸려면 카메라 보정이나 픽셀 크기 같은 추가 정보도 필요합니다. 입문과 응용 세 문서에서 입력·출력 계약을 복습하세요.</li>
+<li>원래 개수는 높이 × 너비 × 3입니다. 변경 후에는 (2 × 높이) × (2 × 너비) × 3이므로 4배입니다. 이 결과만으로 모든 모델의 계산량도 정확히 4배라고 단정할 수는 없습니다. 모델별 토큰 수와 연산 구조를 따로 확인해야 합니다. CNN과 ViT의 차원 설명으로 돌아가세요.</li>
+<li>위치 검출 외에 시간에 걸친 동일성 연결, 즉 추적 문제가 남았습니다. 추적 문서의 연관과 ID 설명으로 돌아가세요.</li>
+</ol>
+</details>
+<h2 id="sec-6-원본-범위와-자료의-역할">6. 원본 범위와 자료의 역할</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>원본</th>
+<th>실제 PDF 쪽수</th>
+<th>이 교재의 대응 범위</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%EA%B5%90%EC%95%88/01_Intro.pdf">Introduction</a></td>
+<td>31</td>
+<td>입문과 전체 학습 맥락</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%EA%B5%90%EC%95%88/02_00_DNN_CNN.pdf">DNN·CNN</a></td>
+<td>43</td>
+<td>DNN, CNN, ResNet 관련 원리</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%EA%B5%90%EC%95%88/03_00_Attention.pdf">Attention</a></td>
+<td>59</td>
+<td>Attention·ViT, DeiT·Swin, CLIP·DINO</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%EA%B5%90%EC%95%88/04_00_Applications.pdf">Applications</a></td>
+<td>101</td>
+<td>검출, 추적, 분할</td>
+</tr>
+</tbody>
+</table></div>
+<p>쪽수는 표지부터 센 실제 PDF 페이지 기준입니다. 세부 페이지와 본문 절의 대응 및 보충 설명은 각 문서의 원문 안내를 확인합니다. 개념에 맞춰 순서를 재구성했으므로 PDF 페이지 순서와 본문 순서가 항상 같지는 않습니다.</p>
+<p>Introduction의 과정 개요에는 생성 모델·Diffusion 등도 등장하지만, 현재 교안 폴더에는 해당 전용 교안이 없습니다. 이번 자료는 제공된 네 교안의 범위를 중심으로 하며 생성 모델의 완전한 자습 과정을 제공한다고 간주하지 않습니다. 시험 범위나 출제 중요도 역시 여기서 새로 정하지 않습니다.</p>
+<p>기준 본문은 이 폴더의 Markdown이고, <a href="index.html">웹 미리보기</a>는 이를 변환한 읽기 화면입니다. 이미지 자산과 PDF는 참고 근거로 보존합니다. 제작·검증 기록은 학습 순서에 포함하지 않으며, 작성자의 검토와 실제 학습자의 이해도 검증은 구분합니다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.md">Vision 자습 교재: 이미지에서 예측과 영역까지 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><span></span><a rel="next" href="01_%EB%B9%84%EC%A0%84_%EC%9E%85%EB%AC%B8.html"><small>다음 장</small>비전 입문: 사진을 숫자로 표현하고 예측을 평가하기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

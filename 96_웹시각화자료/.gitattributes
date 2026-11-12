@@ -1,0 +1,4 @@
+# Generated reports record byte hashes; preserve the validated bytes on checkout.
+* -text whitespace=cr-at-eol
+# These files are verbatim PDF/notebook extracts, including source whitespace.
+제작관리/검증/RAG/원본검토/*.txt -whitespace

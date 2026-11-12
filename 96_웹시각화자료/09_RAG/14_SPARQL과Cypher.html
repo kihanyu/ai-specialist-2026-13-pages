@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/rag-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html" aria-current="page">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>RDF/RDFS의 IRI·literal·스키마 추론을 property graph와 구분하고 SPARQL 패턴 결합·OPTIONAL·UNION·FILTER·결과 형태를 해석한다.</li><li>변수 바인딩·중복·DISTINCT, Cypher의 유한 경로·WITH·집계·JOIN/Expand·실행계획의 의미와 실패 조건을 계산한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="rag-sparql-bindings" id="lab-rag-sparql-bindings"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-rdf와-property-graph의-데이터-모델">1. RDF와 property graph의 데이터 모델</a></li><li><a href="#sec-2-rdfs는-스키마이면서-추론-규칙을-가진다">2. RDFS는 스키마이면서 추론 규칙을 가진다</a></li><li><a href="#sec-3-sparql은-triple-패턴의-변수-바인딩을-구한다">3. SPARQL은 triple 패턴의 변수 바인딩을 구한다</a></li><li><a href="#sec-4-결과의-타입과-스키마-질의">4. 결과의 타입과 스키마 질의</a></li><li><a href="#sec-5-cypher의-패턴은-무엇을-반환하는가">5. Cypher의 패턴은 무엇을 반환하는가</a></li><li><a href="#sec-6-경로반복같은-단계의-사람">6. 경로·반복·같은 단계의 사람</a></li><li><a href="#sec-7-join을-간선으로-미리-연결해도-중복은-사라지지-않는다">7. JOIN을 간선으로 미리 연결해도 중복은 사라지지 않는다</a></li><li><a href="#sec-8-확인-질문과-해설">8. 확인 질문과 해설</a></li><li><a href="#sec-출처와-페이지-대응">출처와 페이지 대응</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-14-sparql과-cypher-그래프-질의의-바인딩경로중복">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</h1>
+<p>이 장은 <code>sparql.pdf</code> 48쪽과 <code>cypher.pdf</code> 45쪽 전체의 핵심을 작은 예제에 연결한다. 그래프를 검색 대상으로 활용하려면 어떤 데이터 모델에 어떤 패턴을 실행하는지 알아야 한다. 아래 코드는 <strong>질의 의미를 읽는 예제</strong>이며 이 페이지가 RDF 저장소·Neo4j를 실행하지는 않는다.</p>
+<h2 id="sec-1-rdf와-property-graph의-데이터-모델">1. RDF와 property graph의 데이터 모델</h2>
+<p>RDF의 기본 사실은 <code>(subject, predicate, object)</code> triple이다. 주어는 IRI 또는 blank node, 술어는 IRI, 목적어는 IRI·blank node·literal이 될 수 있다. IRI는 식별자이며 표시 이름과 다르다. blank node의 문서 내부 ID를 세계 공통 개체 ID처럼 사용하지 않는다. RDF graph는 triple 집합이고, SPARQL의 질의 결과 행은 중복을 가질 수 있다. <a href="https://www.w3.org/TR/rdf11-concepts/">RDF 1.1 원문</a></p>
+<pre><code class="language-turtle">@prefix ex: &lt;https://example.org/&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+ex:Alice ex:name "Alice" ; ex:age 30 ; ex:worksAt ex:Lab .
+ex:Bob ex:name "Bob" ; ex:age 20 .
+ex:Alice ex:email "a1@example.org", "a2@example.org" .
+ex:Paris ex:name "Paris"@fr, "Parijs"@nl .
+ex:Lab ex:code "020"^^xsd:string .
+</code></pre>
+<p>PREFIX는 긴 IRI를 짧게 쓰는 별칭이다. Turtle의 <code>;</code>는 주어를 공유한 술어를, <code>,</code>는 같은 주어·술어의 여러 목적어를 이어 쓴다. <code>a</code>는 rdf:type의 축약이다. 문자열 "020"과 정수20은 식별·비교 의미가 다르고, 언어 태그 @fr과 @nl도 데이터의 일부다. N-Triples·Turtle·RDF/XML은 RDF를 직렬화하는 방법으로 그래프 모델 자체와 구분한다. 연결 데이터는 식별 가능한 HTTP IRI·유용한 설명·다른 IRI 링크를 통해 해석을 돕는다. 임의 IRI를 쓸 수 있다는 것과 다른 사용자가 의미를 이해한다는 것은 다르다.</p>
+<p>Property graph는 노드 라벨, 관계 타입, 노드·관계의 속성을 직접 다룬다. 예를 들면 <code>(Alice:Person {age:30})-[:WORKS_AT {since:2020}]-&gt;(Lab:Company)</code>다. RDF에서는 관계에 관한 추가 정보의 표현 방식을 별도로 정해야 한다. RDF와 property graph를 “모양만 다른 동일 스키마”로 취급하지 않는다.</p>
+<p><img alt="같은 회사 관계의 RDF triple과 property graph 표현, 질의 결과의 행 증식을 비교하는 도식" decoding="async" id="figure-1" loading="lazy" src="../resources/c3f7aedc30fb2803d779-14_graph_queries.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/c3f7aedc30fb2803d779-14_graph_queries.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> 모델은 저장·질의할 의미 구조, 실행계획은 그 의미를 계산하는 방법이다. 같은 데이터를 관계형 테이블·인접 리스트·간선 테이블 등에 저장할 수 있으므로 화면의 노드 그림만으로 물리 저장 방식이나 속도를 단정하지 않는다.</p>
+<h2 id="sec-2-rdfs는-스키마이면서-추론-규칙을-가진다">2. RDFS는 스키마이면서 추론 규칙을 가진다</h2>
+<p><code>sparql.pdf</code> 3~13·41~47쪽의 class·property 정의도 RDF triple이다.</p>
+<pre><code class="language-turtle">@prefix ex: &lt;https://example.org/&gt; .
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+ex:Engineer rdfs:subClassOf ex:Person .
+ex:Person rdfs:subClassOf ex:Agent .
+ex:worksAt rdfs:domain ex:Person ; rdfs:range ex:Company .
+ex:Alice rdf:type ex:Engineer ; ex:worksAt ex:Lab .
+</code></pre>
+<p>이 조건에서는 Engineer→Agent의 하위 클래스 관계, Alice의 Person·Agent 타입, Lab의 Company 타입을 RDFS 의미로 도출할 수 있다. <code>rdfs:domain</code>은 <strong>해당 속성을 쓰면 주어를 그 class로 추론</strong>하는 뜻이다. 데이터 검증의 “그 class가 아니면 입력 거부” 제약과 다르다. range도 목적어의 타입 추론에 쓰인다. subPropertyOf는 하위 속성의 사실이 상위 속성의 사실로도 성립하게 한다.</p>
+<p>RDFS는 임의 업무 규칙 언어가 아니다. “Dog이고 나이14 이상이면 VeryOldDog” 같은 숫자 조건 규칙까지 자동 정의하지 않는다. 스키마가 email 속성을 정의했다고 모든 Person에 email 값이 들어 있는 것도 아니다. 이때 OPTIONAL이 필요하다. 추론 저장소 설정이 꺼져 있으면 명시된 triple만 질의될 수 있으므로 <strong>명시 그래프와 entailment regime</strong>을 구별한다.</p>
+<h2 id="sec-3-sparql은-triple-패턴의-변수-바인딩을-구한다">3. SPARQL은 triple 패턴의 변수 바인딩을 구한다</h2>
+<pre><code class="language-sparql">PREFIX ex: &lt;https://example.org/&gt;
+SELECT ?person ?name ?email
+WHERE {
+  ?person ex:name ?name ; ex:age ?age .
+  FILTER(?age &gt;= 20)
+  OPTIONAL { ?person ex:email ?email }
+}
+ORDER BY ?person ?email
+</code></pre>
+<p>SELECT는 반환 변수, WHERE는 만족해야 하는 패턴, PREFIX는 이름 공간을 지정한다. FROM은 dataset/default graph 선택에 사용할 수 있고 HTTP endpoint 주소와 같은 문법 역할은 아니다. <code>?person ex:name ?name</code>과 <code>?person ex:age ?age</code>는 같은 ?person 바인딩으로 결합한다. 변수 이름을 다르게 쓰면 의도하지 않은 곱집합이 될 수 있다.</p>
+<p>Alice의 email이 두 개이고 Bob의 email이 없으면 OPTIONAL 결과는 다음과 같다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>person</th>
+<th>name</th>
+<th>email</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>Alice</td>
+<td>a1@example.org</td>
+</tr>
+<tr>
+<td>Alice</td>
+<td>Alice</td>
+<td>a2@example.org</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>Bob</td>
+<td>미바인딩</td>
+</tr>
+</tbody>
+</table></div>
+<p>email을 필수 패턴으로 바꾸면 Bob 행이 사라지고, Alice는 여전히 두 행이다. <code>SELECT ?name</code>만 해도 Alice가 두 번 나올 수 있다. <code>SELECT DISTINCT ?name</code>은 최종 투영된 값의 중복을 없애 두 이름을 반환한다. <strong>RDF triple 집합에 중복 사실이 없다는 것과 결과 행의 중복은 다른 문제</strong>다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기능</th>
+<th>의미·예</th>
+<th>주의점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>conjunction</td>
+<td><code>{ ?x ex:worksAt ?c . ?c ex:city ?city }</code></td>
+<td>공유 변수에 호환되는 바인딩끼리 JOIN</td>
+</tr>
+<tr>
+<td>UNION</td>
+<td><code>{ ?x ex:name "Paris"@fr } UNION { ?x ex:name "Parijs"@nl }</code></td>
+<td>양쪽 일치가 결과 중복으로 이어질 수 있음</td>
+</tr>
+<tr>
+<td>OPTIONAL</td>
+<td><code>OPTIONAL { ?p ex:email ?email }</code></td>
+<td>없으면 미바인딩, 필수 패턴과 다름</td>
+</tr>
+<tr>
+<td>FILTER</td>
+<td>숫자 비교, <code>&amp;&amp;</code>, `</td>
+<td></td>
+</tr>
+<tr>
+<td>값 검사</td>
+<td><code>isIRI</code>, <code>isLiteral</code>, <code>STR</code>, <code>DATATYPE</code>, <code>LANG</code>, <code>BOUND</code></td>
+<td><code>STR(?p)</code>는 전체 IRI 문자열, 짧은 이름과 다를 수 있음</td>
+</tr>
+<tr>
+<td>정렬·잘라내기</td>
+<td><code>ORDER BY DESC(?age) ?person LIMIT 10</code></td>
+<td>정렬 없이 LIMIT만 쓰면 안정적 Top-10 기준이 아님</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>OPTIONAL { ... FILTER(...) }</code>는 선택 패턴의 일치 조건을 제한하고 왼쪽 행을 남길 수 있다. OPTIONAL 바깥에서 <code>FILTER(BOUND(?email))</code>를 쓰면 미바인딩 행을 제거한다. 이 차이는 SQL LEFT JOIN 뒤 WHERE가 NULL 행을 제거하는 경우와 연결해 읽는다.</p>
+<h2 id="sec-4-결과의-타입과-스키마-질의">4. 결과의 타입과 스키마 질의</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>형태</th>
+<th>반환</th>
+<th>예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SELECT</td>
+<td>변수 바인딩 행</td>
+<td><code>SELECT ?p WHERE { ?p ex:worksAt ex:Lab }</code></td>
+</tr>
+<tr>
+<td>ASK</td>
+<td>boolean</td>
+<td><code>ASK { ex:Alice ex:worksAt ex:Lab }</code></td>
+</tr>
+<tr>
+<td>CONSTRUCT</td>
+<td>template로 만든 RDF graph</td>
+<td><code>CONSTRUCT { ?c ex:employs ?p } WHERE { ?p ex:worksAt ?c }</code></td>
+</tr>
+<tr>
+<td>DESCRIBE</td>
+<td>해당 자원에 관한 RDF 설명</td>
+<td><code>DESCRIBE ex:Alice</code> — 구체 범위는 구현 규약 확인</td>
+</tr>
+</tbody>
+</table></div>
+<p>SELECT의 표·JSON/XML 직렬화는 IRI·literal·datatype·언어 태그·미바인딩을 보존해야 한다. 결과의 문자열 <code>str(list_of_dict)</code>를 엄격한 JSON과 혼동하지 않는다. CONSTRUCT는 조회된 바인딩을 template에 넣어 사실을 만드는 것으로 원본 DB를 UPDATE하는 명령이 아니다. 반환 RDF graph는 triple 집합이다.</p>
+<p>스키마도 RDF이므로 <code>SELECT ?c WHERE { ex:worksAt rdfs:range ?c }</code>는 Company를 찾는다. <code>?c rdfs:subClassOf ex:Agent</code>는 명시된 직속 관계만 볼 수 있고, 하위 계층 전체를 원하면 추론을 켜거나 SPARQL 1.1 property path <code>rdfs:subClassOf+</code>를 사용한다. <code>+</code>는 길이1 이상, <code>*</code>는 길이0도 포함한다. class IRI 자체를 입력값으로 쓰는 질의와 class의 instance를 찾는 <code>rdf:type</code> 질의를 구별한다. <a href="https://www.w3.org/TR/sparql11-query/">SPARQL 1.1 Query 원문</a></p>
+<h2 id="sec-5-cypher의-패턴은-무엇을-반환하는가">5. Cypher의 패턴은 무엇을 반환하는가</h2>
+<p>다음은 방향 있는 property graph의 예다. 원본 <code>cypher.pdf</code> 13쪽의 그림·코드는 노드 번호와 출연 간선 목적지가 일치하지 않는 부분이 있어, 여기서는 변수 이름으로 목적을 분명히 했다.</p>
+<pre><code class="language-cypher">CREATE (s:Person {name:'Steve'}),
+       (b:Person {name:'Novak'}),
+       (t:TVShow {title:'The Office'}),
+       (s)-[:ACTS_IN {role:'Michael'}]-&gt;(t),
+       (b)-[:ACTS_IN {role:'Ryan'}]-&gt;(t),
+       (b)-[:PRODUCES]-&gt;(t);
+</code></pre>
+<p>이는 생성 문법을 설명하는 예제이며 웹 교안에서 실행하지 않는다. 노드 라벨 <code>TVShow</code>와 <code>TVSHOW</code>, 관계 타입 <code>ACTS_IN</code>과 <code>acts_in</code>을 같은 식별자로 가정하지 않는다.</p>
+<pre><code class="language-cypher">MATCH (p:Person)-[:ACTS_IN]-&gt;(t:TVShow {title:'The Office'})
+      &lt;-[:ACTS_IN]-(q:Person)
+WHERE p.name &lt; q.name
+RETURN p.name, q.name
+ORDER BY p.name, q.name;
+</code></pre>
+<p>원본 17~18쪽의 패턴 매칭은 변수→노드/관계의 대응을 찾아 그래프에 패턴이 존재하게 한다. 위 예에서는 Steve·Novak 한 쌍을 반환한다. <code>p &lt;&gt; q</code>만 쓰면 (Steve,Novak)과 (Novak,Steve)의 두 방향 조합이 남을 수 있다. 이름이 유일하지 않은 실제 자료에서는 안정된 entity ID로 쌍 순서를 정한다.</p>
+<p>MATCH는 연결 패턴, WHERE는 제약, RETURN은 반환/투영, WITH는 중간 투영·집계·변수 범위를 정한다. <code>"PPC" IN p.dept</code>처럼 리스트 속성을 검사할 수 있다. count(*)는 매칭 행 수, count(q)는 NULL이 아닌 q 수, count(DISTINCT q)는 서로 다른 q 수다. 서로 독립인 MATCH 두 개는 곱집합을 만들 수 있으므로 공통 변수·관계가 의도대로 연결됐는지 본다.</p>
+<h2 id="sec-6-경로반복같은-단계의-사람">6. 경로·반복·같은 단계의 사람</h2>
+<pre><code class="language-cypher">MATCH path=(boss:Person {name:'Michael'})-[:MANAGES*1..3]-&gt;(worker:Person)
+RETURN DISTINCT worker.name
+ORDER BY worker.name;
+</code></pre>
+<p><code>*1..3</code>은 길이1~3인 지정 방향 경로다. 직접 보고자는1 hop, 간접 보고자는2 hop 이상이다. 경로 변수 path를 반환하면 연결 자체를, worker를 반환하면 끝점을 얻는다. 한 사람에게 도달하는 경로가 여러 개면 같은 worker가 반복될 수 있어 <code>DISTINCT worker</code>와 <code>DISTINCT path</code>의 결과가 다르다. 무제한 길이는 탐색량을 크게 늘릴 수 있으므로 질문 범위와 예산에 맞는 상한을 둔다.</p>
+<p>공통 상사에서 두 사람까지의 경로 길이가 같다고 같은 단계로 정의할 수 있다. 하지만 조직이 트리가 아니거나 여러 상사·순환이 있으면 “단계” 정의가 모호해진다. 같은 그래프를 관계형 parent table로 두면 recursive CTE의 base case와 반복 확장으로 계산할 수 있다. 같은 데이터에 SQL이 불가능해서 그래프를 쓰는 것이 아니라 표현·접근 경로·질의 형태가 달라지는 것이다.</p>
+<p>최단 경로는 지정한 관계·방향·길이 의미에서 찾는다. 간선 수가 가장 적은 경로와 가중 비용이 가장 작은 경로는 다르다. PageRank·centrality·연결 성분도 별도 그래프 알고리즘이며 <code>MATCH</code>라는 이름만으로 자동 계산되지는 않는다. 원본의 ‘관계 재사용 없이 탐색’은 해당 버전의 패턴 의미다. 새 Cypher에는 match mode 등 설정이 있으므로 교안은 기본적인 방향·유한 길이 예제로 범위를 고정한다. <a href="https://neo4j.com/docs/cypher-manual/current/clauses/match/">Cypher MATCH 공식 문서</a></p>
+<h2 id="sec-7-join을-간선으로-미리-연결해도-중복은-사라지지-않는다">7. JOIN을 간선으로 미리 연결해도 중복은 사라지지 않는다</h2>
+<p>원본 30~41쪽의 작은 관계는 R1(b)=[2,3], R2(a,b)=[(A,1),(A,1),(B,1),(B,2)], R3(a)=[A,B,B]다.</p>
+<pre><code class="language-sql">SELECT r2.a, r1.b
+FROM R1 AS r1 JOIN R2 AS r2 ON r1.b=r2.b
+JOIN R3 AS r3 ON r2.a=r3.a;
+</code></pre>
+<p>R1의2는 R2의(B,2) 한 행에 연결되고, 그 B는 R3의 서로 다른 두 B 행에 연결된다. 결과는 <strong>(B,2)가 두 행</strong>이다. 값이 같아도 별개 행의 매칭 경로가 두 개다. <code>DISTINCT</code>를 붙이면 한 행이 된다. 모든 R1–R2, R2–R3 쌍을 간선으로 만들면 JOIN이 아니라 곱집합이 된다. 값 조건을 만족하는 행끼리 관계를 만들거나, 조회할 때 그 조건을 검사해야 한다.</p>
+<p>그래프에서는 미리 정한 간선을 Expand한 뒤 Filter할 수 있고, 관계형 DB는 값에 따라 JOIN을 계획한다. 어느 쪽도 항상 빠르지는 않다. EXPLAIN의 예상 행 수·연산자를 읽고, PROFILE/실측 시 실제 행 수·DB 접근·시간을 확인한다. CartesianProduct, 불필요한 확장, 행 수 폭증, 인덱스 탐색 여부가 점검 대상이다. 원본 37쪽의 Neo4j4.2 계획과 42~44쪽 Postgres11/Neo4j3.5 비교는 <strong>당시 사례</strong>이며 현재 제품의 일반 우열로 쓰지 않는다. 원본의 GQL 표준화 진행 문구도 현재 표준 상태의 단정으로 옮기지 않았다.</p>
+<h2 id="sec-8-확인-질문과-해설">8. 확인 질문과 해설</h2>
+<ol>
+<li>RDFS domain이 Person이면 다른 타입 주어의 worksAt triple을 DB가 반드시 거부하는가?</li>
+<li>Alice email2개, Bob email0개에서 OPTIONAL과 필수 패턴은 각각 몇 행인가?</li>
+<li>SELECT ?name에 Alice가 두 번 나온 것은 RDF에 중복 triple이 있다는 뜻인가?</li>
+<li>경로가 세 개지만 끝점이 같은 사람이라면 DISTINCT path와 DISTINCT person은 같은가?</li>
+<li>R1·R2·R3 예제에서 (B,2)가 두 번 나오는 이유는?</li>
+<li>관계를 미리 연결하면 데이터 모델링·정합성·집계 검증이 불필요한가?</li>
+</ol>
+<details><summary>해설</summary>
+<ol>
+<li>아니다. RDFS는 주어가 Person임을 추론한다. 입력 검증 제약은 별도다.</li>
+<li>OPTIONAL은 Alice2+Bob1=3행, 필수 email 패턴은 Alice2행이다.</li>
+<li>아니다. 하나의 사람이 여러 목적어·매칭 조합에 대응해 결과 행이 늘어난다.</li>
+<li>다르다. 서로 다른 경로 세 개와 서로 다른 끝점 한 개다.</li>
+<li>R3의 B 두 행이 각각 같은 JOIN 조건을 만족한다. SQL/Cypher의 bag 결과를 임의로 집합으로 줄이면 의미가 바뀐다.</li>
+<li>아니다. 간선이 어떤 관계·방향·버전·행의 식별을 보존하는지 설계해야 한다. 곱집합을 JOIN으로 착각하면 잘못된 관계와 집계가 만들어진다.</li>
+</ol>
+</details>
+<h2 id="sec-출처와-페이지-대응">출처와 페이지 대응</h2>
+<ul>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EA%B5%90%EC%95%88/2%EC%9D%BC%EC%B0%A8/sparql.pdf">sparql.pdf</a>: 3~13쪽 RDF/RDFS·URI·직렬화, 15~24쪽 triple 패턴·결합, 25~31쪽 UNION/OPTIONAL/FILTER·datatype, 32~39쪽 결과/수정자/질의 형태, 41~48쪽 schema·instance 질의.</li>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EA%B5%90%EC%95%88/2%EC%9D%BC%EC%B0%A8/cypher.pdf">cypher.pdf</a>: 2~12쪽 모델·관계형 비교·언어, 13~20쪽 생성·pattern·count/WITH, 21~29쪽 경로·길이·DISTINCT·최단 경로·recursive SQL, 30~41쪽 JOIN/Expand/실행계획, 42~45쪽 당시 비교 사례·결론.</li>
+<li>RDFS 상속·SPARQL 1.1·Cypher 문법의 보충은 위 공식 1차 문서로 확인했다. 실행 DB·스키마·프로토콜 버전이 다른 코드를 같은 실행 결과로 가정하지 않는다.</li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/96_%EC%9B%B9%EC%8B%9C%EA%B0%81%ED%99%94%EC%9E%90%EB%A3%8C/%EA%B8%B0%EC%A4%80%EB%B3%B8%EB%AC%B8/09_RAG/14_SPARQL%EA%B3%BCCypher.md">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="13_GraphRAG.html"><small>이전 장</small>13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a><a rel="next" href="15_Text2SQL%EA%B3%BCMCP.html"><small>다음 장</small>15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

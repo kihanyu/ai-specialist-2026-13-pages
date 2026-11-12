@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>03. 신경망과 역전파 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html" aria-current="page">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>03. 신경망과 역전파</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>순전파·손실·기울기 계산·optimizer 갱신을 구분한다.</li><li>학습률 변화에 따른 새 손실을 같은 표본에서 검산한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-gradient" id="lab-llm-gradient"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-가장-작은-학습-한-번">1. 가장 작은 학습 한 번</a></li><li><a href="#sec-2-원문의-두-입력두-은닉-뉴런-신경망">2. 원문의 두 입력·두 은닉 뉴런 신경망</a></li><li><a href="#sec-3-출력에서-입력-방향으로-기울기를-재사용한다">3. 출력에서 입력 방향으로 기울기를 재사용한다</a></li><li><a href="#sec-4-새-가중치로-손실을-다시-계산해-확인한다">4. 새 가중치로 손실을 다시 계산해 확인한다</a></li><li><a href="#sec-5-작은-재현-활동">5. 작은 재현 활동</a></li><li><a href="#sec-6-확인-질문과-해설">6. 확인 질문과 해설</a></li><li><a href="#sec-페이지별-상세-읽기">페이지별 상세 읽기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-03-신경망과-역전파">03. 신경망과 역전파</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">이전: 벡터·행렬과 확률 변환</a> · <a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">다음: 교차엔트로피·KL·PPL</a></p>
+<p>학습은 현재 가중치로 예측한 뒤, 손실이 각 가중치에 얼마나 민감한지 구하고, 손실을 낮추는 쪽으로 가중치를 바꾸는 과정이다. <strong>순전파 → 손실 → 역전파 → 갱신</strong>의 네 역할을 구분하자. 원문 46~53쪽의 세 단계 설명에서 갱신을 별도 동작으로 풀어 쓴 것이다. 사전 배경은 가중합·sigmoid이며 <a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html#activation">2장</a>에서 돌아볼 수 있다.</p>
+<p>이 장을 마치면 작은 신경망의 중간값과 기울기를 구하고, 원문의 수치 오류와 반올림 차이를 구분하며, 학습률에 따른 결과를 예측할 수 있어야 한다. 먼저 1절로 계산을 익힌 다음 2~4절의 같은 신경망을 끝까지 따라간다. 미분 기호 <code>∂L/∂w</code>는 다른 변수를 고정했을 때 w의 작은 변화가 손실 L에 미치는 비율이다.</p>
+<p><a id="scalar"></a></p>
+<h2 id="sec-1-가장-작은-학습-한-번">1. 가장 작은 학습 한 번</h2>
+<p><strong>보충 예제:</strong> 입력 x=2, 실제값 y=3, 가중치 w=1, 예측 <code>ŷ=wx</code>, 손실 <code>L=(ŷ-y)²</code>로 놓는다. 여기서는 표본 하나이므로 MSE와 같다.</p>
+<pre><code class="language-text">순전파: ŷ=1×2=2
+손실: L=(2-3)²=1
+출력에 대한 기울기: dL/dŷ=2(ŷ-y)=-2
+가중치에 대한 출력 변화: dŷ/dw=x=2
+연쇄법칙: dL/dw=(dL/dŷ)(dŷ/dw)=-2×2=-4
+학습률 η=0.1로 갱신: w_new=w-η(dL/dw)=1.4
+다시 순전파: ŷ_new=2.8, L_new=0.04
+</code></pre>
+<p>기울기 -4는 w를 아주 조금 늘리면 현재 근처에서 손실이 줄어든다는 뜻이다. 역전파는 이 기울기를 계산한다. optimizer의 갱신은 그 뒤 <code>w-η∇L</code> 같은 규칙을 적용한다. 기울기를 계산했다고 w가 자동으로 바뀌는 것은 아니다.</p>
+<p>원문 48쪽의 치타·사자·곰·사람 속도비 <code>2×2×1.5=6</code>은 연속된 비율을 곱하는 비유다. 실제 동물 속도 측정값으로 쓰지 않는다. 함수 <code>L(o(z(w)))</code>에서도 국소 변화율을 경로를 따라 곱한다. 경로가 여러 개라면 각 경로의 기여를 더한다. 속도비 비유만으로 이 합산까지 설명되지는 않는다.</p>
+<p><a id="forward"></a></p>
+<h2 id="sec-2-원문의-두-입력두-은닉-뉴런-신경망">2. 원문의 두 입력·두 은닉 뉴런 신경망</h2>
+<p>그림의 선을 따라 어느 가중치가 어느 입력에 붙는지 먼저 확인한다. 교차하는 선은 별도 뉴런이 아니다.</p>
+<p><img alt="입력 x1과 x2가 두 은닉 뉴런 z1 h1, z2 h2로 연결되고 출력 z3 o1로 합쳐지는 신경망; w1=0.7,w2=0.3,w3=0.4,w4=0.6,w5=0.55,w6=0.45" decoding="async" id="figure-1" loading="lazy" src="../resources/ddff28fe9b66b777e9a5-p046_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/ddff28fe9b66b777e9a5-p046_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>위 입력 x₁은 w₁로 h₁, w₂로 h₂에 연결된다. 아래 입력 x₂는 w₃로 h₁, w₄로 h₂에 연결된다. h₁과 h₂는 각각 w₅, w₆를 통해 출력으로 간다. z는 활성화 전 가중합, h와 o는 sigmoid를 통과한 값이다.</p>
+<p><strong>원문 조건:</strong> <code>x₁=0.5, x₂=0.3</code>, <code>w=(0.7,0.3,0.4,0.6,0.55,0.45)</code>, 편향 없음, 모든 활성화 sigmoid, 목표 y=1, 제곱오차 L, 학습률 η=0.1이다. 아래 값은 중간에 반올림하지 않고 재계산한 뒤 표시한 것이다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>계산</th>
+<th>값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>첫 은닉 가중합</td>
+<td><code>z₁=x₁w₁+x₂w₃</code></td>
+<td>0.47</td>
+</tr>
+<tr>
+<td>첫 은닉 출력</td>
+<td><code>h₁=σ(z₁)</code></td>
+<td>0.615384</td>
+</tr>
+<tr>
+<td>둘째 은닉 가중합</td>
+<td><code>z₂=x₁w₂+x₂w₄</code></td>
+<td>0.33</td>
+</tr>
+<tr>
+<td>둘째 은닉 출력</td>
+<td><code>h₂=σ(z₂)</code></td>
+<td>0.581759</td>
+</tr>
+<tr>
+<td>출력 가중합</td>
+<td><code>z₃=h₁w₅+h₂w₆</code></td>
+<td>0.600253</td>
+</tr>
+<tr>
+<td>예측</td>
+<td><code>o=σ(z₃)</code></td>
+<td>0.645714</td>
+</tr>
+<tr>
+<td>손실</td>
+<td><code>L=(o-1)²</code></td>
+<td>0.125518</td>
+</tr>
+</tbody>
+</table></div>
+<p>원문 47쪽의 <code>o=0.645</code>를 그대로 사용하면 손실 0.126025다. 이 값은 앞 단계의 절삭·근사에 따른 차이다. 정밀 재계산의 0.125518과 섞어서 같은 경로의 값인 것처럼 비교하지 않는다. 제곱오차 앞에 1/2을 넣는 다른 관례도 있지만 여기서는 넣지 않으므로 미분에 2가 남는다.</p>
+<p><a id="backward"></a></p>
+<h2 id="sec-3-출력에서-입력-방향으로-기울기를-재사용한다">3. 출력에서 입력 방향으로 기울기를 재사용한다</h2>
+<p>출력에 가까운 두 가중치에는 같은 공통 인자가 있다. 이를 <code>δ₃=∂L/∂z₃</code>라고 쓰면 계산을 반복하지 않아도 된다.</p>
+<pre><code class="language-text">∂L/∂o=2(o-1)
+∂o/∂z₃=o(1-o)
+δ₃=2(o-1)o(1-o)≈-0.162098
+∂L/∂w₅=δ₃h₁≈-0.099753
+∂L/∂w₆=δ₃h₂≈-0.094302
+</code></pre>
+<p><strong>원문 정정, 49쪽:</strong> <code>-0.71×0.229×0.615≈-0.01</code>로 적혀 있지만 실제 곱은 -0.09999285, 약 -0.100이다. 그러므로 원문의 <code>w₅_new=0.551</code>은 이 오류에서 나온 값이다. 정밀 재계산의 갱신은 <code>0.55-0.1×(-0.099753)≈0.559975</code>다. 50쪽의 w₆ 기울기 -0.095와 갱신 0.4595는 반올림에 따른 근사이며 w₅의 10배 오류와 구분해야 한다.</p>
+<p>은닉층으로 더 들어가려면 출력층 가중치와 은닉 활성화의 미분을 추가로 곱한다.</p>
+<pre><code class="language-text">δ₁=∂L/∂z₁=δ₃w₅h₁(1-h₁)
+δ₂=∂L/∂z₂=δ₃w₆h₂(1-h₂)
+∂L/∂w₁=δ₁x₁    ∂L/∂w₃=δ₁x₂
+∂L/∂w₂=δ₂x₁    ∂L/∂w₄=δ₂x₂
+</code></pre>
+<p>원문 51쪽의 w₁ 경로는 <code>L→o→z₃→h₁→z₁→w₁</code> 순서다. 곱에 등장하는 w₅는 <strong>갱신 전의 0.55</strong>다. 한 번의 순전파에 대한 모든 기울기를 같은 옛 가중치에서 계산한 뒤 함께 갱신해야 한다. 중간에 w₅를 먼저 바꾸면 다른 계산 지점의 기울기가 섞인다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>가중치</th>
+<th>기울기(약)</th>
+<th>동시 갱신 후(약)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w₁</td>
+<td>-0.010551</td>
+<td>0.701055</td>
+</tr>
+<tr>
+<td>w₂</td>
+<td>-0.008874</td>
+<td>0.300887</td>
+</tr>
+<tr>
+<td>w₃</td>
+<td>-0.006330</td>
+<td>0.400633</td>
+</tr>
+<tr>
+<td>w₄</td>
+<td>-0.005325</td>
+<td>0.600532</td>
+</tr>
+<tr>
+<td>w₅</td>
+<td>-0.099753</td>
+<td>0.559975</td>
+</tr>
+<tr>
+<td>w₆</td>
+<td>-0.094302</td>
+<td>0.459430</td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="update"></a></p>
+<h2 id="sec-4-새-가중치로-손실을-다시-계산해-확인한다">4. 새 가중치로 손실을 다시 계산해 확인한다</h2>
+<p>위 여섯 새 가중치를 같은 입력에 넣으면 새 출력은 약 0.6484, 새 손실은 약 0.12362다. 0.125518보다 작아 이번 한 번의 갱신에서는 개선되었다. 기울기의 부호만 확인하는 것으로 끝내지 않고 새 순전파까지 수행한다.</p>
+<p><strong>원문과의 구분:</strong> 52쪽은 <code>w₃=0.4011</code>, <code>w₅=0.551</code> 등을 사용해 손실 약 0.1245를 적었다. w₃의 정확한 갱신값은 0.400633이며, w₅는 앞에서 발견한 곱셈 오류를 반영한다. 원문 값으로도 손실이 조금 줄 수 있지만, 그것이 앞의 미분 계산이 정확하다는 증거는 아니다. 이 교재의 표와 새 손실은 일관된 정밀 계산을 기준으로 한다.</p>
+<p>경사하강법 일반식은 <code>w_(t+1)=w_t-η∇L(w_t)</code>다. η는 학습률로 한 번에 이동하는 크기를 정한다. 원문 53쪽의 <code>y=x²</code> 그래프에서는 왼쪽 기울기가 음수라 오른쪽으로, 오른쪽 기울기가 양수라 왼쪽으로 움직이면 원점에 가까워진다.</p>
+<p><strong>정정:</strong> 원문의 <code>0&lt;α&lt;1</code>은 모든 문제에 통하는 안정 조건이 아니다. 1절의 <code>L=(2w-3)²</code>에서는 최적값 w*=1.5이고, 오차 <code>e_t=w_t-1.5</code>에 대해 <code>e_(t+1)=(1-8η)e_t</code>다. 따라서 이 예제는 <code>0&lt;η&lt;0.25</code>에서 수렴한다. η=0.25이면 양쪽으로 같은 거리만큼 오가며, η=1이면 첫 갱신 w=5, 손실 49로 커진다. 작아 보이는 학습률도 손실의 곡률에 따라 너무 클 수 있다. 일반 신경망에서는 매번 손실 감소나 전역 최적해 도달을 보장하지 않는다.</p>
+<p><a id="activity"></a></p>
+<h2 id="sec-5-작은-재현-활동">5. 작은 재현 활동</h2>
+<p>다음은 외부 라이브러리가 없는 Python 실행 예제다. 원문의 전체 실습을 대신 실행했다는 뜻이 아니며 이 장의 수치 예제만 재현한다.</p>
+<pre><code class="language-python">from math import exp
+def sigmoid(z): return 1 / (1 + exp(-z))
+def forward(w):
+    h1 = sigmoid(0.5*w[0] + 0.3*w[2])
+    h2 = sigmoid(0.5*w[1] + 0.3*w[3])
+    o = sigmoid(h1*w[4] + h2*w[5])
+    return h1, h2, o, (o-1)**2
+w = [0.7, 0.3, 0.4, 0.6, 0.55, 0.45]
+h1, h2, o, loss = forward(w)
+d3 = 2*(o-1)*o*(1-o)
+d1 = d3*w[4]*h1*(1-h1)
+d2 = d3*w[5]*h2*(1-h2)
+g = [d1*0.5, d2*0.5, d1*0.3, d2*0.3, d3*h1, d3*h2]
+new = [v-0.1*dv for v, dv in zip(w, g)]
+print(round(loss, 6), round(forward(new)[3], 6))
+</code></pre>
+<p>예상 출력은 첫 손실 약 0.125518, 다음 손실 약 0.123618이다. 손으로 w₅ 한 항을 먼저 계산하고 출력값과 비교하자. 더 확인하려면 w₅만 ε=0.000001만큼 올리고 내린 두 손실의 차이를 <code>2ε</code>로 나눈다. 결과는 약 -0.099753으로 미분과 일치해야 한다. 이는 <strong>중앙 유한차분</strong>을 이용한 별도 검산이다.</p>
+<h2 id="sec-6-확인-질문과-해설">6. 확인 질문과 해설</h2>
+<ol>
+<li>역전파와 가중치 갱신은 무엇이 다른가? (1절)</li>
+<li>w₁ 기울기에 왜 h₁의 sigmoid 미분과 w₅가 들어가는가? (3절)</li>
+<li>w₃의 기울기는 w₁ 기울기의 몇 배인가? (3절)</li>
+<li>한 번 손실이 줄면 그때 사용한 미분이 정확했다고 결론 내려도 되는가? (4절)</li>
+<li>1절에서 η=0.25면 새 w와 손실은? (4절)</li>
+</ol>
+<p><strong>해설:</strong> 1은 역전파가 기울기를 구하고 갱신이 이를 이용해 값을 바꾼다는 차이다. 2는 w₁에서 손실까지의 경로가 은닉 활성화와 출력 가중합을 통과하기 때문이다. 3은 같은 δ₁에 각각 0.3과 0.5를 곱하므로 0.6배다. 4는 아니다. 잘못된 이동도 우연히 손실을 줄일 수 있으므로 유한차분 등으로 기울기 자체를 점검해야 한다. 5는 w=2, 예측=4, 손실=1로 처음과 같다.</p>
+<h2 id="sec-페이지별-상세-읽기">페이지별 상세 읽기</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p046.html">46 구조</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p047.html">47 순전파</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p048.html">48 연쇄법칙</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p049.html">49 w₅ 정정</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p050.html">50 w₆</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p051.html">51 w₁</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p052.html">52 재계산</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p053.html">53 학습률</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.md">03. 신경망과 역전파 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html"><small>이전 장</small>02. 벡터·행렬과 확률 변환</a><a rel="next" href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html"><small>다음 장</small>04. 교차엔트로피·KL과 PPL</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

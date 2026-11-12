@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="730" viewBox="0 0 1200 730" role="img" aria-labelledby="title desc">
+<title id="title">같은 검색 결과를 네 가지 지표로 읽기</title><desc id="desc">관련 문서 집합 {B,D,E} · K=3 · 순위는 1부터 시작</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526175"/></marker></defs>
+<style>text{font-family:"Malgun Gothic","Noto Sans KR",sans-serif;fill:#172B4D} .note{fill:#526175}</style>
+<rect width="1200" height="730" fill="white"/>
+<text x="30" y="48.0" font-size="32" text-anchor="start" style="fill:#172B4D;font-weight:700">같은 검색 결과를 네 가지 지표로 읽기</text>
+<text x="30" y="92.0" font-size="24" text-anchor="start" style="fill:#526175;font-weight:400">관련 문서 집합 {B,D,E} · K=3 · 순위는 1부터 시작</text>
+<rect x="30" y="155" width="565" height="156" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="45" y="144.0" font-size="24" text-anchor="start" style="fill:#0072B2;font-weight:700">상위 K=3의 평가 범위</text>
+<text x="123" y="195.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">1위</text>
+<rect x="55" y="214" width="136" height="72" rx="12" fill="#F2F4F7" stroke="#526175" stroke-width="2"/>
+<text x="123" y="260.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">A  무관</text>
+<text x="311" y="195.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">2위</text>
+<rect x="243" y="214" width="136" height="72" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="311" y="260.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">B  관련</text>
+<text x="499" y="195.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">3위</text>
+<rect x="431" y="214" width="136" height="72" rx="12" fill="#F2F4F7" stroke="#526175" stroke-width="2"/>
+<text x="499" y="260.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">C  무관</text>
+<text x="687" y="195.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">4위</text>
+<rect x="619" y="214" width="136" height="72" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="687" y="260.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">D  관련</text>
+<text x="875" y="195.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">5위</text>
+<rect x="807" y="214" width="136" height="72" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="875" y="260.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">E  관련</text>
+<text x="1063" y="195.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">6위</text>
+<rect x="995" y="214" width="136" height="72" rx="12" fill="#F2F4F7" stroke="#526175" stroke-width="2"/>
+<text x="1063" y="260.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">F  무관</text>
+<line x1="312" y1="320" x2="312" y2="350" stroke="#00856A" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="312" y="388.0" font-size="26" text-anchor="middle" style="fill:#00856A;font-weight:700">첫 관련 문서 = 2위</text>
+<rect x="30" y="440" width="270" height="180" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="48" y="477.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">Success@3</text>
+<text x="165" y="530.0" font-size="30" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<text x="165" y="582.0" font-size="22" text-anchor="middle" style="fill:#172B4D;font-weight:400">상위 3개 안에 존재</text>
+<rect x="320" y="440" width="270" height="180" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="338" y="477.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">RR@3</text>
+<text x="455" y="530.0" font-size="30" text-anchor="middle" style="fill:#172B4D;font-weight:700">1/2 = 0.5</text>
+<text x="455" y="582.0" font-size="22" text-anchor="middle" style="fill:#172B4D;font-weight:400">첫 관련 문서가 2위</text>
+<rect x="610" y="440" width="270" height="180" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="628" y="477.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">Precision@3</text>
+<text x="745" y="530.0" font-size="30" text-anchor="middle" style="fill:#172B4D;font-weight:700">1/3</text>
+<text x="745" y="582.0" font-size="22" text-anchor="middle" style="fill:#172B4D;font-weight:400">반환 3개 중 관련 1개</text>
+<rect x="900" y="440" width="270" height="180" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="918" y="477.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">Recall@3</text>
+<text x="1035" y="530.0" font-size="30" text-anchor="middle" style="fill:#172B4D;font-weight:700">1/3</text>
+<text x="1035" y="582.0" font-size="22" text-anchor="middle" style="fill:#172B4D;font-weight:400">전체 관련 3개 중 1개</text>
+<text x="30" y="690.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">RR은 첫 정답의 위치를 보고, Precision·Recall은 상위 K 안의 관련 문서 수를 본다.</text>
+</svg>

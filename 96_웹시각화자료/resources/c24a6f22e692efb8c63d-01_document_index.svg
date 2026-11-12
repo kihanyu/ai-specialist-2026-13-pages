@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="790" viewBox="0 0 1200 790" role="img" aria-labelledby="title desc">
+<title id="title">같은 문서 집합을 세 가지 방향으로 읽기</title><desc id="desc">문서 → term-document matrix → term별 posting list</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526175"/></marker></defs>
+<style>text{font-family:"Malgun Gothic","Noto Sans KR",sans-serif;fill:#172B4D} .note{fill:#526175}</style>
+<rect width="1200" height="790" fill="white"/>
+<text x="30" y="48.0" font-size="32" text-anchor="start" style="fill:#172B4D;font-weight:700">같은 문서 집합을 세 가지 방향으로 읽기</text>
+<text x="30" y="92.0" font-size="24" text-anchor="start" style="fill:#526175;font-weight:400">문서 → term-document matrix → term별 posting list</text>
+<text x="30" y="145.0" font-size="26" text-anchor="start" style="fill:#172B4D;font-weight:700">① 문서별 단어</text>
+<rect x="30" y="170" width="310" height="110" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="48" y="205.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">d1</text>
+<text x="48" y="240.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">machine learning</text>
+<text x="48" y="272.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">basics</text>
+<rect x="30" y="294" width="310" height="110" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="48" y="329.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">d2</text>
+<text x="48" y="364.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">machine translation</text>
+<rect x="30" y="418" width="310" height="110" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="48" y="453.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">d3</text>
+<text x="48" y="488.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">deep learning machine</text>
+<text x="48" y="520.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">learning methods</text>
+<rect x="30" y="542" width="310" height="110" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="48" y="577.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">d4</text>
+<text x="48" y="612.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">refund policy</text>
+<line x1="352" y1="390" x2="398" y2="390" stroke="#526175" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="415" y="145.0" font-size="26" text-anchor="start" style="fill:#172B4D;font-weight:700">② 행: term / 열: 문서</text>
+<text x="421" y="208.0" font-size="23" text-anchor="start" style="fill:#172B4D;font-weight:700">term</text>
+<text x="587" y="208.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">d1</text>
+<text x="632" y="208.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">d2</text>
+<text x="677" y="208.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">d3</text>
+<text x="722" y="208.0" font-size="23" text-anchor="middle" style="fill:#172B4D;font-weight:700">d4</text>
+<rect x="415" y="223" width="330" height="47" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="421" y="254.0" font-size="22" text-anchor="start" style="fill:#172B4D;font-weight:400">machine</text>
+<rect x="565" y="223" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="587" y="254.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="610" y="223" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="632" y="254.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="655" y="223" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="677" y="254.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="700" y="223" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="722" y="254.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="415" y="272" width="330" height="47" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="421" y="303.0" font-size="22" text-anchor="start" style="fill:#172B4D;font-weight:400">learning</text>
+<rect x="565" y="272" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="587" y="303.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="610" y="272" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="632" y="303.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="655" y="272" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="677" y="303.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">2</text>
+<rect x="700" y="272" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="722" y="303.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="415" y="321" width="330" height="47" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="421" y="352.0" font-size="22" text-anchor="start" style="fill:#172B4D;font-weight:400">basics</text>
+<rect x="565" y="321" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="587" y="352.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="610" y="321" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="632" y="352.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="655" y="321" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="677" y="352.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="700" y="321" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="722" y="352.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="415" y="370" width="330" height="47" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="421" y="401.0" font-size="22" text-anchor="start" style="fill:#172B4D;font-weight:400">translation</text>
+<rect x="565" y="370" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="587" y="401.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="610" y="370" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="632" y="401.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="655" y="370" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="677" y="401.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="700" y="370" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="722" y="401.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="415" y="419" width="330" height="47" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="421" y="450.0" font-size="22" text-anchor="start" style="fill:#172B4D;font-weight:400">deep</text>
+<rect x="565" y="419" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="587" y="450.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="610" y="419" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="632" y="450.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="655" y="419" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="677" y="450.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="700" y="419" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="722" y="450.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="415" y="468" width="330" height="47" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="421" y="499.0" font-size="22" text-anchor="start" style="fill:#172B4D;font-weight:400">methods</text>
+<rect x="565" y="468" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="587" y="499.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="610" y="468" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="632" y="499.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="655" y="468" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="677" y="499.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="700" y="468" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="722" y="499.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="415" y="517" width="330" height="47" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="421" y="548.0" font-size="22" text-anchor="start" style="fill:#172B4D;font-weight:400">refund</text>
+<rect x="565" y="517" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="587" y="548.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="610" y="517" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="632" y="548.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="655" y="517" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="677" y="548.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="700" y="517" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="722" y="548.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<rect x="415" y="566" width="330" height="47" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="421" y="597.0" font-size="22" text-anchor="start" style="fill:#172B4D;font-weight:400">policy</text>
+<rect x="565" y="566" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="587" y="597.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="610" y="566" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="632" y="597.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="655" y="566" width="45" height="47" rx="0" fill="#FFFFFF" stroke="#CFD8E3" stroke-width="2"/>
+<text x="677" y="597.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">0</text>
+<rect x="700" y="566" width="45" height="47" rx="0" fill="#D9EEF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="722" y="597.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1</text>
+<line x1="762" y1="390" x2="810" y2="390" stroke="#526175" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="835" y="145.0" font-size="26" text-anchor="start" style="fill:#172B4D;font-weight:700">③ term에서 문서 찾기</text>
+<rect x="835" y="170" width="335" height="110" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="853" y="205.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">machine</text>
+<text x="853" y="240.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d1:1 · d2:1 · d3:1</text>
+<rect x="835" y="294" width="335" height="110" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="853" y="329.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">learning</text>
+<text x="853" y="364.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d1:1 · d3:2</text>
+<rect x="835" y="418" width="335" height="110" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="853" y="453.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">refund</text>
+<text x="853" y="488.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d4:1</text>
+<rect x="835" y="542" width="335" height="110" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="853" y="577.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">policy</text>
+<text x="853" y="612.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d4:1</text>
+<rect x="30" y="700" width="1140" height="62" rx="12" fill="#EAF4EE" stroke="#B9D8CA" stroke-width="2"/>
+<text x="50" y="740.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">핵심: d3의 learning은 2회지만, 등장 문서 수 df(learning)은 2개다.</text>
+</svg>

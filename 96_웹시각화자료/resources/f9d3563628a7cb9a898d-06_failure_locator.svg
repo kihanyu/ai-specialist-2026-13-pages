@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+<title id="title">정답 근거가 어디에서 사라졌는지 먼저 확인한다</title>
+<desc id="desc">네 행은 독립적인 실패 사례다. 원본, 청크, 검색 후보, 최종 입력, 답변 순서로 근거의 존재를 확인하여 처음 실패한 단계를 찾는다.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#617184"/></marker></defs>
+<rect width="1200" height="100%" fill="white"/>
+<text x="40" y="55" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="34" font-weight="700" fill="#17324d" text-anchor="start">정답 근거가 어디에서 사라졌는지 먼저 확인한다</text>
+<text x="40" y="97" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="400" fill="#17324d" text-anchor="start">찾아야 할 근거 P2: ‘전자책은 일반 환불 대상에서 제외한다’</text>
+<rect x="40" y="130" width="1120" height="65" rx="12" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="60" y="170" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="400" fill="#17324d" text-anchor="start">읽는 순서: 왼쪽부터 확인 → 처음 ‘없음’이 된 단계의 처리를 살핀다</text>
+<rect x="40" y="235" width="95" height="65" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="87.5" y="277" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">사례</text>
+<rect x="135" y="235" width="130" height="65" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="200.0" y="277" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">원본</text>
+<rect x="265" y="235" width="130" height="65" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="330.0" y="277" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">청크</text>
+<rect x="395" y="235" width="130" height="65" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="460.0" y="277" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">후보</text>
+<rect x="525" y="235" width="130" height="65" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="590.0" y="277" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">입력</text>
+<rect x="655" y="235" width="130" height="65" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="720.0" y="277" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">답변</text>
+<rect x="785" y="235" width="375" height="65" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="972.5" y="277" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">먼저 확인할 곳</text>
+<rect x="40" y="300" width="95" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="135" y="300" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="265" y="300" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="395" y="300" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="525" y="300" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="655" y="300" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="785" y="300" width="375" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="87" y="350" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">A</text>
+<text x="200.0" y="350" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="330.0" y="350" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#aa3542" text-anchor="middle">없음</text>
+<text x="460.0" y="350" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#617184" text-anchor="middle">—</text>
+<text x="590.0" y="350" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#617184" text-anchor="middle">—</text>
+<text x="720.0" y="350" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#617184" text-anchor="middle">—</text>
+<text x="805" y="350" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="start">파싱·청킹</text>
+<rect x="40" y="382" width="95" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="135" y="382" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="265" y="382" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="395" y="382" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="525" y="382" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="655" y="382" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="785" y="382" width="375" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="87" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">B</text>
+<text x="200.0" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="330.0" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="460.0" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#aa3542" text-anchor="middle">없음</text>
+<text x="590.0" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#617184" text-anchor="middle">—</text>
+<text x="720.0" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#617184" text-anchor="middle">—</text>
+<text x="805" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="start">필터·표현·ANN</text>
+<rect x="40" y="464" width="95" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="135" y="464" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="265" y="464" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="395" y="464" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="525" y="464" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="655" y="464" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="785" y="464" width="375" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="87" y="514" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">C</text>
+<text x="200.0" y="514" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="330.0" y="514" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="460.0" y="514" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="590.0" y="514" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#aa3542" text-anchor="middle">없음</text>
+<text x="720.0" y="514" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#617184" text-anchor="middle">—</text>
+<text x="805" y="514" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="start">재정렬·길이 예산</text>
+<rect x="40" y="546" width="95" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="135" y="546" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="265" y="546" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="395" y="546" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="525" y="546" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="655" y="546" width="130" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="785" y="546" width="375" height="82" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="87" y="596" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">D</text>
+<text x="200.0" y="596" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="330.0" y="596" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="460.0" y="596" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="590.0" y="596" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">있음</text>
+<text x="720.0" y="596" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#aa3542" text-anchor="middle">오답</text>
+<text x="805" y="596" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="start">조건·예외 해석·생성</text>
+<text x="40" y="675" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#617184" text-anchor="start">범례: 있음 = 필요한 근거 확보 · 없음 = 이 단계에서 누락 · — = 이후 상태 미판정</text>
+<rect x="40" y="710" width="1120" height="60" rx="12" fill="#fff5df" stroke="#cad6e0" stroke-width="2"/>
+<text x="60" y="748" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="400" fill="#17324d" text-anchor="start">예전 정책으로 답한다면? 문서 버전·인덱스 갱신·캐시도 확인한다.</text>
+</svg>

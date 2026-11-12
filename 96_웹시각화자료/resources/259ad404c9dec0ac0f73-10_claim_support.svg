@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="875" viewBox="0 0 1200 875" role="img" aria-labelledby="title desc">
+<title id="title">인용 ID가 있어도 주장을 지지하지 않을 수 있다</title>
+<desc id="desc">P1은14일 신청 기한, P2는전자책 제외를 지지한다. 즉시계좌입금 주장은 둘 다 지지하지 않으며 단순 지지 비율은2/3이다.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#617184"/></marker></defs>
+<rect width="1200" height="100%" fill="white"/>
+<text x="40" y="55" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="34" font-weight="700" fill="#17324d" text-anchor="start">인용 ID가 있어도 주장을 지지하지 않을 수 있다</text>
+<text x="40" y="98" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#617184" text-anchor="start">범례: ‘지지’ = 해당 문장이 근거에 있음 · ‘없음’ = 이 자료로 입증되지 않음</text>
+<rect x="40" y="135" width="540" height="125" rx="12" fill="#edf5fc" stroke="#2266ab" stroke-width="2"/>
+<text x="310.0" y="173" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#2266ab" text-anchor="middle">P1: 기간 규칙</text>
+<text x="310.0" y="212" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">일반 상품은 구매 후 14일 이내</text>
+<text x="310.0" y="246" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">환불을 신청할 수 있다.</text>
+<rect x="620" y="135" width="540" height="125" rx="12" fill="#edf8f5" stroke="#0d746e" stroke-width="2"/>
+<text x="890.0" y="173" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">P2: 상품 예외</text>
+<text x="890.0" y="212" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">전자책은 일반 환불 대상에서</text>
+<text x="890.0" y="246" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" font-weight="400" fill="#17324d" text-anchor="middle">제외한다.</text>
+<rect x="40" y="315" width="690" height="60" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="60" y="354" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="start">답변에 포함된 주장</text>
+<rect x="730" y="315" width="215" height="60" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="837.5" y="354" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">P1</text>
+<rect x="945" y="315" width="215" height="60" rx="0" fill="#edf5fc" stroke="#cad6e0" stroke-width="2"/>
+<text x="1052.5" y="354" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="middle">P2</text>
+<rect x="40" y="375" width="690" height="95" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="730" y="375" width="215" height="95" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="945" y="375" width="215" height="95" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="60" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="400" fill="#17324d" text-anchor="start">① 일반 상품의 신청 기한은 14일이다.</text>
+<text x="837.5" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">지지</text>
+<text x="1052.5" y="432" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#aa3542" text-anchor="middle">없음</text>
+<rect x="40" y="470" width="690" height="95" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="730" y="470" width="215" height="95" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<rect x="945" y="470" width="215" height="95" rx="0" fill="white" stroke="#cad6e0" stroke-width="2"/>
+<text x="60" y="527" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="400" fill="#17324d" text-anchor="start">② 전자책은 일반 환불에서 제외된다.</text>
+<text x="837.5" y="527" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#aa3542" text-anchor="middle">없음</text>
+<text x="1052.5" y="527" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#0d746e" text-anchor="middle">지지</text>
+<rect x="40" y="565" width="690" height="95" rx="0" fill="#fff0f1" stroke="#cad6e0" stroke-width="2"/>
+<rect x="730" y="565" width="215" height="95" rx="0" fill="#fff0f1" stroke="#cad6e0" stroke-width="2"/>
+<rect x="945" y="565" width="215" height="95" rx="0" fill="#fff0f1" stroke="#cad6e0" stroke-width="2"/>
+<text x="60" y="622" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="400" fill="#17324d" text-anchor="start">③ 신청 즉시 계좌로 입금된다.</text>
+<text x="837.5" y="622" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#aa3542" text-anchor="middle">없음</text>
+<text x="1052.5" y="622" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#aa3542" text-anchor="middle">없음</text>
+<rect x="40" y="710" width="1120" height="125" rx="12" fill="#fff5df" stroke="#cad6e0" stroke-width="2"/>
+<text x="65" y="750" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#17324d" text-anchor="start">세 주장 중 두 개만 지지됨 → 단순 지지 비율 = 2 / 3 ≈ 0.667</text>
+<text x="65" y="797" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" font-weight="400" fill="#17324d" text-anchor="start">③에 [P1]을 붙여도 근거는 생기지 않는다. 지우거나 미확인으로 표시한다.</text>
+</svg>

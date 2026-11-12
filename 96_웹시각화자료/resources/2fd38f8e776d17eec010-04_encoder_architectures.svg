@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+<title id="title">질문과 문서가 만나는 시점이 검색 구조를 바꾼다</title><desc id="desc">Cross-Encoder: 함께 읽기 / Bi-Encoder: 따로 읽고 비교하기</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526175"/></marker></defs>
+<style>text{font-family:"Malgun Gothic","Noto Sans KR",sans-serif;fill:#172B4D} .note{fill:#526175}</style>
+<rect width="1200" height="820" fill="white"/>
+<text x="30" y="48.0" font-size="32" text-anchor="start" style="fill:#172B4D;font-weight:700">질문과 문서가 만나는 시점이 검색 구조를 바꾼다</text>
+<text x="30" y="92.0" font-size="24" text-anchor="start" style="fill:#526175;font-weight:400">Cross-Encoder: 함께 읽기 / Bi-Encoder: 따로 읽고 비교하기</text>
+<rect x="25" y="125" width="550" height="580" rx="12" fill="#F5F9FC" stroke="#CFD8E3" stroke-width="2"/>
+<rect x="625" y="125" width="550" height="580" rx="12" fill="#F6FAF8" stroke="#CFD8E3" stroke-width="2"/>
+<text x="50" y="170.0" font-size="29" text-anchor="start" style="fill:#0072B2;font-weight:700">Cross-Encoder</text>
+<rect x="50" y="200" width="500" height="112" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="68" y="235.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">쌍 입력</text>
+<text x="68" y="270.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">[CLS] 질문 [SEP] 문서 [SEP]</text>
+<line x1="300" y1="318" x2="300" y2="352" stroke="#526175" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="50" y="360" width="500" height="135" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="68" y="395.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">하나의 Transformer encoder</text>
+<text x="68" y="430.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">질문 ↔ 문서 토큰이 함께 Attention</text>
+<text x="68" y="462.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">쌍마다 h_CLS가 달라진다.</text>
+<line x1="300" y1="502" x2="300" y2="535" stroke="#526175" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="50" y="545" width="500" height="112" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="68" y="580.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">선형 head → 점수 s(q,d)</text>
+<text x="68" y="615.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">후보 C개라면 C쌍 인코딩</text>
+<text x="650" y="170.0" font-size="29" text-anchor="start" style="fill:#00856A;font-weight:700">Bi-Encoder</text>
+<rect x="650" y="200" width="235" height="112" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="668" y="235.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">질문</text>
+<text x="668" y="270.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">질문 encoder</text>
+<rect x="910" y="200" width="235" height="112" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="928" y="235.0" font-size="25" text-anchor="start" style="fill:#00856A;font-weight:700">문서</text>
+<text x="928" y="270.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">문서 encoder</text>
+<line x1="768" y1="318" x2="768" y2="352" stroke="#526175" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1028" y1="318" x2="1028" y2="352" stroke="#526175" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="650" y="360" width="235" height="112" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="668" y="395.0" font-size="25" text-anchor="start" style="fill:#0072B2;font-weight:700">질문 벡터 u</text>
+<text x="668" y="430.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">질의마다 계산</text>
+<rect x="910" y="360" width="235" height="112" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="928" y="395.0" font-size="25" text-anchor="start" style="fill:#00856A;font-weight:700">문서 벡터 v</text>
+<text x="928" y="430.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">미리 저장 가능</text>
+<line x1="768" y1="480" x2="850" y2="535" stroke="#526175" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1028" y1="480" x2="950" y2="535" stroke="#526175" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="650" y="545" width="495" height="112" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="668" y="580.0" font-size="25" text-anchor="start" style="fill:#00856A;font-weight:700">내적 uᵀv → 점수</text>
+<text x="668" y="615.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">벡터 인덱스로 후보 탐색 가능</text>
+<rect x="30" y="740" width="1140" height="55" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="45" y="776.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">차이: 같은 softmax 손실을 써도 입력 구조·사전 계산·encoder 처리 쌍 수는 다르다.</text>
+</svg>

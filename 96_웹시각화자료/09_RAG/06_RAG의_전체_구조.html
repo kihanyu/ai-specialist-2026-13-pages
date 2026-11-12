@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/rag-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html" aria-current="page">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>인덱싱과 질의 단계의 입력·출력·저장 본문·벡터·메타데이터·갱신 비용을 연결한다.</li><li>검색 후보 수와 최종 컨텍스트 수를 구분하고 출력 예약·고정 입력을 포함한 토큰 예산을 계산한다.</li><li>원문·청크·후보·최종 입력·답변에서 근거가 처음 사라지는 위치와 버전·권한·표현 공간 불일치를 진단한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="rag-context-budget" id="lab-rag-context-budget"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-해결하려는-문제-모델이-아는-것과-지금-확인해야-할-것은-다르다">1. 해결하려는 문제: 모델이 아는 것과 지금 확인해야 할 것은 다르다</a></li><li><a href="#sec-2-인덱싱과-질의를-나눠서-보기">2. 인덱싱과 질의를 나눠서 보기</a></li><li><a href="#sec-3-작은-예제로-끝까지-추적하기">3. 작은 예제로 끝까지 추적하기</a></li><li><a href="#sec-4-임베딩-모델과-벡터-db가-보장하지-않는-것">4. 임베딩 모델과 벡터 DB가 보장하지 않는 것</a></li><li><a href="#sec-5-후보-수와-컨텍스트-예산은-서로-다른-설정이다">5. 후보 수와 컨텍스트 예산은 서로 다른 설정이다</a></li><li><a href="#sec-6-실패를-단계별로-진단하기">6. 실패를 단계별로 진단하기</a></li><li><a href="#sec-7-스스로-확인하기">7. 스스로 확인하기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-06-rag의-전체-구조-문서에서-근거를-찾아-답변까지-연결하기">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</h1>
+<p><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">이전: 벡터검색과 인덱스</a> · <a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">다음: 청킹과 컨텍스트 구성</a></p>
+<h2 id="sec-1-해결하려는-문제-모델이-아는-것과-지금-확인해야-할-것은-다르다">1. 해결하려는 문제: 모델이 아는 것과 지금 확인해야 할 것은 다르다</h2>
+<p>고객이 “어제 구매한 전자책도 환불되나요?”라고 물었다고 하자. 언어 모델이 일반적인 환불 설명을 잘하더라도, 우리 회사의 현재 전자책 정책을 확인했다는 뜻은 아니다. 학습 뒤에 바뀐 정책, 사내 전용 문서, 구매자에게만 허용된 정보는 질문 시점에 별도로 접근해야 한다. 학습한 내용에 대해서도 모델의 기억이 정확하다고 보장할 수 없다.</p>
+<p>**RAG(Retrieval-Augmented Generation)**는 질문과 관련된 외부 자료를 검색하고, 그 결과를 생성 모델의 입력에 넣어 답변을 만드는 구성이다. 검색은 근거를 가져오고, 생성은 그 근거를 질문에 맞게 설명한다. 문서를 프롬프트에 넣는 보통의 RAG 요청에서 생성 모델의 가중치는 바뀌지 않는다. 검색기와 생성기를 함께 학습하는 RAG-Sequence는 <a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08장</a>에서 별도로 다룬다.</p>
+<p>RAG가 필요한지는 먼저 <strong>어떤 질문에 어떤 데이터로 답할 것인가</strong>로 결정한다. 날짜·버전이 중요하면 그 정보를 저장해야 하고, 전체 매출 집계처럼 모든 행을 계산해야 하는 질문에는 Top-k 문서 검색만으로 충분하지 않다. SQL이나 계산 도구를 함께 써야 할 수 있다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구성 요소</th>
+<th>입력</th>
+<th>출력</th>
+<th>맡은 일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>문서 처리기</td>
+<td>PDF·HTML·텍스트·DB 레코드</td>
+<td>본문과 출처·버전·권한 메타데이터</td>
+<td>검색 가능한 형태로 정리</td>
+</tr>
+<tr>
+<td>Chunker</td>
+<td>본문과 문서 구조</td>
+<td>청크와 원문 위치</td>
+<td>검색 단위를 생성</td>
+</tr>
+<tr>
+<td>Embedding model</td>
+<td>질의 또는 청크 텍스트</td>
+<td>고정 차원의 벡터</td>
+<td>의미 검색에 쓸 표현 생성</td>
+</tr>
+<tr>
+<td>Retriever</td>
+<td>질문·필터·인덱스</td>
+<td>점수와 출처가 있는 후보 목록</td>
+<td>관련 근거 검색</td>
+</tr>
+<tr>
+<td>Reranker, 선택 사항</td>
+<td>질문과 후보 목록</td>
+<td>재정렬된 후보</td>
+<td>후보 안에서 관련성 정밀 판단</td>
+</tr>
+<tr>
+<td>Context builder</td>
+<td>후보와 입력 길이 예산</td>
+<td>모델에 넣을 근거 묶음</td>
+<td>중복·순서·인용 ID·길이 관리</td>
+</tr>
+<tr>
+<td>Reader / Generator</td>
+<td>질문·근거·답변 규칙</td>
+<td>답변 또는 보류</td>
+<td>근거를 읽고 답변 생성</td>
+</tr>
+</tbody>
+</table></div>
+<p>Reader는 근거를 읽어 답하는 역할을 뜻한다. 문서에서 답 구간을 뽑는 reader도 있고 자유 문장을 생성하는 reader도 있다. 이 장에서는 생성형 reader가 답을 작성하는 경우를 중심으로 설명한다.</p>
+<h2 id="sec-2-인덱싱과-질의를-나눠서-보기">2. 인덱싱과 질의를 나눠서 보기</h2>
+<p>RAG의 두 단계는 서로 다른 입력과 비용을 갖는다.</p>
+<p><img alt="문서 등록·변경 시 수행하는 인덱싱과 질문마다 수행하는 질의 처리, 저장된 표현·본문의 연결" decoding="async" id="figure-1" loading="lazy" src="../resources/b7f7a55170fdf433ea58-06_indexing_query.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/b7f7a55170fdf433ea58-06_indexing_query.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> 위쪽 파란 흐름에서 문서를 청크·표현으로 준비하고, 아래쪽 초록 흐름에서 질문에 필요한 근거를 찾는다. 가운데 연결선은 이미 저장한 벡터·본문의 재사용이다. 검색 인덱스가 주는 후보를 근거 구성기가 선택한 뒤 생성기에 전달한다. 이때 문서를 입력에 넣는 것과 모델 가중치를 학습하는 것은 다르다.</p>
+<p><strong>인덱싱</strong>에서는 원본을 읽고 청크를 만든 뒤, 검색에 쓸 표현과 원문을 저장한다. 문서 ID뿐 아니라 청크 ID, 원문 위치, 문서 버전, 갱신 시각을 남겨야 검색 결과를 원문에 연결할 수 있다. 의미 검색용 벡터 인덱스와 키워드 검색용 역색인은 같은 자료에서 서로 다른 표현을 저장한다.</p>
+<p><strong>질의 단계</strong>에서는 질문과 접근 조건을 받아 후보를 찾는다. 모델에 모든 후보를 넣는 것이 아니라, 필요한 근거를 선택하고 질문·출력 규칙과 함께 프롬프트를 구성한다. 답변이 오면 인용 ID가 실제 검색 결과에 있는지, 근거가 주장을 지지하는지도 확인해야 한다.</p>
+<p>인덱싱은 “한 번만 하면 끝”이 아니다. 문서 변경·삭제·권한 변경이나 임베딩 모델 교체 때 갱신해야 한다. 원본 문서가 바뀌어도 이전 벡터와 본문을 사용하면 답변은 예전 정책을 따른다. 문서 갱신과 검색 반영 사이의 지연도 시스템의 정확성 조건이다.</p>
+<h2 id="sec-3-작은-예제로-끝까지-추적하기">3. 작은 예제로 끝까지 추적하기</h2>
+<p>아래는 실제 회사 정책이 아닌 학습용 자료다. 세 청크는 모두 같은 시점에 유효하다고 가정한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>청크 ID</th>
+<th>원문 내용</th>
+<th>메타데이터</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>일반 상품은 구매 후 14일 이내 환불을 신청할 수 있다.</td>
+<td>문서 <code>refund-v3</code>, 절 <code>기간</code>, 공개</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>전자책과 소프트웨어 라이선스는 일반 환불 대상에서 제외한다.</td>
+<td>문서 <code>refund-v3</code>, 절 <code>제외</code>, 공개</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>사내 소모품 구매는 부서장의 승인을 받는다.</td>
+<td>문서 <code>purchase-v2</code>, 사내 전용</td>
+</tr>
+</tbody>
+</table></div>
+<p>질문은 “어제 산 전자책도 환불되나요?”다. 접근 가능한 공개 청크만 검색한다고 하자. 설명을 위해 실제 임베딩 모델 대신 다음 2차원 단위벡터를 사용한다.</p>
+<div class="math-raw math-display">$$
+q=(1,0),\quad e(P1)=(0.8,0.6),\quad e(P2)=(1,0),\quad e(P3)=(0,1).
+$$</div><p>모두 길이가 1이므로 cosine similarity는 내적과 같다. 점수는 P1이 0.8, P2가 1.0, P3가 0이다. 권한 조건을 통과한 P1·P2 중에서 Top-2를 가져오면 순서는 P2, P1이다. <strong>이 숫자는 관련성 점수이며, 정책이 맞을 확률이나 환불 가능 확률이 아니다.</strong> 실제 모델 벡터의 각 좌표에 사람이 붙일 수 있는 고정 의미가 있다고 가정하지 않는다.</p>
+<p>컨텍스트 구성기는 다음과 같은 입력을 만든다.</p>
+<pre><code class="language-text">답변 규칙: 제공한 자료를 근거로 답하고 사용한 문서 ID를 표시한다.
+자료에 없는 예외는 추측하지 않는다.
+
+[P2 | refund-v3 | 제외]
+전자책과 소프트웨어 라이선스는 일반 환불 대상에서 제외한다.
+
+[P1 | refund-v3 | 기간]
+일반 상품은 구매 후 14일 이내 환불을 신청할 수 있다.
+
+질문: 어제 산 전자책도 환불되나요?
+</code></pre>
+<p>근거에 충실한 답변은 “제공된 정책에서 전자책은 일반 환불 대상에서 제외됩니다. [P2]”다. “어제 샀으므로 14일 이내여서 가능하다”는 답은 기간 규칙만 읽고 상품 예외를 놓친 것이다. P1과 P2를 둘 다 검색했는데도 이렇게 답하면 <strong>검색 성공 뒤의 근거 해석 실패</strong>다. P1만 검색했다면 <strong>필요한 예외 근거를 확보하지 못한 실패</strong>가 먼저다.</p>
+<h2 id="sec-4-임베딩-모델과-벡터-db가-보장하지-않는-것">4. 임베딩 모델과 벡터 DB가 보장하지 않는 것</h2>
+<p>문서와 질문은 <strong>호환되는 검색 표현 공간</strong>에 있어야 한다. 같은 차원이라고 호환되는 것은 아니다. 서로 다른 모델이 만든 768차원 벡터를 섞으면 좌표의 기준이 다르므로 유사도 비교가 의미를 잃을 수 있다. Bi-Encoder는 질의·문서용 인코더가 다를 수 있지만, 함께 학습된 호환 공간을 사용한다. 모델이 요구하는 query/document 입력 형식도 맞춰야 한다.</p>
+<p>벡터 DB는 벡터와 연결된 식별자·메타데이터를 저장하고 근접 후보를 찾는다. 정책의 최신성·권위·적용 대상까지 벡터 유사도만으로 판단하지는 않는다. 날짜·문서 종류·언어·사용자 권한이 중요하면 별도 메타데이터 조건을 사용한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>선택 기준</th>
+<th>확인할 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>임베딩</td>
+<td>내 문서·질문 언어와 전문 용어에서 관련 문서를 상위에 올리는가?</td>
+</tr>
+<tr>
+<td>인덱스</td>
+<td>목표 recall에서 지연·메모리·갱신 비용을 만족하는가?</td>
+</tr>
+<tr>
+<td>DB</td>
+<td>필요한 필터·삭제·백업·버전 관리·동시 접근을 지원하는가?</td>
+</tr>
+<tr>
+<td>검색 방식</td>
+<td>정확한 코드·이름 검색과 의미 검색이 각각 필요한가?</td>
+</tr>
+<tr>
+<td>생성 모델</td>
+<td>근거의 조건·예외를 읽고 인용·보류 규칙을 따르는가?</td>
+</tr>
+</tbody>
+</table></div>
+<p>모델·DB 선택에서는 제품 순위 하나보다 같은 데이터와 목표 recall에서의 측정 조건을 확인한다. API 사용료뿐 아니라 자체 호스팅·인덱스 저장·문서 갱신 비용도 비교해야 한다.</p>
+<h2 id="sec-5-후보-수와-컨텍스트-예산은-서로-다른-설정이다">5. 후보 수와 컨텍스트 예산은 서로 다른 설정이다</h2>
+<p>검색 Top-50과 모델에 넣는 Top-5는 모순이 아니다. 전자는 정답을 놓치지 않기 위한 후보 수이고, 후자는 입력 길이·노이즈를 고려한 최종 근거 수다. 중간에 reranking과 중복 제거가 있을 수 있다. <a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09장</a>에서 이 단계를 분리한다.</p>
+<p>예를 들어 입력에 쓸 수 있는 예산을 4,000토큰, 규칙·질문·문서 ID 등 고정 부분을 600토큰, 청크 하나를 500토큰으로 가정하면 근거 예산은 3,400토큰이다.</p>
+<div class="math-raw math-display">$$
+K_{context}\leq \left\lfloor\frac{4000-600}{500}\right\rfloor=6.
+$$</div><p>7개는 4,100토큰으로 예산을 넘는다. 실제 청크 길이는 서로 다르고, 사용하는 모델의 토크나이저로 계산해야 한다. 출력 토큰까지 포함하는 전체 context window 제한이 있다면, 위의 <strong>입력 예산을 정하기 전에</strong> 출력에 필요한 공간도 예약해야 한다.</p>
+<p>온라인 지연은 대략 <code>질의 처리 + 검색 + 재정렬 + 프롬프트 구성 + 생성</code>이다. 병렬 검색 두 개의 지연을 단순 합산하지는 않지만, 느린 검색의 응답과 결과 통합을 기다려야 한다. 청크마다 LLM으로 문맥을 생성하는 비용은 주로 인덱싱에서 발생한다. 이를 온라인 생성 비용과 구분해야 변경의 영향을 알 수 있다.</p>
+<h2 id="sec-6-실패를-단계별로-진단하기">6. 실패를 단계별로 진단하기</h2>
+<p><img alt="원본부터 답변까지 근거 상태를 확인하여 파싱·검색·입력 구성·생성 실패를 구분하는 표" decoding="async" id="figure-2" loading="lazy" src="../resources/f9d3563628a7cb9a898d-06_failure_locator.svg"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/f9d3563628a7cb9a898d-06_failure_locator.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> A~D는 서로 다른 실패 사례다. 한 행에서 왼쪽부터 확인하여 근거가 처음 사라진 위치를 찾는다. D처럼 최종 입력까지 P2가 있는데도 잘못 답했다면, 검색 실패보다 생성기의 조건·예외 해석을 먼저 살핀다. ‘있음’ 표시는 관련 근거를 확보했다는 뜻이며, 그 뒤 모든 처리가 자동으로 성공한다는 뜻은 아니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>관찰</th>
+<th>먼저 확인할 곳</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>원본에는 답이 있는데 청크에 없다</td>
+<td>파싱·청킹</td>
+<td>표 헤더나 예외 조항이 떨어져 나갔을 수 있음</td>
+</tr>
+<tr>
+<td>청크에는 있는데 후보에 없다</td>
+<td>필터·검색기·인덱스</td>
+<td>잘못된 필터, 표현 불일치, ANN 누락 가능</td>
+</tr>
+<tr>
+<td>후보에는 있는데 최종 입력에 없다</td>
+<td>reranking·예산·중복 제거</td>
+<td>순위나 길이 때문에 근거가 제거될 수 있음</td>
+</tr>
+<tr>
+<td>입력에는 있는데 답이 틀리다</td>
+<td>프롬프트·생성·근거 검증</td>
+<td>조건·예외·시간 관계를 잘못 읽었을 수 있음</td>
+</tr>
+<tr>
+<td>예전 정책으로 답한다</td>
+<td>버전·갱신·캐시</td>
+<td>최신 문서가 검색에 반영되지 않았을 수 있음</td>
+</tr>
+</tbody>
+</table></div>
+<p>RAG가 외부 근거를 제공해도 생성 오류가 없어지는 것은 아니다. 검색·입력 구성·생성 중 어디에서 얼마나 실패하는지는 데이터·질문·시스템에 따라 측정해야 한다. RAG와 fine-tuning도 같은 문제를 해결하는 대체재가 아니다. 최신 근거 접근과 모델 행동·출력 방식의 학습은 함께 필요할 수 있다.</p>
+<h2 id="sec-7-스스로-확인하기">7. 스스로 확인하기</h2>
+<ol>
+<li>문서 파일만 최신으로 바꾸고 임베딩·본문 저장소를 갱신하지 않았다. 질문 시점에 최신 정책이 반영되는가?</li>
+<li>예제에서 P1·P2를 모두 입력했는데 환불 가능하다고 답했다면 검색기를 먼저 바꿔야 하는가?</li>
+<li>질의·문서 벡터의 차원이 같다는 사실만으로 같은 인덱스에 넣어도 되는가?</li>
+<li>위의 4,000토큰 예산에서 청크를 7개 넣을 수 없는 이유는 무엇인가?</li>
+</ol>
+<details>
+<summary>학습용 해설</summary>
+<ol>
+<li>보장할 수 없다. 검색되는 청크·벡터·버전과 캐시를 함께 확인해야 한다.</li>
+<li>근거가 이미 최종 입력에 있다면 생성 단계의 예외 해석과 근거 검증을 먼저 살핀다. 검색 지표와 답변 지표를 분리하는 이유다.</li>
+<li>아니다. 차원은 배열 크기이고, 좌표계의 호환성은 모델의 학습·입력 계약에 달려 있다.</li>
+<li><code>600 + 7×500 = 4,100</code>으로 입력 예산을 넘는다. 6개는 3,600토큰이다.</li>
+</ol>
+</details>
+<p><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">이전: 벡터검색과 인덱스</a> · <a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">다음: 청킹과 컨텍스트 구성</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.md">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html"><small>이전 장</small>05. 벡터검색과 인덱스</a><a rel="next" href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html"><small>다음 장</small>07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

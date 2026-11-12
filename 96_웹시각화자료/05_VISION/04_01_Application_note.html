@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Vision Applications: 검출·추적·분할 학습 안내 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">VISION 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">Vision 자습 교재: 이미지에서 예측과 영역까지</a></li><li><a href="01_%EB%B9%84%EC%A0%84_%EC%9E%85%EB%AC%B8.html">비전 입문: 사진을 숫자로 표현하고 예측을 평가하기</a></li><li><a href="02_01_DNN_Note.html">DNN: 예측 확률에서 손실과 가중치 업데이트까지</a></li><li><a href="02_02_CNN_Note.html">CNN</a></li><li><a href="02_03_CNN_ResNet_18Layer.html">ResNet-18: 잔차를 이해하고 차원을 추적하며 구현하기</a></li><li><a href="03_01_Attention_Note.html">Attention 학습 지도</a></li><li><a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT: 관계 계산에서 이미지 분류까지</a></li><li><a href="03_03_DeiT%EC%99%80_Swin.html">DeiT와 Swin: 데이터 효율과 계산 효율</a></li><li><a href="03_04_CLIP%EA%B3%BC_DINO.html">CLIP과 DINO: 정답 신호를 어디서 얻을까</a></li><li><a href="04_01_Application_note.html" aria-current="page">Vision Applications: 검출·추적·분할 학습 안내</a></li><li><a href="04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.html">객체 검출: 박스를 만들고, 중복을 줄이고, 성능을 판단하기</a></li><li><a href="04_03_%EA%B0%9D%EC%B2%B4_%EC%B6%94%EC%A0%81.html">객체 추적 — 위치를 갱신하면서 같은 ID를 유지하기</a></li><li><a href="04_04_%EC%98%81%EC%83%81_%EB%B6%84%ED%95%A0.html">영상 분할 — 픽셀의 의미와 개체의 경계를 예측하기</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">VISION</p><h1>Vision Applications: 검출·추적·분할 학습 안내</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>검출·추적·분할에서 필요한 출력과 평가 단위를 비교한다.</li><li>모델 이름을 박스·ID·마스크의 역할에 연결한다.</li></ul></details></header><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-vision-applications-검출추적분할-학습-안내">Vision Applications: 검출·추적·분할 학습 안내</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-vision-applications-검출추적분할-학습-안내">Vision Applications: 검출·추적·분할 학습 안내</h1>
+<p>CNN과 Attention으로 얻은 특징을 실제 시각 과제의 출력으로 바꾸는 과정입니다. <strong>검출은 종류와 박스, 추적은 시간에 걸친 ID, 분할은 픽셀 영역</strong>을 예측합니다. 상세 본문은 아래 세 문서가 기준입니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>중심 질문</th>
+<th>읽을 문서</th>
+<th>핵심 목표</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>무엇이 어디에 있는가?</td>
+<td><a href="04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.html">객체 검출</a></td>
+<td>IoU·NMS·AP 계산, R-CNN 계열·CenterNet·DETR 설계 비교</td>
+</tr>
+<tr>
+<td>이전 프레임의 누구와 같은가?</td>
+<td><a href="04_03_%EA%B0%9D%EC%B2%B4_%EC%B6%94%EC%A0%81.html">객체 추적</a></td>
+<td>ID 연결과 검출 오류 구분, ByteTrack·TrackFormer 이해</td>
+</tr>
+<tr>
+<td>정확히 어느 픽셀에 있는가?</td>
+<td><a href="04_04_%EC%98%81%EC%83%81_%EB%B6%84%ED%95%A0.html">영상 분할</a></td>
+<td>Semantic·Instance·Panoptic 구분, FCN·Mask R-CNN·U-Net·SegFormer·SAM 이해</td>
+</tr>
+</tbody>
+</table></div>
+<p>처음 학습한다면 <a href="02_02_CNN_Note.html">CNN</a> → <a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT</a> → 검출 → 추적 → 분할 순서를 권합니다. 분할만 필요한 경우 검출의 IoU와 RPN·RoI 개념을 복습한 후 분할로 이동해도 됩니다. 각 문서 첫머리의 선수지식과 기본·심화 경로를 따라 읽고 마지막 질문을 풀어 보세요.</p>
+<p>모델을 선택할 때는 원하는 출력과 실패 비용을 먼저 정합니다. 박스가 맞아도 ID가 바뀔 수 있고, ID를 유지해도 픽셀 경계는 틀릴 수 있습니다. AP, 추적 지표, 분할 지표는 각각 다른 실패를 측정하므로 숫자만 직접 비교하지 않습니다.</p>
+<p>원문은 <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%EA%B5%90%EC%95%88/04_00_Applications.pdf">04_00_Applications.pdf</a>입니다. 쪽수는 PDF 실제 순서이며 검출은 3–35쪽, 추적은 37–61쪽, 분할은 63–101쪽에 대응합니다. 표지와 각 장 구분은 본문 개념 설명에서 제외했습니다. 원문의 실험 수치는 해당 설정의 결과로 읽고, 보충·정정·작은 계산은 각 상세 문서의 표시와 근거를 확인하세요.</p>
+<p>복습 질문: “한 프레임에서 사람을 둘 다 찾았지만 다음 프레임에서 ID가 뒤바뀌었다”면 어떤 문서로 돌아가야 할까요? <strong>추적</strong>입니다. 검출 정답 여부만으로 시간에 걸친 동일성을 보장하지 못하기 때문입니다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/04_01_Application_note.md">Vision Applications: 검출·추적·분할 학습 안내 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="03_04_CLIP%EA%B3%BC_DINO.html"><small>이전 장</small>CLIP과 DINO: 정답 신호를 어디서 얻을까</a><a rel="next" href="04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.html"><small>다음 장</small>객체 검출: 박스를 만들고, 중복을 줄이고, 성능을 판단하기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

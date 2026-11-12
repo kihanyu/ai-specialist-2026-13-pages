@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>02. TF-IDF와 BM25 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/rag-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html" aria-current="page">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>02. TF-IDF와 BM25</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>원문 네 문서에서 길이·DF·avgdl을 구하고 이진 질의와 길이 정규화 TF-IDF 점수를 계산한다.</li><li>BM25의 원시 빈도·양수 IDF 변형·k₁·b·고유 질의 term 규약을 적용해 문서별 기여와 순위를 계산한다.</li><li>포화와 길이 보정의 역할을 구분하고 f=0·k₁=0·어휘 밖 term·동점 조건을 설명한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="rag-bm25" id="lab-rag-bm25"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-입력과-필요한-통계">1. 입력과 필요한 통계</a></li><li><a href="#sec-2-tf-한-문서-안에서-얼마나-자주-나오는가">2. TF: 한 문서 안에서 얼마나 자주 나오는가?</a></li><li><a href="#sec-3-idf-전체-집합에서는-얼마나-드문가">3. IDF: 전체 집합에서는 얼마나 드문가?</a></li><li><a href="#sec-4-tf-idf-표현을-만든-뒤-점수-규칙을-정한다">4. TF-IDF: 표현을 만든 뒤 점수 규칙을 정한다</a></li><li><a href="#sec-5-bm25-반복을-포화시키고-길이를-보정한다">5. BM25: 반복을 포화시키고 길이를 보정한다</a></li><li><a href="#sec-6-포화-곡선과-길이-보정을-숫자로-읽기">6. 포화 곡선과 길이 보정을 숫자로 읽기</a></li><li><a href="#sec-7-역색인과-연결하고-한계를-이해하기">7. 역색인과 연결하고 한계를 이해하기</a></li><li><a href="#sec-8-확인-질문과-해설">8. 확인 질문과 해설</a></li><li><a href="#sec-그림으로-복습하기">그림으로 복습하기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-02-tf-idf와-bm25">02. TF-IDF와 BM25</h1>
+<p><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">이전: 검색의 기본과 역색인</a> · <a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">다음: 검색 평가지표</a></p>
+<p>단어가 겹치는 문서만 골라도 순서는 남는다. <strong>문서 안에서 자주 나오는 단어</strong>와 <strong>문서 집합 전체에서는 드문 단어</strong>를 구별하면 더 유용한 점수를 만들 수 있다. TF-IDF는 이 두 통계를 곱하고, BM25는 단어 반복의 포화와 문서 길이를 명시적으로 보정한다.</p>
+<h2 id="sec-1-입력과-필요한-통계">1. 입력과 필요한 통계</h2>
+<p>입력은 질의 <span class="math-raw math-inline">$q$</span>, 문서 <span class="math-raw math-inline">$d$</span>, 문서 집합 <span class="math-raw math-inline">$D$</span>다. 출력은 질의에 대한 문서별 점수다. 점수는 확률이 아니며, 이 공식만으로 ‘정답일 확률 80%’라고 읽을 수 없다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기호</th>
+<th>뜻</th>
+<th>예제 값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$N=\lvert D\rvert$</span></td>
+<td>전체 문서 수</td>
+<td>4</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$f(t,d)$</span></td>
+<td>문서 <span class="math-raw math-inline">$d$</span>에 term <span class="math-raw math-inline">$t$</span>가 나온 횟수</td>
+<td><span class="math-raw math-inline">$f(learning,d_3)=2$</span></td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$\lvert d\rvert$</span></td>
+<td>전처리 후 문서의 term 수</td>
+<td><span class="math-raw math-inline">$\lvert d_3\rvert=5$</span></td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$df(t)$</span></td>
+<td>term <span class="math-raw math-inline">$t$</span>를 포함한 문서 수</td>
+<td><span class="math-raw math-inline">$df(learning)=2$</span></td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$avgdl$</span></td>
+<td>문서 길이의 평균</td>
+<td><span class="math-raw math-inline">$(3+2+5+2)/4=3$</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>01장의 문서 집합을 다시 쓰면 다음과 같다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>문서</th>
+<th>텍스트</th>
+<th style="text-align:right"><span class="math-raw math-inline">$\lvert d\rvert$</span></th>
+<th style="text-align:right">machine 횟수</th>
+<th style="text-align:right">learning 횟수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$d_1$</span></td>
+<td><code>machine learning basics</code></td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_2$</span></td>
+<td><code>machine translation</code></td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_3$</span></td>
+<td><code>deep learning machine learning methods</code></td>
+<td style="text-align:right">5</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_4$</span></td>
+<td><code>refund policy</code></td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>learning</code>은 총 3번 나오지만 등장한 문서는 2개다. <strong>총 등장 횟수와 <span class="math-raw math-inline">$df$</span>를 혼동하면 IDF가 틀어진다.</strong> 이 장은 자연로그 <span class="math-raw math-inline">$\ln$</span>을 사용하고, 중간 계산은 반올림하지 않으며 표의 최종값만 반올림한다.</p>
+<h2 id="sec-2-tf-한-문서-안에서-얼마나-자주-나오는가">2. TF: 한 문서 안에서 얼마나 자주 나오는가?</h2>
+<p>TF에는 원시 횟수, 길이로 나눈 비율, 로그 빈도 등 여러 정의가 있다. 이 장에서는 길이 정규화 정의를 쓴다.</p>
+<div class="math-raw math-display">$$TF(t,d)=\frac{f(t,d)}{|d|}.$$</div><p><span class="math-raw math-inline">$d_1$</span>의 <code>learning</code>은 <span class="math-raw math-inline">$1/3$</span>, <span class="math-raw math-inline">$d_3$</span>는 <span class="math-raw math-inline">$2/5$</span>다. 원시 횟수는 두 배지만 비율은 <span class="math-raw math-inline">$0.3333\to0.4$</span>다. 빈도 비율은 문서 안의 비중이고, 전체 문서 집합에서 흔한지는 아직 반영하지 않는다. 빈 문서는 분모가 0이므로 인덱싱에서 제외하거나 빈 벡터로 처리하는 규칙을 정해야 한다.</p>
+<h2 id="sec-3-idf-전체-집합에서는-얼마나-드문가">3. IDF: 전체 집합에서는 얼마나 드문가?</h2>
+<p>이 장의 기본 TF-IDF는 다음 IDF를 쓴다.</p>
+<div class="math-raw math-display">$$IDF(t)=\ln\frac{N}{df(t)}.$$</div><div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>term</th>
+<th style="text-align:right"><span class="math-raw math-inline">$df$</span></th>
+<th style="text-align:right">IDF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>machine</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right"><span class="math-raw math-inline">$\ln(4/3)\approx0.287682$</span></td>
+</tr>
+<tr>
+<td>learning</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"><span class="math-raw math-inline">$\ln 2\approx0.693147$</span></td>
+</tr>
+<tr>
+<td>basics</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><span class="math-raw math-inline">$\ln4\approx1.386294$</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>모든 문서에 나온 term은 이 정의에서 <span class="math-raw math-inline">$IDF=\ln1=0$</span>이다. 이는 <strong>이 가중치로 문서들을 구별하는 기여가 0</strong>이라는 뜻이다. 단어가 문장 의미에서 무의미하다는 뜻은 아니다. 질의에만 있는 term은 <span class="math-raw math-inline">$df=0$</span>이므로 이 식에 그대로 넣지 않는다. 없는 term을 무시하거나, 별도로 정한 smoothing·어휘 정책을 적용한다.</p>
+<p>실제 라이브러리는 <code>log((N+1)/(df+1))+1</code> 등의 다른 정의를 사용할 수 있다. 두 구현의 숫자를 비교하기 전에 TF, IDF, 로그 밑, 벡터 정규화 규약을 먼저 확인한다.</p>
+<h2 id="sec-4-tf-idf-표현을-만든-뒤-점수-규칙을-정한다">4. TF-IDF: 표현을 만든 뒤 점수 규칙을 정한다</h2>
+<p>문서 가중치는 <span class="math-raw math-inline">$w_{t,d}=TF(t,d)IDF(t)$</span>다. 질의 <span class="math-raw math-inline">$q=machine\ learning$</span>에 대해 질의에 있는 term의 가중치를 더하는 단순 점수를 사용하자.</p>
+<div class="math-raw math-display">$$s(q,d)=\sum_{t\in q} w_{t,d}.$$</div><p>이것은 문서 TF-IDF 벡터와 <strong>질의의 이진 term 벡터</strong>의 내적이다. 질의에도 TF-IDF를 적용하는 다른 방법과 구분한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>문서</th>
+<th style="text-align:right">machine의 문서 가중치</th>
+<th style="text-align:right">learning의 문서 가중치</th>
+<th style="text-align:right">합산 점수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$d_1$</span></td>
+<td style="text-align:right"><span class="math-raw math-inline">$\frac13\ln(4/3)=0.095894$</span></td>
+<td style="text-align:right"><span class="math-raw math-inline">$\frac13\ln2=0.231049$</span></td>
+<td style="text-align:right">0.326943</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_2$</span></td>
+<td style="text-align:right"><span class="math-raw math-inline">$\frac12\ln(4/3)=0.143841$</span></td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0.143841</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_3$</span></td>
+<td style="text-align:right"><span class="math-raw math-inline">$\frac15\ln(4/3)=0.057536$</span></td>
+<td style="text-align:right"><span class="math-raw math-inline">$\frac25\ln2=0.277259$</span></td>
+<td style="text-align:right">0.334795</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_4$</span></td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+</tbody>
+</table></div>
+<p>이 규약에서 순위는 <span class="math-raw math-inline">$d_3&gt;d_1&gt;d_2&gt;d_4$</span>다. 희귀한 <code>basics</code>는 IDF가 높지만 질의에 없으므로 점수에 기여하지 않는다. ‘희귀한 단어가 있으면 무조건 검색 순위가 높다’가 아니다.</p>
+<p><img alt="machine과 learning의 문서별 TF-IDF 가중치를 색과 숫자로 표시하고 질의 점수를 합산하는 heatmap" decoding="async" id="figure-1" loading="lazy" src="../resources/c64dbd273470fbdda44d-02_tfidf_heatmap.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/c64dbd273470fbdda44d-02_tfidf_heatmap.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> 위의 문서 길이로 빈도를 나누고, 오른쪽 IDF를 곱해 가운데 칸을 계산한 뒤 열별로 더한다. 진한 칸은 큰 문서 가중치이고 확률이 아니다. d3의 <code>machine</code>은 길이 때문에 d1보다 작지만 <code>learning</code> 기여가 커 총점에서는 앞선다. 질의 벡터를 이진 벡터로 두었으므로 이 그림의 합산을 ‘질의와 문서 양쪽에 TF-IDF를 적용한 내적’으로 바꾸어 읽지 않는다.</p>
+<p>TF-IDF는 <strong>가중치 표현</strong>이고, 내적·cosine은 그 표현을 <strong>비교하는 규칙</strong>이다. cosine은 <span class="math-raw math-inline">$s=\mathbf q^\top\mathbf d/(\|\mathbf q\|\|\mathbf d\|)$</span>로 벡터 방향을 비교한다. 질의에 없는 term도 문서 벡터의 전체 norm에는 영향을 줄 수 있어, 위 합산 점수와 순위가 달라질 수 있다. 0벡터의 cosine은 정의되지 않으므로 구현에서 따로 처리한다.</p>
+<h2 id="sec-5-bm25-반복을-포화시키고-길이를-보정한다">5. BM25: 반복을 포화시키고 길이를 보정한다</h2>
+<p>이 장은 IDF가 양수가 되도록 한 아래 변형을 사용한다. 질의의 각 고유 term을 한 번씩 합산한다.</p>
+<div class="math-raw math-display">$$
+BM25(q,d)=\sum_{t\in q} IDF_B(t)\;
+\frac{f(t,d)(k_1+1)}{f(t,d)+k_1\left(1-b+b\frac{|d|}{avgdl}\right)}
+$$</div><div class="math-raw math-display">$$IDF_B(t)=\ln\left(1+\frac{N-df(t)+0.5}{df(t)+0.5}\right).$$</div><p>여기서 <span class="math-raw math-inline">$f$</span>는 <strong>원시 term 횟수</strong>다. 앞의 정규화 TF를 그대로 넣지 않는다. 포화 계수는 <span class="math-raw math-inline">$k_1$</span>, 검색 결과 수는 <span class="math-raw math-inline">$K$</span>로 써서 구별한다.</p>
+<ul>
+<li><span class="math-raw math-inline">$k_1\ge0$</span>: term 반복에 따른 증가·포화 정도를 조절한다.</li>
+<li><span class="math-raw math-inline">$0\le b\le1$</span>: 평균 길이에 대한 문서 길이 보정 정도를 조절한다.</li>
+<li><span class="math-raw math-inline">$b=0$</span>: 길이 보정이 사라진다.</li>
+<li><span class="math-raw math-inline">$b=1$</span>: 분모의 길이 보정 부분이 <span class="math-raw math-inline">$k_1|d|/avgdl$</span>이 된다.</li>
+</ul>
+<p>term이 없는 문서는 그 term 기여를 0으로 정의한다. <span class="math-raw math-inline">$k_1=0,f=0$</span>일 때 생기는 <span class="math-raw math-inline">$0/0$</span>을 직접 계산하지 않는다. <span class="math-raw math-inline">$k_1=0$</span>에서 term이 한 번 이상 있으면 빈도 항은 1이므로 반복 횟수 대신 포함 여부만 남는다.</p>
+<h3 id="sec-같은-문서-집합으로-실제-계산">같은 문서 집합으로 실제 계산</h3>
+<p><span class="math-raw math-inline">$k_1=1.2,b=0.75,avgdl=3$</span>을 둔다. IDF는 다음과 같다.</p>
+<div class="math-raw math-display">$$IDF_B(machine)=\ln(1+1.5/3.5)\approx0.356675,$$</div><div class="math-raw math-display">$$IDF_B(learning)=\ln(1+2.5/2.5)\approx0.693147.$$</div><p><span class="math-raw math-inline">$d_3$</span>의 길이 보정은 <span class="math-raw math-inline">$1-b+b(5/3)=1.5$</span>다. 따라서 <code>machine</code>의 빈도 항은 <span class="math-raw math-inline">$2.2/(1+1.2\times1.5)=0.785714$</span>, <code>learning</code>은 <span class="math-raw math-inline">$4.4/(2+1.2\times1.5)=1.157895$</span>다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>문서</th>
+<th style="text-align:right">machine 기여</th>
+<th style="text-align:right">learning 기여</th>
+<th style="text-align:right">BM25 합</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$d_1$</span></td>
+<td style="text-align:right">0.356675</td>
+<td style="text-align:right">0.693147</td>
+<td style="text-align:right">1.049822</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_2$</span></td>
+<td style="text-align:right">0.412992</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0.412992</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_3$</span></td>
+<td style="text-align:right">0.280245</td>
+<td style="text-align:right">0.802591</td>
+<td style="text-align:right">1.082836</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_4$</span></td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+</tbody>
+</table></div>
+<p><span class="math-raw math-inline">$d_2$</span>는 <code>machine</code>을 한 번만 포함하지만 짧아서 해당 term의 기여가 <span class="math-raw math-inline">$d_1$</span>보다 높다. 그래도 <code>learning</code>이 없어 총점은 낮다. 점수 변화는 term별 기여의 합으로 해석해야 한다.</p>
+<h2 id="sec-6-포화-곡선과-길이-보정을-숫자로-읽기">6. 포화 곡선과 길이 보정을 숫자로 읽기</h2>
+<p>평균 길이 문서에서는 <span class="math-raw math-inline">$|d|/avgdl=1$</span>이므로 빈도 항이 <span class="math-raw math-inline">$f(k_1+1)/(f+k_1)$</span>가 된다. <span class="math-raw math-inline">$k_1=1.2$</span>일 때 다음과 같다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align:right">원시 횟수 <span class="math-raw math-inline">$f$</span></th>
+<th style="text-align:right">빈도 항</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:right">1</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:right">2</td>
+<td style="text-align:right">1.375</td>
+</tr>
+<tr>
+<td style="text-align:right">4</td>
+<td style="text-align:right">1.692308</td>
+</tr>
+<tr>
+<td style="text-align:right">8</td>
+<td style="text-align:right">1.913043</td>
+</tr>
+<tr>
+<td style="text-align:right">무한히 증가</td>
+<td style="text-align:right">극한은 2.2</td>
+</tr>
+</tbody>
+</table></div>
+<p>반복할수록 증가하지만 선형으로 계속 증가하지 않는다. 단어를 무한히 반복해 순위를 올리는 효과를 완화한다. <span class="math-raw math-inline">$k_1$</span>을 키우면 반복 횟수 사이의 차이가 더 크게 남고 포화가 느려진다. <span class="math-raw math-inline">$k_1$</span>은 단순히 모든 점수를 같은 배수로 키우는 값이 아니다.</p>
+<p>같은 term을 2번 포함하는 두 문서에서 길이만 비교하자. <span class="math-raw math-inline">$avgdl=3,b=0.75,k_1=1.2$</span>다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align:right">문서 길이</th>
+<th style="text-align:right">길이 보정</th>
+<th style="text-align:right">빈도 항</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">3</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><span class="math-raw math-inline">$4.4/(2+1.2)=1.375$</span></td>
+</tr>
+<tr>
+<td style="text-align:right">6</td>
+<td style="text-align:right">1.75</td>
+<td style="text-align:right"><span class="math-raw math-inline">$4.4/(2+2.1)\approx1.073171$</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>긴 문서는 같은 2회 반복의 상대적 중요도가 낮아진다. 하지만 짧으면 항상 좋은 것은 아니다. 필요한 정보가 긴 문서에만 있거나, 단락별 길이가 다른 데이터에서는 같은 파라미터가 최선이 아닐 수 있다.</p>
+<p><img alt="BM25 빈도 항의 포화 곡선과 평균 길이·길이 두 배 문서의 보정 차이를 표시한 그래프" decoding="async" id="figure-2" loading="lazy" src="../resources/efb599abee7833d6f997-02_bm25_saturation.svg"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/efb599abee7833d6f997-02_bm25_saturation.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> 가로축은 원시 반복 횟수, 세로축은 IDF를 곱하기 전의 빈도 항이다. 같은 f에서 파란 실선보다 주황 점선이 낮은 이유는 문서 길이가 평균의 두 배이기 때문이다. 오른쪽으로 갈수록 곡선이 평평해지는 것이 포화다. ‘긴 문서 점수가 항상 낮다’는 뜻은 아니며, 다른 term·IDF·반복 횟수까지 합산한 최종 점수는 별도로 계산해야 한다.</p>
+<h3 id="sec-포화와-길이-보정을-함께-읽는-정지-화면">포화와 길이 보정을 함께 읽는 정지 화면</h3>
+<p><img alt="포화 계수 1.2와 길이 보정 0.75 조건에서 BM25 빈도 항의 포화 곡선과 상대 문서 길이별 보정 곡선을 함께 보여주는 화면" decoding="async" id="figure-3" loading="lazy" src="../resources/a407e5d0584fdcb1613b-02_bm25_html_crop.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/a407e5d0584fdcb1613b-02_bm25_html_crop.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>화면 읽기:</strong> 위 수식과 슬라이더는 <code>k₁=1.2</code>, <code>b=0.75</code>라는 촬영 조건이다. 화면의 <code>TF</code>는 <strong>원시 횟수 f</strong>이고, 앞의 TF-IDF에서 쓴 <code>f/문서 길이</code>가 아니다. 화면의 <code>k</code>도 검색 개수 K가 아니라 포화 계수 <code>k₁</code>이다. 왼쪽은 평균 길이 문서에서 반복 횟수를 늘린 <strong>IDF 이전 빈도 항</strong>이다. 오른쪽은 같은 횟수를 유지하고 상대 문서 길이를 늘리는 비교다. 화면의 축·범례·조건은 정지된 이미지에 함께 포함되어 있어 웹페이지를 열거나 슬라이더를 조작할 필요가 없다.</p>
+<p><strong>두 곡선의 메시지:</strong> 왼쪽은 f가 커질수록 증가 폭이 줄어 <code>k₁+1=2.2</code>에 가까워진다. 오른쪽은 길이 비율이 1일 때 b에 관계없이 길이 보정 부분이 1이라 곡선들이 만난다. <code>b=0</code>은 수평선이며, b가 클수록 평균보다 긴 문서의 기여가 더 줄고 짧은 문서의 기여는 더 커진다. 이 그림은 term 하나의 빈도 항을 비교한 것이므로 여러 term의 IDF까지 합친 최종 BM25 순위를 직접 뜻하지 않는다.</p>
+<h2 id="sec-7-역색인과-연결하고-한계를-이해하기">7. 역색인과 연결하고 한계를 이해하기</h2>
+<p>BM25는 각 질의 term의 posting list에서 term 빈도를 읽고, 문서 길이·<span class="math-raw math-inline">$df$</span>·<span class="math-raw math-inline">$avgdl$</span>로 기여를 누적할 수 있다. 어휘 전체의 거대한 dense 행렬을 매번 만들 필요는 없다. 문서가 추가·삭제되면 <span class="math-raw math-inline">$N,df,avgdl$</span>이 변할 수 있어 같은 문서의 점수도 바뀔 수 있다.</p>
+<p>정확한 제품명·약어·숫자처럼 표현 일치가 중요한 질문에 희소 검색은 유용하다. 반대로 <code>자동차</code>와 <code>승용차</code>처럼 같은 단어를 쓰지 않은 관련 문서, 부정·조건·어순에 따른 의미 차이를 놓칠 수 있다. 형태소 분석·동의어 확장·학습형 희소 표현·밀집 검색을 검토할 이유다. 어느 방식이 더 좋은지는 03장의 평가로 확인한다.</p>
+<h2 id="sec-8-확인-질문과-해설">8. 확인 질문과 해설</h2>
+<ol>
+<li><span class="math-raw math-inline">$d_3$</span>에 <code>learning</code>을 10번 더 넣으면 <span class="math-raw math-inline">$df(learning)$</span>도 10 늘어나는가?</li>
+<li>TF-IDF의 IDF와 이 장 BM25 IDF는 모든 문서에 나온 term에 대해 같은 값을 가지는가?</li>
+<li><span class="math-raw math-inline">$b=0$</span>이면 긴 문서와 짧은 문서가 언제 같은 term 점수를 받는가?</li>
+<li>두 구현 모두 BM25인데 결과가 다르다면 어떤 규약을 먼저 비교할까?</li>
+</ol>
+<details>
+<summary>학습용 해설</summary>
+<ol>
+<li>아니다. 그 문서는 이미 term을 포함하므로 <span class="math-raw math-inline">$df$</span>는 그대로다. 원시 횟수·문서 길이·평균 길이는 달라진다.</li>
+<li>아니다. 기본 TF-IDF는 0이고, 이 장 BM25 변형은 <span class="math-raw math-inline">$\ln(1+0.5/(N+0.5))&gt;0$</span>이다. 두 IDF를 섞지 않는다.</li>
+<li>같은 term 원시 횟수·같은 IDF·같은 <span class="math-raw math-inline">$k_1$</span>이면 같다. 문서 길이만 달라서는 차이가 생기지 않는다.</li>
+<li>토큰화·정규화, 문서 경계, IDF 변형, <span class="math-raw math-inline">$k_1,b$</span>, 질의 term 반복 처리, stopword, 자료 통계의 갱신 시점, 동점 정렬을 비교한다.</li>
+</ol>
+</details>
+<h2 id="sec-그림으로-복습하기">그림으로 복습하기</h2>
+<ul>
+<li><a href="../resources/c64dbd273470fbdda44d-02_tfidf_heatmap.svg">TF-IDF heatmap</a>의 각 칸을 빈도·길이·IDF로 재계산한다.</li>
+<li><a href="../resources/efb599abee7833d6f997-02_bm25_saturation.svg">BM25 곡선</a>에서 포화와 길이 보정의 역할을 따로 설명한다.</li>
+<li>TF-IDF는 표현·정규화 규약, BM25는 원시 빈도·<span class="math-raw math-inline">$k_1,b$</span>·IDF 변형을 명시해야 결과를 비교할 수 있다. 높은 검색 점수가 실제 관련성으로 이어지는지는 다음 장의 라벨 기반 평가로 확인한다.</li>
+</ul>
+<p><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">이전: 검색의 기본과 역색인</a> · <a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">다음: 검색 평가지표</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/02_TF_IDF%EC%99%80_BM25.md">02. TF-IDF와 BM25 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html"><small>이전 장</small>01. 검색의 기본과 역색인</a><a rel="next" href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html"><small>다음 장</small>03. 검색 평가지표</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

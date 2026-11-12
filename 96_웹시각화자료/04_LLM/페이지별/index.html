@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>페이지별 상세 해설 — 001~280 | AI 학습 교안</title><link rel="stylesheet" href="../../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../../%EA%B3%B5%ED%86%B5/learning.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="../index.html">LLM 전체 흐름</a></li><li><a href="../00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="../01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="../02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="../03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="../04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="../05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="../06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="../07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="../08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="../09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="../10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="../11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="../12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="../13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="../14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="../15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="../16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="../17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="../18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="../19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="../20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="../21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="../22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="../%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>페이지별 상세 해설 — 001~280</h1></header><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-페이지별-상세-해설-001280">페이지별 상세 해설 — 001~280</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-페이지별-상세-해설-001280">페이지별 상세 해설 — 001~280</h1>
+<p><a href="../00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/16_%EC%9B%90%EB%AC%B8%EB%8C%80%EC%9D%91%EA%B3%BC_%ED%99%95%EC%9D%B8%EB%B2%94%EC%9C%84.md">대응·정정·확인 범위</a></p>
+<p>번호는 원본 PDF의 파일 순서입니다. PDF를 열지 않아도 각 문서의 핵심 요지·그림 해석·작은 활동을 읽을 수 있습니다. 웹 검색은 이 280문서의 전체 텍스트를 검색하며, JavaScript가 없어도 아래 목차를 사용할 수 있습니다.</p>
+<ul>
+<li><a href="p001.html">p001 · LLM 모델의 이해와 확장: 표지
+</a></li>
+<li><a href="p002.html">p002 · 강의 목차: 구조를 이해한 뒤 학습으로
+</a></li>
+<li><a href="p003.html">p003 · AI 모델의 역사: 구분 페이지
+</a></li>
+<li><a href="p004.html">p004 · AI·머신러닝·딥러닝·생성형 AI
+</a></li>
+<li><a href="p005.html">p005 · 세 시기의 발전 지도
+</a></li>
+<li><a href="p006.html">p006 · AlexNet: 학습 계산과 영상 분류
+</a></li>
+<li><a href="p007.html">p007 · ResNet: 입력에 변화량을 더하기
+</a></li>
+<li><a href="p008.html">p008 · Word2Vec: 단어 번호에서 벡터 관계로
+</a></li>
+<li><a href="p009.html">p009 · AlphaGo 계열: 학습과 탐색
+</a></li>
+<li><a href="p010.html">p010 · Transformer: 문맥을 직접 참조하는 구조
+</a></li>
+<li><a href="p011.html">p011 · GAN·Diffusion: 생성 방법을 구분하기
+</a></li>
+<li><a href="p012.html">p012 · GPT: 규모와 능력을 구별하기
+</a></li>
+<li><a href="p013.html">p013 · AlphaFold: 예측과 실험의 관계
+</a></li>
+<li><a href="p014.html">p014 · AI의 미래: 사실에서 전망으로 전환
+</a></li>
+<li><a href="p015.html">p015 · AI 호황: 자원·기업가치·경쟁
+</a></li>
+<li><a href="p016.html">p016 · 투자 계획: 합계부터 점검하기
+</a></li>
+<li><a href="p017.html">p017 · World Model과 Physical AI
+</a></li>
+<li><a href="p018.html">p018 · Humanoid: 몸과 모델을 결합할 때
+</a></li>
+<li><a href="p019.html">p019 · 배움: 인간 비교와 가소성
+</a></li>
+<li><a href="p020.html">p020 · 수능 점수: 기준이 다른 표를 합치지 않기
+</a></li>
+<li><a href="p021.html">p021 · 수학 연구: 원고·문제·검증을 나누기
+</a></li>
+<li><a href="p022.html">p022 · 연구자의 감회와 증명의 상태
+</a></li>
+<li><a href="p023.html">p023 · 노동의 가치와 해방: 서로 다른 주장
+</a></li>
+<li><a href="p024.html">p024 · 산업 변화: 제품 기능과 시장 반응
+</a></li>
+<li><a href="p025.html">p025 · 전쟁과 AI: 판단과 권한
+</a></li>
+<li><a href="p026.html">p026 · 의식과 자유의지: 관측과 해석
+</a></li>
+<li><a href="p027.html">p027 · 새로운 지적 존재라는 질문
+</a></li>
+<li><a href="p028.html">p028 · 바둑: AI 유사도와 승률의 상관
+</a></li>
+<li><a href="p029.html">p029 · 바둑: 이용률과 활용 능력
+</a></li>
+<li><a href="p030.html">p030 · AI를 어떻게 바라볼까: 내부 복습 활동
+</a></li>
+<li><a href="p031.html">p031. AI 기본 수학: 구분 페이지
+</a></li>
+<li><a href="p032.html">p032. 벡터의 덧셈과 배열의 축
+</a></li>
+<li><a href="p033.html">p033. 내적의 성분 계산과 부호
+</a></li>
+<li><a href="p034.html">p034. Tech와 Fruitness 내적 예시
+</a></li>
+<li><a href="p035.html">p035. 코사인 유사도의 길이 정규화
+</a></li>
+<li><a href="p036.html">p036. 단위 벡터에서 내적과 코사인의 일치
+</a></li>
+<li><a href="p037.html">p037. 행렬의 요소별 연산·곱·전치
+</a></li>
+<li><a href="p038.html">p038. 2차원 회전 행렬과 정지 프레임
+</a></li>
+<li><a href="p039.html">p039. 선형층과 실제값·예측값·평균값
+</a></li>
+<li><a href="p040.html">p040. MSE와 파라미터 공간의 경사하강
+</a></li>
+<li><a href="p041.html">p041. 비선형 활성화와 결정 경계
+</a></li>
+<li><a href="p042.html">p042. Sigmoid·Tanh·ReLU·LeakyReLU
+</a></li>
+<li><a href="p043.html">p043. 지수·로그와 수치 안정성
+</a></li>
+<li><a href="p044.html">p044. Softmax와 이진 Sigmoid의 관계
+</a></li>
+<li><a href="p045.html">p045. 다섯 후보 확률과 잘린 Sigmoid 화면
+</a></li>
+<li><a href="p046.html">p046. 신경망 학습 단계와 연결 구조
+</a></li>
+<li><a href="p047.html">p047. 순전파와 제곱오차의 실제 숫자
+</a></li>
+<li><a href="p048.html">p048. 연쇄법칙의 비율 비유
+</a></li>
+<li><a href="p049.html">p049. w₅ 기울기의 곱셈 오류와 수정
+</a></li>
+<li><a href="p050.html">p050. w₆ 기울기와 공통 인자 재사용
+</a></li>
+<li><a href="p051.html">p051. 은닉층 w₁까지의 다섯 미분
+</a></li>
+<li><a href="p052.html">p052. 갱신 뒤 재계산과 원문 수치 경로
+</a></li>
+<li><a href="p053.html">p053. 경사하강법의 방향과 학습률 조건
+</a></li>
+<li><a href="p054.html">p054. 관측열과 목표 분포의 출발
+</a></li>
+<li><a href="p055.html">p055. 세 후보 주사위의 분포 비교
+</a></li>
+<li><a href="p056.html">p056. Die1의 엔트로피 계산
+</a></li>
+<li><a href="p057.html">p057. Die2의 교차엔트로피
+</a></li>
+<li><a href="p058.html">p058. Die3과 흔한 결과의 낮은 확률
+</a></li>
+<li><a href="p059.html">p059. CE·KL·확률 비교표의 정정
+</a></li>
+<li><a href="p060.html">p060. PPL 정의와 해석 조건
+</a></li>
+<li><a href="p061.html">p061. 균등분포와 역확률의 기하평균
+</a></li>
+<li><a href="p062.html">p062. 조건부확률의 분모
+</a></li>
+<li><a href="p063.html">p063. 베이즈 정리의 유도와 네 확률
+</a></li>
+<li><a href="p064.html">p064. 가상 검사 예제의 자연빈도
+</a></li>
+<li><a href="p065.html">p065. 베이즈 분자와 전체 증거의 분모
+</a></li>
+<li><a href="p066.html">p066. 베이즈와 LLM의 연결 및 비유의 경계
+</a></li>
+<li><a href="p067.html">p067. 언어 모델의 발전
+</a></li>
+<li><a href="p068.html">p068. 규칙기반 번역
+</a></li>
+<li><a href="p069.html">p069. Encoders와 Decoders
+</a></li>
+<li><a href="p070.html">p070. RNN
+</a></li>
+<li><a href="p071.html">p071. RNN Attention
+</a></li>
+<li><a href="p072.html">p072. Transformer 비교
+</a></li>
+<li><a href="p073.html">p073. Transformer 구조
+</a></li>
+<li><a href="p074.html">p074. BERT GPT T5 구조
+</a></li>
+<li><a href="p075.html">p075. MLM과 CLM
+</a></li>
+<li><a href="p076.html">p076. 언어 모델 비교
+</a></li>
+<li><a href="p077.html">p077. GPT 확대 구조
+</a></li>
+<li><a href="p078.html">p078. 언어 모델 입력
+</a></li>
+<li><a href="p079.html">p079. 모델 학습 경로
+</a></li>
+<li><a href="p080.html">p080. 입력 전처리 파이프라인
+</a></li>
+<li><a href="p081.html">p081. Tokenizer와 번호
+</a></li>
+<li><a href="p082.html">p082. Embedding의 뜻
+</a></li>
+<li><a href="p083.html">p083. 벡터 공간의 유추
+</a></li>
+<li><a href="p084.html">p084. 벡터 공간 실습
+</a></li>
+<li><a href="p085.html">p085. BPE
+</a></li>
+<li><a href="p086.html">p086. WordPiece
+</a></li>
+<li><a href="p087.html">p087. Unigram
+</a></li>
+<li><a href="p088.html">p088. Subword 세 방법 비교
+</a></li>
+<li><a href="p089.html">p089. 위치 정보의 필요성
+</a></li>
+<li><a href="p090.html">p090. 절대 위치 인코딩
+</a></li>
+<li><a href="p091.html">p091. Sinusoidal
+</a></li>
+<li><a href="p092.html">p092. 상대 위치 인코딩
+</a></li>
+<li><a href="p093.html">p093. RoPE 회전 직관
+</a></li>
+<li><a href="p094.html">p094. RoPE 좌표쌍
+</a></li>
+<li><a href="p095.html">p095. 자기회귀 Text 생성
+</a></li>
+<li><a href="p096.html">p096. 데이터셋 Token화
+</a></li>
+<li><a href="p097.html">p097. 특수 토큰 추가
+</a></li>
+<li><a href="p098.html">p098. 특수 토큰의 용도
+</a></li>
+<li><a href="p099.html">p099. 자기지도 데이터셋
+</a></li>
+<li><a href="p100.html">p100. 토큰 임베딩 조회
+</a></li>
+<li><a href="p101.html">p101. 데이터셋 실습
+</a></li>
+<li><a href="p102.html">p102. Attention: 단원 시작
+</a></li>
+<li><a href="p103.html">p103. GPT 안에서 Attention의 위치
+</a></li>
+<li><a href="p104.html">p104. Apple의 좌표를 묻는 임베딩 지도
+</a></li>
+<li><a href="p105.html">p105. Apple의 다의성: 과일과 회사
+</a></li>
+<li><a href="p106.html">p106. 문맥 가중합으로 Apple 좌표 이동
+</a></li>
+<li><a href="p107.html">p107. 참조 관계와 Self-Attention
+</a></li>
+<li><a href="p108.html">p108. 임베딩에서 Q K V 만들기
+</a></li>
+<li><a href="p109.html">p109. Query와 Key의 역할 분리 및 대칭성
+</a></li>
+<li><a href="p110.html">p110. Key와 Value: 검색 단서와 전달 내용
+</a></li>
+<li><a href="p111.html">p111. 특징별 내적 기여의 예
+</a></li>
+<li><a href="p112.html">p112. 다음 토큰 학습과 Attention 패턴
+</a></li>
+<li><a href="p113.html">p113. Scaled Dot-product Attention의 전체 식
+</a></li>
+<li><a href="p114.html">p114. Attention map의 행과 열
+</a></li>
+<li><a href="p115.html">p115. 스케일 분모는 dk가 아니라 √dk
+</a></li>
+<li><a href="p116.html">p116. query 하나가 모든 Value를 합치는 흐름
+</a></li>
+<li><a href="p117.html">p117. 문맥을 더한 creature 표현
+</a></li>
+<li><a href="p118.html">p118. Softmax와 S자 그림의 구별
+</a></li>
+<li><a href="p119.html">p119. Causal masking의 삼각형
+</a></li>
+<li><a href="p120.html">p120. 여러 head와 특징 방향 연결
+</a></li>
+<li><a href="p121.html">p121. GPT-2 Small의 12×12 지도
+</a></li>
+<li><a href="p122.html">p122. DeepSeek-R1의 layer×head 비교
+</a></li>
+<li><a href="p123.html">p123. 초기·후기 Attention map과 참조 방향
+</a></li>
+<li><a href="p124.html">p124. Attention 실습 안내와 내부 대체 활동
+</a></li>
+<li><a href="p125.html">p125. GPT Layer들: 단원 전환
+</a></li>
+<li><a href="p126.html">p126. Decoder-only 블록의 두 잔차
+</a></li>
+<li><a href="p127.html">p127. Dropout과 causal mask는 다르다
+</a></li>
+<li><a href="p128.html">p128. 정규화의 목적과 정규분포의 차이
+</a></li>
+<li><a href="p129.html">p129. LayerNorm 식과 잘못된 분모 문구
+</a></li>
+<li><a href="p130.html">p130. 행 평균과 열 평균: 정규화 축
+</a></li>
+<li><a href="p131.html">p131. RMSNorm은 평균을 빼지 않는다
+</a></li>
+<li><a href="p132.html">p132. FFN은 위치별로 특징을 변환한다
+</a></li>
+<li><a href="p133.html">p133. Sigmoid와 기울기 소실
+</a></li>
+<li><a href="p134.html">p134. ReLU와 비활성 뉴런
+</a></li>
+<li><a href="p135.html">p135. GELU와 ReLU 그래프 비교
+</a></li>
+<li><a href="p136.html">p136. Swish의 self-gating
+</a></li>
+<li><a href="p137.html">p137. GLU: gate와 value의 원소곱
+</a></li>
+<li><a href="p138.html">p138. SwiGLU의 코드와 FFN 폭
+</a></li>
+<li><a href="p139.html">p139. Residual connection의 경로와 산술 오류
+</a></li>
+<li><a href="p140.html">p140. Vision Transformer: 패치가 입력 단위
+</a></li>
+<li><a href="p141.html">p141. Whisper: 음성 Encoder와 텍스트 Decoder
+</a></li>
+<li><a href="p142.html">p142. AlphaFold: MSA와 잔기쌍 표현
+</a></li>
+<li><a href="p143.html">p143. 시계열을 구간 토큰으로 표현하기
+</a></li>
+<li><a href="p144.html">PDF 144쪽 · GPT 모델 입출력
+</a></li>
+<li><a href="p145.html">PDF 145쪽 · 블록의 입출력 차원을 유지하는 이유
+</a></li>
+<li><a href="p146.html">PDF 146쪽 · B·T·d·V와 최종 출력
+</a></li>
+<li><a href="p147.html">PDF 147쪽 · 마지막 위치에서 다음 토큰을 고르는 과정
+</a></li>
+<li><a href="p148.html">PDF 148쪽 · 온도로 분포의 뾰족함 바꾸기
+</a></li>
+<li><a href="p149.html">PDF 149쪽 · top-k 후보 제한과 재정규화
+</a></li>
+<li><a href="p150.html">PDF 150쪽 · 지식의 저장 단원 시작
+</a></li>
+<li><a href="p151.html">PDF 151쪽 · 정확한 직교와 거의 직교
+</a></li>
+<li><a href="p152.html">PDF 152쪽 · 직교성과 특징 분리의 비유
+</a></li>
+<li><a href="p153.html">PDF 153쪽 · 평행 방향과 공간 활용
+</a></li>
+<li><a href="p154.html">PDF 154쪽 · MLP가 문맥 표현에 정보를 더하는 그림
+</a></li>
+<li><a href="p155.html">PDF 155쪽 · 병목형 잠재 공간의 예
+</a></li>
+<li><a href="p156.html">PDF 156쪽 · 확장층과 다시 줄이는 투영
+</a></li>
+<li><a href="p157.html">PDF 157쪽 · GPT 실습 안내와 내부 대체 활동
+</a></li>
+<li><a href="p158.html">PDF 158쪽 · 모델 학습 단원 시작
+</a></li>
+<li><a href="p159.html">PDF 159쪽 · 구축·사전학습·미세튜닝의 지도
+</a></li>
+<li><a href="p160.html">PDF 160쪽 · 학습·검증·시험 데이터의 역할
+</a></li>
+<li><a href="p161.html">PDF 161쪽 · 검증 오차와 과적합
+</a></li>
+<li><a href="p162.html">PDF 162쪽 · 순전파·손실·역전파·갱신
+</a></li>
+<li><a href="p163.html">PDF 163쪽 · 수치 예측의 평균제곱오차
+</a></li>
+<li><a href="p164.html">PDF 164쪽 · 이진 교차엔트로피의 두 가지 경우
+</a></li>
+<li><a href="p165.html">PDF 165쪽 · 정답 토큰 확률을 높인다는 의미
+</a></li>
+<li><a href="p166.html">PDF 166쪽 · 어휘 사전·확률 행·예측 인덱스
+</a></li>
+<li><a href="p167.html">PDF 167쪽 · 정답 확률을 모아 로그 평균내기
+</a></li>
+<li><a href="p168.html">PDF 168쪽 · 기울기 부호와 학습률
+</a></li>
+<li><a href="p169.html">PDF 169쪽 · 국소 최소·안장점·평탄 영역 구분
+</a></li>
+<li><a href="p170.html">PDF 170쪽 · Momentum과 RMSprop의 직관
+</a></li>
+<li><a href="p171.html">PDF 171쪽 · Adam의 갱신식과 각 기호
+</a></li>
+<li><a href="p172.html">PDF 172쪽 · epoch·batch·optimizer step
+</a></li>
+<li><a href="p173.html">PDF 173쪽 · 배치 크기 그래프의 비교 조건
+</a></li>
+<li><a href="p174.html">PDF 174쪽 · 병렬 학습과 자기회귀 생성
+</a></li>
+<li><a href="p175.html">PDF 175쪽 · 사전학습 실습 안내와 작은 활동
+</a></li>
+<li><a href="p176.html">p176. 미세튜닝으로 학습 목적 바꾸기
+</a></li>
+<li><a href="p177.html">p177. 프롬프트 분류와 분류 전용 출력
+</a></li>
+<li><a href="p178.html">p178. 짧은 문장에 padding 붙이기
+</a></li>
+<li><a href="p179.html">p179. 토큰 행렬과 문장 라벨 벡터
+</a></li>
+<li><a href="p180.html">p180. 어휘 head에서 두 클래스 head로
+</a></li>
+<li><a href="p181.html">p181. softmax와 argmax의 역할
+</a></li>
+<li><a href="p182.html">p182. 분류 미세튜닝 작은 실습
+</a></li>
+<li><a href="p183.html">p183. LoRA가 줄이는 비용과 표의 조건
+</a></li>
+<li><a href="p184.html">p184. full fine-tuning과 PEFT 비교
+</a></li>
+<li><a href="p185.html">p185. rank 2 행렬곱의 크기
+</a></li>
+<li><a href="p186.html">p186. 기반 가중치에 수정분 더하기
+</a></li>
+<li><a href="p187.html">p187. 동결 경로와 학습 경로
+</a></li>
+<li><a href="p188.html">p188. 0 수정분과 살아 있는 gradient
+</a></li>
+<li><a href="p189.html">p189. 양자화는 연속 값을 대표값으로 묶는다
+</a></li>
+<li><a href="p190.html">p190. 16개 코드와 이중 양자화
+</a></li>
+<li><a href="p191.html">p191. 24GB 비교 그림의 범위
+</a></li>
+<li><a href="p192.html">p192. NF4 저장과 BF16 계산
+</a></li>
+<li><a href="p193.html">p193. FP16·FP32·BF16 비트 배치
+</a></li>
+<li><a href="p194.html">p194. LoRA 초기화와 첫 갱신 실습
+</a></li>
+<li><a href="p195.html">p195. 지시 미세튜닝의 시작
+</a></li>
+<li><a href="p196.html">p196. 지시와 기대 응답의 쌍
+</a></li>
+<li><a href="p197.html">p197. Alpaca와 Phi-3 형식 비교
+</a></li>
+<li><a href="p198.html">p198. 데이터 생성은 학습 텐서 준비 과정
+</a></li>
+<li><a href="p199.html">p199. 필드에서 텍스트를 거쳐 토큰 ID로
+</a></li>
+<li><a href="p200.html">p200. 배치별 가장 긴 길이에 맞추기
+</a></li>
+<li><a href="p201.html">p201. 다음 토큰 target의 한 칸 이동
+</a></li>
+<li><a href="p202.html">p202. 실제 종료 한 개와 채움 제외
+</a></li>
+<li><a href="p203.html">p203. instruction은 문맥에 남기고 손실에서 제외
+</a></li>
+<li><a href="p204.html">p204. 응답 마스킹 실습
+</a></li>
+<li><a href="p205.html">p205. 정답 응답에서 선호 쌍으로
+</a></li>
+<li><a href="p206.html">p206. PPO 기반 RLHF의 학습 루프
+</a></li>
+<li><a href="p207.html">p207. 사람 순위를 보상 학습 쌍으로
+</a></li>
+<li><a href="p208.html">p208. DPO의 직접 경로와 고정 reference
+</a></li>
+<li><a href="p209.html">p209. 보상 점수에서 선호 확률 만들기
+</a></li>
+<li><a href="p210.html">p210. sigmoid 그래프의 가로축은 점수 차이
+</a></li>
+<li><a href="p211.html">p211. 개선과 과도한 분포 변화 구별
+</a></li>
+<li><a href="p212.html">p212. KL은 방향이 있는 분포 차이
+</a></li>
+<li><a href="p213.html">p213. DPO 손실의 부호·reference·로그합
+</a></li>
+<li><a href="p214.html">p214. rating 자료와 chosen/rejected 자료
+</a></li>
+<li><a href="p215.html">p215. DPO 한 쌍 손계산 실습
+</a></li>
+<li><a href="p216.html">p216. 추론 모델: 장의 출발점
+</a></li>
+<li><a href="p217.html">p217. 추론과정: 답과 풀이 비교
+</a></li>
+<li><a href="p218.html">p218. 모델 추론: 단계 제시를 유도하는 지시
+</a></li>
+<li><a href="p219.html">p219. 모델에게 가르치는 방법: 세 풀이
+</a></li>
+<li><a href="p220.html">p220. 풀이별 평가 표시와 기준의 모호함
+</a></li>
+<li><a href="p221.html">p221. GRPO 목적 함수 전체 지도
+</a></li>
+<li><a href="p222.html">p222. 응답 전체 평균: G의 의미
+</a></li>
+<li><a href="p223.html">p223. 토큰 평균과 단계 평균의 구분
+</a></li>
+<li><a href="p224.html">p224. Advantage가 들어가는 두 위치
+</a></li>
+<li><a href="p225.html">p225. 단계와 답의 보상 규칙
+</a></li>
+<li><a href="p226.html">p226. 9개 원점수의 평균과 표준편차
+</a></li>
+<li><a href="p227.html">p227. 확률비 항의 위치
+</a></li>
+<li><a href="p228.html">p228. 학습 전후 출력의 질적 비교
+</a></li>
+<li><a href="p229.html">p229. 정답 범주의 확률 증가
+</a></li>
+<li><a href="p230.html">p230. 정책 비율과 advantage의 부호
+</a></li>
+<li><a href="p231.html">p231. 비율에 advantage를 곱하기
+</a></li>
+<li><a href="p232.html">p232. min과 clip을 결합하는 이유
+</a></li>
+<li><a href="p233.html">p233. 확률이 작을 때 비율이 커지는 사례
+</a></li>
+<li><a href="p234.html">p234. 클리핑 전의 비율 분포
+</a></li>
+<li><a href="p235.html">p235. 클리핑 후와 surrogate의 차이
+</a></li>
+<li><a href="p236.html">p236. 범위 밖 기울기 0이라는 문장의 정정
+</a></li>
+<li><a href="p237.html">p237. 양의 advantage에서 상한 초과의 미분
+</a></li>
+<li><a href="p238.html">p238. KL 제약과 참조 정책
+</a></li>
+<li><a href="p239.html">p239. 세 분포의 KL 비교
+</a></li>
+<li><a href="p240.html">p240. LLM 효율화: 학습에서 실행으로
+</a></li>
+<li><a href="p241.html">p241. 캐시 전후: Time flies fast의 계산
+</a></li>
+<li><a href="p242.html">p242. 새 행만 계산하고 과거 블록은 읽기
+</a></li>
+<li><a href="p243.html">p243. KV 캐시의 계산 곡선 해석
+</a></li>
+<li><a href="p244.html">p244. KV 캐시 용량의 축과 단위
+</a></li>
+<li><a href="p245.html">p245. MHA와 GQA의 head 연결
+</a></li>
+<li><a href="p246.html">p246. MLA의 위치와 공유 latent
+</a></li>
+<li><a href="p247.html">p247. Latent KV cache의 행렬식
+</a></li>
+<li><a href="p248.html">p248. K와 V 복원을 피하는 결합법칙
+</a></li>
+<li><a href="p249.html">p249. 용량 비교와 성능 배수의 조건
+</a></li>
+<li><a href="p250.html">p250. 성능표와 길이별 캐시 곡선의 한계
+</a></li>
+<li><a href="p251.html">p251. Sliding window attention</a></li>
+<li><a href="p252.html">p252. 정규화 레이어 배치</a></li>
+<li><a href="p253.html">p253. 폭과 깊이의 선택</a></li>
+<li><a href="p254.html">p254. Gated DeltaNet 도입</a></li>
+<li><a href="p255.html">p255. 세 gate와 short convolution</a></li>
+<li><a href="p256.html">p256. Delta rule의 수정 예</a></li>
+<li><a href="p257.html">p257. Decay gate의 감쇠</a></li>
+<li><a href="p258.html">p258. 3:1 hybrid</a></li>
+<li><a href="p259.html">p259. Hybrid의 메모리 그래프</a></li>
+<li><a href="p260.html">p260. Multi-token prediction</a></li>
+<li><a href="p261.html">p261. FlashAttention의 목적</a></li>
+<li><a href="p262.html">p262. GPU 메모리 계층</a></li>
+<li><a href="p263.html">p263. N제곱 중간 행렬</a></li>
+<li><a href="p264.html">p264. 기본 attention의 왕복</a></li>
+<li><a href="p265.html">p265. 타일 없는 행렬 곱</a></li>
+<li><a href="p266.html">p266. Tiling의 재사용</a></li>
+<li><a href="p267.html">p267. Softmax의 세 루프</a></li>
+<li><a href="p268.html">p268. 최댓값과 분모 통합</a></li>
+<li><a href="p269.html">p269. 출력 누적 통합</a></li>
+<li><a href="p270.html">p270. 하나의 루프</a></li>
+<li><a href="p271.html">p271. 첫 블록의 SRAM 처리</a></li>
+<li><a href="p272.html">p272. 다음 블록으로 이동</a></li>
+<li><a href="p273.html">p273. 블록 처리의 마무리</a></li>
+<li><a href="p274.html">p274. TurboQuant의 압축 목표</a></li>
+<li><a href="p275.html">p275. 벡터의 두 표현</a></li>
+<li><a href="p276.html">p276. 무작위 회전</a></li>
+<li><a href="p277.html">p277. 이상치 분산 그림</a></li>
+<li><a href="p278.html">p278. 여덟 양자화 구간</a></li>
+<li><a href="p279.html">p279. 두 단계와 QJL 의사 코드</a></li>
+<li><a href="p280.html">p280. 압축 효과와 주의점</a></li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/index.md">페이지별 상세 해설 — 001~280 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><span></span></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

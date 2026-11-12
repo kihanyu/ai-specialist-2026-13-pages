@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html" aria-current="page">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>head 병렬 축과 층의 깊이 축을 구별한다.</li><li>문맥 표현에서 어휘 logits까지의 Tensor 경로를 추적한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-attention" id="lab-llm-attention"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-세-층위의-값을-구별하기">1. 세 층위의 값을 구별하기</a></li><li><a href="#sec-2-구조를-한-번-따라가기">2. 구조를 한 번 따라가기</a></li><li><a href="#sec-3-학습과-생성의-같은-점다른-점">3. 학습과 생성의 같은 점·다른 점</a></li><li><a href="#sec-4-head가-많다는-것과-깊다는-것">4. Head가 많다는 것과 깊다는 것</a></li><li><a href="#sec-5-확인-질문">5. 확인 질문</a></li><li><a href="#sec-6-한-층-안의-head와-여러-층을-직접-추적하기">6. 한 층 안의 head와 여러 층을 직접 추적하기</a></li><li><a href="#sec-7-124쪽-실습을-대체하는-내부-활동">7. 124쪽 실습을 대체하는 내부 활동</a></li><li><a href="#sec-페이지별-상세-대조">페이지별 상세 대조</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-10-multi-head와-gpt-전체-구조-attention의-출력은-어떻게-다음-토큰-예측으로-이어질까">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">전체 학습 안내</a> · <a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">이전: Attention</a> · <a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">다음: GPT Layer들</a></p>
+<p>GPT는 앞 문맥으로부터 다음 토큰의 분포를 계산하는 Decoder-only 언어모델입니다. 핵심은 <strong>Attention이 만든 문맥 벡터를 여러 블록에서 가공한 뒤, 어휘별 점수로 변환한다</strong>는 연결입니다. 이 단원은 구조 입문이며, LayerNorm·FFN·잔차의 상세는 다음 목차 ‘GPT Layer들’, 생성·샘플링은 ‘GPT 모델 입출력’에서 이어집니다.</p>
+<p>원문의 120~124쪽을 중심으로 103쪽 전체 구조를 연결합니다. 09장은 Attention 내부 계산, 이 장은 병렬 head와 순차 블록의 연결을 다룹니다.</p>
+<h2 id="sec-1-세-층위의-값을-구별하기">1. 세 층위의 값을 구별하기</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>층위</th>
+<th>예시 모양</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>토큰 ID</td>
+<td><code>[B,T]</code></td>
+<td>사전에서 토큰을 가리키는 정수 번호</td>
+</tr>
+<tr>
+<td>문맥 표현</td>
+<td><code>[B,T,C]</code></td>
+<td>위치마다 현재까지 가공된 실수 특징</td>
+</tr>
+<tr>
+<td>어휘 logits</td>
+<td><code>[B,T,V]</code></td>
+<td>위치별 다음 토큰 후보 V개의 점수</td>
+</tr>
+</tbody>
+</table></div>
+<p>B는 배치 크기, T는 문맥 길이, C는 은닉 폭, V는 어휘 크기입니다. Attention의 출력 폭 C는 정답 후보 수가 아닙니다. 마지막 언어모델 출력층(LM head)이 C차원 특징을 V개 점수로 바꿉니다. logits는 아직 확률이 아니며 softmax로 정규화할 수 있습니다.</p>
+<h2 id="sec-2-구조를-한-번-따라가기">2. 구조를 한 번 따라가기</h2>
+<p>교육용 설정 B=1,T=3,C=4,V=20을 사용합니다.</p>
+<pre><code class="language-text">입력 [11,4,8]                    [1,3]
+→ 임베딩과 위치 정보             [1,3,4]
+→ Transformer 블록 반복          [1,3,4]
+→ 최종 정규화와 LM head          [1,3,20]
+→ 마지막 위치 점수 선택          [1,20]
+→ 다음 ID 선택·문맥에 추가        [1,4]
+</code></pre>
+<p>블록 안의 Attention은 다른 위치의 정보를 섞습니다. FFN은 각 위치의 특징을 비선형 변환합니다. 잔차 통로는 변환 전 표현과 변화량을 더하고, 정규화는 학습의 수치적 동작을 조절합니다. 여기서는 기본 구성의 역할만 연결합니다. 구체적인 순서가 Pre-Norm인지 Post-Norm인지는 구현과 교안의 해당 블록을 확인해야 합니다.</p>
+<p>LM head가 토큰 2에 가장 큰 점수를 주었다면 greedy 방식은 2를 선택합니다. 입력은 <code>[11,4,8,2]</code>가 되고 길이가 4로 늘어납니다. 다음 반복에서는 <strong>이제 선택한 2도 조건</strong>으로 사용합니다. 95쪽의 자기회귀는 이 반복을 뜻합니다. 확률에서 무작위로 선택하는 샘플링은 greedy와 다른 선택 규칙이며 구조 자체는 공유할 수 있습니다.</p>
+<p>아래 그림에서는 <strong>은닉 특징 축 C가 어휘 축 V로 바뀌는 곳</strong>과 <strong>생성 후 길이 T가 늘어나는 곳</strong>을 찾아보세요.</p>
+<p><img alt="입력 ID 1×3이 임베딩 1×3×4와 블록을 거쳐 logits 1×3×20이 되고 마지막 분포에서 ID를 추가하는 흐름도" decoding="async" id="figure-1" loading="lazy" src="../resources/90f4da9d6293f1bbfcac-06_gpt.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/90f4da9d6293f1bbfcac-06_gpt.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p>블록 반복에서는 모양이 유지되고 LM head에서 마지막 폭이 4에서 20으로 바뀝니다. 토큰을 추가할 때 바뀌는 것은 문맥 길이입니다. 수가 우연히 같더라도 축의 역할을 이름으로 구별하세요.</p>
+<h2 id="sec-3-학습과-생성의-같은-점다른-점">3. 학습과 생성의 같은 점·다른 점</h2>
+<p>학습 입력 <code>[11,4,8]</code>의 정답은 <code>[4,8,2]</code>입니다. 세 위치 logits 모두에서 각 정답 확률을 평가합니다. 첫 위치는 11을 보고 4를, 마지막 위치는 11·4·8을 보고 2를 맞힙니다. 정답이 이미 주어졌으므로 한 번에 계산할 수 있지만 causal mask로 허용 문맥을 제한합니다.</p>
+<p>생성 시에는 새 정답이 주어지지 않습니다. 마지막 위치의 분포에서 직접 토큰을 선택하고 그 선택을 다음 입력에 넣습니다. 학습에서 이전 정답을 넣어주는 방식(teacher forcing)과 생성에서 자신의 선택을 이어 쓰는 방식의 차이가 있습니다. 학습된 모델도 한 번의 잘못된 선택 이후 다른 문맥을 따라갈 수 있습니다.</p>
+<h2 id="sec-4-head가-많다는-것과-깊다는-것">4. Head가 많다는 것과 깊다는 것</h2>
+<p>head는 한 층에서 서로 다른 투영으로 <strong>나란히</strong> 정보를 섞고, layer는 이전 층의 출력 표현을 <strong>차례로</strong> 입력받습니다. 교안 123쪽의 초기·후기 층 시각화는 특정 예시에 대한 관찰입니다. 모든 초기 층은 문맥만, 모든 후기 층은 다음 토큰만 처리한다는 엄격한 규칙은 아닙니다.</p>
+<p>층을 두 번 통과한다고 토큰 수 T가 두 배가 되지 않습니다. 보통 블록은 잔차 덧셈과 반복을 위해 <code>[B,T,C]</code> 모양을 보존하고, 내부 정보가 바뀝니다. 마지막 LM head만 특징 축을 C에서 V로 바꿉니다. 이 구분을 먼저 해두면 다음 단원의 잔차·FFN 설명을 따라가기 쉽습니다.</p>
+<h2 id="sec-5-확인-질문">5. 확인 질문</h2>
+<ol>
+<li>위 예시의 Attention 출력 <code>[1,3,4]</code>에서 가장 큰 좌표를 고르면 다음 토큰 ID가 되나요?</li>
+<li>layer 수를 2에서 4로 바꾸되 B,T,C,V를 유지하면 최종 logits 모양은?</li>
+<li>생성 과정에서 토큰 하나를 추가하면 어느 축이 바뀌나요? 어휘 크기도 증가하나요?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>아닙니다. 은닉 특징 4개는 어휘 후보 20개가 아닙니다. LM head를 거쳐 V개 logits를 만들어야 합니다. 1~2절.</li>
+<li><code>[1,3,20]</code>으로 같습니다. 반복 횟수와 표현은 바뀌지만 입력 길이·출력 어휘 폭은 유지됩니다. 4절.</li>
+<li>문맥 길이 T가 3에서 4로 바뀝니다. 어휘 크기 V=20은 그대로입니다. 2절.</li>
+</ol>
+</details>
+<p><strong>다음 연결:</strong> 이제 <a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">GPT Layer들</a>에서 블록 내부의 정규화·FFN·잔차를 자세히 읽고 같은 <code>[B,T,C]</code>가 어떤 연산을 거쳐 보존되는지 검증합니다. 실습 원문에서는 <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%EC%8B%A4%EC%8A%B5/Chapter_3_Excercise_Attention.ipynb">Chapter 3 Attention</a>을 찾아 계산과 축을 대조하세요.</p>
+<h2 id="sec-6-한-층-안의-head와-여러-층을-직접-추적하기">6. 한 층 안의 head와 여러 층을 직접 추적하기</h2>
+<p>학습 목표는 head 출력의 연결 축을 정하고, 층 수를 바꾸어도 외부 텐서 모양이 유지되는 이유를 설명하는 것이다. 선행 배경은 <a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09장의 Attention 계산</a>이다. 원문 120쪽에서 같은 <code>I am a student</code> 입력이 세 갈래 Q0/K0/V0, Q1/K1/V1, Q2/K2/V2로 들어간다.</p>
+<p>아래에서 a0·a1·a2를 쌓는 방향을 먼저 찾는다.</p>
+<p><img alt="네 토큰 입력에서 세 head의 Q K V와 a0 a1 a2를 병렬로 계산하고 특징 방향으로 이어 붙이는 구조" decoding="async" id="figure-2" loading="lazy" src="../resources/0e542ecee34a92a9994d-p120_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/0e542ecee34a92a9994d-p120_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>세 head의 토큰 수는 모두 4이며 연결 후에도 4다. 예를 들어 각 head가 <code>[4,2]</code>를 내면 연결 결과는 <code>[4,6]</code>이다. 원문 그림 끝은 concat이고, <strong>보충:</strong> 기본 Multi-head의 최종 출력은 여기에 <code>W_O[6,C]</code>를 곱해 <code>[4,C]</code>로 만든다. head 출력을 평균내는 연산과 다르다. C를 h개 같은 폭으로 나누는 구현에서는 C가 h로 나누어떨어져야 하지만 모든 설계가 이 폭 규칙을 강제하는 것은 아니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>B=2, T=3, C=8, h=2</th>
+<th>확인할 축</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력·투영 Q,K,V</td>
+<td><code>[2,3,8]</code></td>
+<td>배치, 위치, 특징</td>
+</tr>
+<tr>
+<td>head 분리·축 교환</td>
+<td><code>[2,2,3,4]</code></td>
+<td>배치, head, 위치, head폭</td>
+</tr>
+<tr>
+<td>점수</td>
+<td><code>[2,2,3,3]</code></td>
+<td>마지막 두 축은 query,key</td>
+</tr>
+<tr>
+<td>Value 가중합</td>
+<td><code>[2,2,3,4]</code></td>
+<td>위치마다 head폭 4</td>
+</tr>
+<tr>
+<td>연결·출력 투영</td>
+<td><code>[2,3,8]</code></td>
+<td>잔차에 더할 폭 8</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>Kᵀ</code>는 전체 텐서 축을 뒤집는 것이 아니라 마지막 두 축만 바꾼다. softmax는 마지막 key 축이다. head 축으로 softmax하면 위치 간 참고 비율이라는 의미를 잃는다. 위 설정의 스케일 분모는 √4=2다. 메모리 배치가 바뀐 후 reshape/view의 연속성 조건도 실제 구현에서 확인한다.</p>
+<h3 id="sec-121123쪽의-head-지도">121~123쪽의 head 지도</h3>
+<p>121쪽 GPT-2 Small은 세로 12 layers, 가로 12 attention heads per layer로 표시된다. 144개의 작은 지도는 144층이 아니다. <a href="https://github.com/openai/gpt-2/blob/master/src/model.py">GPT-2 공식 코드</a>의 기본 설정 n_head=12, n_layer=12 및 block 함수로 대조했다. 122쪽 DeepSeek-R1은 61×128=7,808개 head 위치를 펼쳐 비교한다. <a href="https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/config.json">배포자 설정</a>의 num_hidden_layers=61, num_attention_heads=128과 일치한다(확인 2026-11-09). 이는 해당 전체 모델 사례이며 증류 모델까지 같은 구조라는 뜻이 아니다. 작은 타일의 색만으로 정확도·계산량·개별 head 기능을 추정할 수 없다.</p>
+<p>123쪽에서는 가로 Inputs, 세로 Outputs를 기준으로 어느 토큰이 어느 토큰을 읽는지 판단한다.</p>
+<p><img alt="초기 지도에서 flag 출력 행이 American 입력 열을 읽고 후기 and 행이 flag red white 열을 읽는 두 삼각형 지도. 원문 하단 초기 캡션의 방향은 본문에서 정정함" decoding="async" id="figure-3" loading="lazy" src="../resources/e3c9ed1972d47e75bf9b-p123_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/e3c9ed1972d47e75bf9b-p123_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>정정:</strong> 원문 초기 캡션은 ‘American → flag에 주목’이라고 적지만 강조된 칸은 <strong>flag 행, American 열</strong>이다. causal 문맥에서 flag가 앞선 American을 읽는 해석이 축과 맞는다. American이 미래 flag를 읽는 해석은 삼각형 제약과 충돌한다. 후기 지도는 and 위치가 앞의 flag·red·white를 참고하고 다음 blue 예측에 쓰일 표현을 만든다는 예시다. 특정 그림의 관찰을 ‘모든 초기 층/후기 층의 기능이 고정됨’으로 일반화하지 않는다. 원영상·강사의 추가 발언은 확인하지 않았다.</p>
+<h2 id="sec-7-124쪽-실습을-대체하는-내부-활동">7. 124쪽 실습을 대체하는 내부 활동</h2>
+<p>원문에는 <code>Chapter_3_Excercise_Attention.ipynb</code>라는 안내만 있다. 전체 노트북을 실행했다고 가정하지 않고 다음 활동을 자료 안에서 수행한다.</p>
+<ol>
+<li>길이 2, head 2개, head당 폭 1로 두고 Value는 두 head 모두 <code>(2,6)</code>으로 정한다.</li>
+<li>head 0의 두 번째 query 가중치는 <code>(0.75,0.25)</code>, head 1은 <code>(0.25,0.75)</code>다. 각각의 문맥값을 계산한다.</li>
+<li>두 결과를 연결하고 <code>W_O=[[1,0],[0,1]]</code>로 투영한다.</li>
+<li>첫 query에는 causal mask가 있어 첫 Value만 볼 수 있다. 첫 위치의 연결 결과도 구한다.</li>
+</ol>
+<p>예상 결과: 두 번째 위치는 head 0에서 <code>0.75×2+0.25×6=3</code>, head 1에서 <code>0.25×2+0.75×6=5</code>이므로 연결 <code>(3,5)</code>, 항등 출력 투영 후에도 <code>(3,5)</code>다. 첫 위치는 <code>(2,2)</code>다. 결과는 토큰 두 개의 특징 두 개, 즉 <code>[2,2]</code>이고 토큰 네 개가 되지 않는다. 출력 투영을 <code>[[1,1],[1,-1]]</code>로 바꾸면 두 번째 위치는 <code>(8,-2)</code>다. head의 가중합은 비음수 가중치를 사용해도 출력 투영 뒤 값은 단순한 평균에 제한되지 않는다.</p>
+<p><strong>조건·한계:</strong> 이 활동은 가중치를 주고 concat을 확인하는 손계산이다. 가중치를 학습하는 과정, GPU 속도, 실제 모델 품질을 검증하는 실험은 아니다. 표준 head 분리의 다음 변형들은 <a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19장 KV캐시와 GQA·MLA</a>에서 별도로 다룬다.</p>
+<h2 id="sec-페이지별-상세-대조">페이지별 상세 대조</h2>
+<p>핵심 학습은 위 본문으로 완결된다. 아래는 개별 슬라이드의 그림·수치·정정 근거를 찾는 경로다.</p>
+<ul>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p120.html">120쪽: 여러 head와 특징 방향 연결</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p121.html">121쪽: GPT-2 Small의 12×12 지도</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p122.html">122쪽: DeepSeek-R1의 layer×head 비교</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p123.html">123쪽: 초기·후기 Attention map과 참조 방향</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p124.html">124쪽: Attention 실습 안내와 내부 대체 활동</a></li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.md">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html"><small>이전 장</small>09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a><a rel="next" href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html"><small>다음 장</small>11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

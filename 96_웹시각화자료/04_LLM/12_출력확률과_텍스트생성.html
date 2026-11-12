@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>12. GPT 모델 입출력 — 벡터에서 다음 토큰으로 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html" aria-current="page">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>hidden 폭과 어휘 크기를 구분한다.</li><li>temperature·확률·토큰 선택과 생성 반복을 설명한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-temperature" id="lab-llm-temperature"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-시각적으로-확인할-핵심">시각적으로 확인할 핵심</a></li><li><a href="#sec-1-폭-c와-어휘-크기-v는-서로-다르다">1. 폭 C와 어휘 크기 V는 서로 다르다</a></li><li><a href="#sec-2-logits는-확률이-아니다">2. logits는 확률이 아니다</a></li><li><a href="#sec-3-생성-반복과-학습의-경계">3. 생성 반복과 학습의 경계</a></li><li><a href="#sec-4-같은-점수에서-선택-방식을-바꿔-보기">4. 같은 점수에서 선택 방식을 바꿔 보기</a></li><li><a href="#sec-5-이해-확인">5. 이해 확인</a></li><li><a href="#sec-6-원문-수치로-추적하는-생성">6. 원문 수치로 추적하는 생성</a></li><li><a href="#sec-페이지별-복습">페이지별 복습</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-12-gpt-모델-입출력-벡터에서-다음-토큰으로">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</h1>
+<p>GPT는 입력 토큰마다 <strong>어휘의 모든 후보에 대한 점수</strong>를 출력한다. 생성에서는 마지막 위치의 점수로 다음 ID 하나를 고르고, 그 ID를 문맥 뒤에 붙여 반복한다. 은닉 벡터의 좌표와 토큰 ID를 구별하는 것이 핵심이다.</p>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">전체 학습 경로</a> · <a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">선행: GPT Layer들</a></p>
+<p>학습 목표는 shape를 추적하고 greedy·temperature·top-k의 차이를 설명하는 것이다. 기본 경로는 1~3절이며, 샘플링을 비교하려면 4절을 읽는다.</p>
+<h2 id="sec-시각적으로-확인할-핵심">시각적으로 확인할 핵심</h2>
+<p>위에서 아래로 읽으며, 어떤 단계에서 C가 V로 바뀌는지 찾으세요.</p>
+<p><img alt="길이 T와 후보 수 V는 다른 축이다: 입력 ID · [2,3] B=2 · T=3; 은닉 표현 · [2,3,8] C=8 · 토큰별 특징; LM head · [2,3,11] V=11 · 어휘 후보 점수; 마지막 위치 · [2,11] 위치 축에서 마지막 선택; 다음 ID · [2,1] V축에서 후보 인덱스 선택" decoding="async" id="figure-1" loading="lazy" src="../resources/b42121f0d0b475dc8733-08_%ED%95%B5%EC%8B%AC%EA%B4%80%EA%B3%84.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/b42121f0d0b475dc8733-08_%ED%95%B5%EC%8B%AC%EA%B4%80%EA%B3%84.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p>LM head는 은닉 폭 8을 어휘 크기 11로 바꾼다. 다음 ID는 후보 점수의 인덱스다.</p>
+<h2 id="sec-1-폭-c와-어휘-크기-v는-서로-다르다">1. 폭 C와 어휘 크기 V는 서로 다르다</h2>
+<p>설명용으로 B=2문장, T=3위치, C=8은닉 특징, V=11어휘를 사용한다. 숫자가 작아서 실제 언어능력을 나타내지는 않는 계산 예다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>shape</th>
+<th>값의 뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력 ID</td>
+<td><code>[2,3]</code></td>
+<td>정수 토큰 번호</td>
+</tr>
+<tr>
+<td>token+position embedding</td>
+<td><code>[2,3,8]</code></td>
+<td>토큰별 실수 표현</td>
+</tr>
+<tr>
+<td>반복 GPT 블록·final norm</td>
+<td><code>[2,3,8]</code></td>
+<td>문맥이 반영된 은닉 표현</td>
+</tr>
+<tr>
+<td>LM head</td>
+<td><code>[2,3,11]</code></td>
+<td>각 위치의 11개 후보 점수(logits)</td>
+</tr>
+<tr>
+<td>마지막 위치 선택</td>
+<td><code>[2,11]</code></td>
+<td>각 문장 뒤에 올 후보 점수</td>
+</tr>
+<tr>
+<td>다음 ID 선택</td>
+<td><code>[2,1]</code></td>
+<td>문장당 정수 하나</td>
+</tr>
+<tr>
+<td>입력 뒤에 붙이기</td>
+<td><code>[2,4]</code></td>
+<td>길이가 하나 증가한 문맥</td>
+</tr>
+</tbody>
+</table></div>
+<p>행벡터 표기에서 LM head의 가중치가 <code>[C,V]</code>이면 <code>H @ W</code>가 <code>[B,T,V]</code>를 만든다. 선형층 라이브러리의 저장 weight가 <code>[V,C]</code>일 수도 있으므로 표기와 저장 방향을 구분한다. 블록 내부는 잔차 덧셈을 위해 C를 보존하지만 마지막 head는 C를 V로 바꾼다. 원문 146쪽 ‘토큰수’는 <strong>현재 길이 T가 아닌 어휘 크기 V</strong>로 명확히 읽는다.</p>
+<h2 id="sec-2-logits는-확률이-아니다">2. logits는 확률이 아니다</h2>
+<p>logits는 음수도 가능한 점수다. 후보 3개의 설명용 logits를 (2,1,0)으로 놓자. 큰 값을 빼도 softmax는 같으므로 (0,-1,-2)의 지수를 사용한다.</p>
+<pre><code class="language-text">지수값       = (1, 0.367879, 0.135335)
+분모         = 1.503214
+softmax 확률 ≈ (0.665241, 0.244728, 0.090031)
+</code></pre>
+<p>greedy는 가장 큰 logit의 <strong>인덱스</strong>를 고른다. 이 예에서 인덱스 0이다. softmax는 순서를 보존하므로 greedy에 확률 변환은 필수가 아니다. 원문 147쪽의 ‘마지막 임베딩에서 최대 위치’는 <strong>마지막 위치에 대한 LM head의 어휘 logits에서 최대 인덱스</strong>로 보완한다. 은닉 폭 C의 최대 좌표를 ID로 쓰면 V개 후보를 평가한 것이 아니다.</p>
+<h2 id="sec-3-생성-반복과-학습의-경계">3. 생성 반복과 학습의 경계</h2>
+<pre><code class="language-text">현재 ID 문맥 → 허용 길이만 남김 → 모델 순전파
+→ 마지막 유효 위치 logits → 다음 ID 선택 → 문맥 뒤에 추가
+→ EOS 또는 생성 길이 한도면 종료, 아니면 반복
+</code></pre>
+<p>위 흐름은 의사 코드이며 실행 API가 아니다. 학습된 모델은 보통 평가 모드로 바꾸고 자동미분을 기록하지 않은 채 생성한다. 긴 문맥을 잘라야 하는지는 위치 인코딩과 모델의 context 한도에 달린다. 오른쪽 padding이 있는 배치는 배열의 마지막 위치와 마지막 유효 토큰 위치가 다르다. EOS는 모델이 학습한 종료 토큰이며 항상 생성된다는 보장은 없으므로 길이 제한도 필요하다. 이 과정은 가중치를 갱신하지 않는다.</p>
+<h2 id="sec-4-같은-점수에서-선택-방식을-바꿔-보기">4. 같은 점수에서 선택 방식을 바꿔 보기</h2>
+<p>온도 τ&gt;0에서 <code>softmax(logits/τ)</code>를 계산한다. 문맥 길이 T와 혼동하지 않도록 온도는 τ로 쓴다. τ=2이면 위 점수는 (1,0.5,0), 확률은 약 (0.506480,0.307196,0.186324)다. τ가 커질수록 이 예에서는 분포가 평평해진다. 유한한 양의 온도만 바꾸고 greedy를 계속 사용하면 최대 인덱스는 바뀌지 않는다. τ=0을 식에 직접 넣지 않는다.</p>
+<p>top-k는 높은 점수 후보 k개만 남겨 다시 정규화한 뒤 확률적으로 뽑는다. 위 예에서 k=2이면 후보 0·1의 확률은 약 (0.731059,0.268941), 후보 2는 0이다. 후보를 남기는 단계와 랜덤으로 뽑는 단계를 구분하자. k=1은 동점 처리 규칙이 정해졌을 때 greedy와 같다. 실제 랜덤 결과는 seed와 구현에 영향을 받으므로 본문 숫자는 샘플 한 번의 관측값이 아니라 정확한 분포 계산이다.</p>
+<h2 id="sec-5-이해-확인">5. 이해 확인</h2>
+<ol>
+<li>B=2,T=5,C=8,V=11로 T만 바꾸면 logits shape와 다음 ID shape는?</li>
+<li>은닉 표현의 최대 좌표를 토큰 ID로 쓰면 왜 틀리는가?</li>
+<li>top-k에서 k=3은 위 3후보 예에 무슨 효과가 있는가? 온도를 바꾸고 argmax만 한다면?</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li><code>[2,5,11]</code>과 <code>[2,1]</code>. 입력 길이는 logits의 위치 축만 바꾼다. 1절.</li>
+<li>은닉 축의 의미는 특징이고, ID 후보 점수는 LM head 이후의 V축이다. 1~2절.</li>
+<li>모든 후보를 남기므로 자르기 효과가 없다. 양의 온도에 대한 argmax는 그대로다. 4절.</li>
+</ol>
+</details>
+<p>이제 <a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13장</a>에서 가중치에 남는 정보와 매 입력마다 생기는 표현을 구별한다.</p>
+<h2 id="sec-6-원문-수치로-추적하는-생성">6. 원문 수치로 추적하는 생성</h2>
+<p><strong>원문 해설.</strong> <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p146.html">146쪽</a>의 B=1,T=4,C=768,V=50,257에서 logits는 [1,4,50257]이다. 총 201,028개 점수 중 생성에 직접 쓰는 마지막 행은 50,257개다. 어휘 크기는 현재 입력의 네 토큰 수와 다르다. 아래 네 상자에서 C가 V로 바뀌는 지점을 찾는다.</p>
+<p><img alt="입력 [1,4], 임베딩과 은닉 [1,4,768], 최종 logits [1,4,50257]의 네 단계" decoding="async" id="figure-2" loading="lazy" src="../resources/331c6074e8a1bfe880df-p146_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/331c6074e8a1bfe880df-p146_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>입력 ID는 범주 번호, 은닉 값은 문맥 특징, logits는 후보 점수다. <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p147.html">147쪽</a>의 Hello, 쉼표, I, am 예에서 ID 257을 골라 a를 덧붙이는 과정은 마지막 은닉 좌표의 최대값을 고르는 과정이 아니다. 후보 축 V로 투영한 후 선택한다. 문자열 앞 공백과 토큰 경계는 토크나이저에 따라 달라져 다른 토크나이저에 이 ID를 그대로 옮길 수 없다.</p>
+<p><strong>원문 수치 검산.</strong> <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p148.html">148쪽</a>의 logits [6,-5,4,1.5,9.9,-2.3,4]에서 τ=0.96이면 최대 후보 확률은 약 0.978806, τ=10이면 약 0.267521다. 아래 양쪽 수식에서 나누는 것은 확률 자체가 아니라 지수에 들어갈 logit이다.</p>
+<p><img alt="온도 0.96과 10.00에서 같은 일곱 logits의 softmax 확률과 막대 비교" decoding="async" id="figure-3" loading="lazy" src="../resources/5a9ff81f1fb66b3b324e-p148_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/5a9ff81f1fb66b3b324e-p148_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>작은 온도에서는 최대 후보가 거의 독점하고 큰 온도에서는 작은 점수 후보도 가능성이 커진다. 이 변화가 답의 정확성을 자동으로 높이는 것은 아니다. 원하는 다양성과 반복 가능성에 맞춰 선택 정책을 정한다.</p>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p149.html">149쪽</a>의 top-k에서는 9개 중 점수 4.51,6.75,6.28의 세 후보만 남는다. 아래 -inf 마스킹과 softmax 행을 비교한다.</p>
+<p><img alt="아홉 logits에서 인덱스 0·3·7을 남기고 나머지를 음의 무한대로 마스킹하는 top-k 3 과정" decoding="async" id="figure-4" loading="lazy" src="../resources/1875a7adf58c0faea690-p149_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/1875a7adf58c0faea690-p149_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>남긴 후보 확률을 다시 합 1로 정규화한다. 그림의 0.06·0.57·0.36은 거친 표시이며 정확한 값은 페이지 해설과 검산 기록을 따른다. 무작위 표본 추출은 이 재정규화 다음의 별도 단계다. top-k와 온도는 함께 쓸 수 있으나 변환 순서·동점·난수 seed를 명시해야 비교가 가능하다.</p>
+<p><strong>내부 활동.</strong> 분포 (0.665241,0.244728,0.090031)의 누적 구간은 [0,0.665241), [0.665241,0.909969), [0.909969,1)이다. 균등 난수 u=0.8이면 어느 후보를 고르는가? 두 번째 구간이므로 ID 1이다. 이것은 실제 LLM 실행 결과가 아니라 샘플링 원리를 손으로 수행하는 예다.</p>
+<h2 id="sec-페이지별-복습">페이지별 복습</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p144.html">144 표지</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p145.html">145 블록 shape</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p146.html">146 출력 shape</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p147.html">147 생성 반복</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p148.html">148 온도</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p149.html">149 top-k</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.md">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html"><small>이전 장</small>11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a><a rel="next" href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html"><small>다음 장</small>13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

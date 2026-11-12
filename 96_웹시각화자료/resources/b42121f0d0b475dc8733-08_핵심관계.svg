@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="650" viewBox="0 0 800 650" role="img" aria-labelledby="title desc">
+<title id="title">길이 T와 후보 수 V는 다른 축이다</title><desc id="desc">교육용 예시. 위에서 아래로 읽으며 각 단계의 값과 조건을 확인한다.</desc>
+<rect width="800" height="650" fill="#f8fafc"/>
+<style>text{font-family:Malgun Gothic,Noto Sans KR,sans-serif;fill:#172554}.title{font-size:23px;font-weight:700}.main{font-size:21px;font-weight:700}.sub{font-size:18px}</style>
+<text x="36" y="46" class="title">길이 T와 후보 수 V는 다른 축이다</text>
+<rect x="35" y="75" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="108" class="main">1. 입력 ID · [2,3]</text>
+<text x="55" y="139" class="sub">B=2 · T=3</text>
+<path d="M400 163 v15 m-5 -5 l5 5 5 -5" fill="none" stroke="#334155" stroke-width="2"/>
+<rect x="35" y="181" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="214" class="main">2. 은닉 표현 · [2,3,8]</text>
+<text x="55" y="245" class="sub">C=8 · 토큰별 특징</text>
+<path d="M400 269 v15 m-5 -5 l5 5 5 -5" fill="none" stroke="#334155" stroke-width="2"/>
+<rect x="35" y="287" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="320" class="main">3. LM head · [2,3,11]</text>
+<text x="55" y="351" class="sub">V=11 · 어휘 후보 점수</text>
+<path d="M400 375 v15 m-5 -5 l5 5 5 -5" fill="none" stroke="#334155" stroke-width="2"/>
+<rect x="35" y="393" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="426" class="main">4. 마지막 위치 · [2,11]</text>
+<text x="55" y="457" class="sub">위치 축에서 마지막 선택</text>
+<path d="M400 481 v15 m-5 -5 l5 5 5 -5" fill="none" stroke="#334155" stroke-width="2"/>
+<rect x="35" y="499" width="730" height="86" rx="12" fill="white" stroke="#94a3b8"/>
+<text x="55" y="532" class="main">5. 다음 ID · [2,1]</text>
+<text x="55" y="563" class="sub">V축에서 후보 인덱스 선택</text>
+<text x="36" y="628" class="sub">교육용 재구성 · 측정 성능·실제 모델 실행 결과가 아님</text></svg>

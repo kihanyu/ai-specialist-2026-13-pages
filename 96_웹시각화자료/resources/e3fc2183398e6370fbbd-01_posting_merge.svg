@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+<title id="title">정렬된 posting list의 AND 교집합</title><desc id="desc">같은 ID면 반환하고, 다르면 작은 ID의 커서만 이동한다.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526175"/></marker></defs>
+<style>text{font-family:"Malgun Gothic","Noto Sans KR",sans-serif;fill:#172B4D} .note{fill:#526175}</style>
+<rect width="1200" height="700" fill="white"/>
+<text x="30" y="48.0" font-size="32" text-anchor="start" style="fill:#172B4D;font-weight:700">정렬된 posting list의 AND 교집합</text>
+<text x="30" y="92.0" font-size="24" text-anchor="start" style="fill:#526175;font-weight:400">같은 ID면 반환하고, 다르면 작은 ID의 커서만 이동한다.</text>
+<text x="35" y="156.0" font-size="26" text-anchor="start" style="fill:#172B4D;font-weight:700">machine</text>
+<text x="35" y="230.0" font-size="26" text-anchor="start" style="fill:#172B4D;font-weight:700">learning</text>
+<rect x="215" y="124" width="108" height="54" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="269" y="161.0" font-size="27" text-anchor="middle" style="fill:#172B4D;font-weight:700">d1</text>
+<rect x="345" y="124" width="108" height="54" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="399" y="161.0" font-size="27" text-anchor="middle" style="fill:#172B4D;font-weight:700">d2</text>
+<rect x="475" y="124" width="108" height="54" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="529" y="161.0" font-size="27" text-anchor="middle" style="fill:#172B4D;font-weight:700">d3</text>
+<rect x="215" y="198" width="108" height="54" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="269" y="235.0" font-size="27" text-anchor="middle" style="fill:#172B4D;font-weight:700">d1</text>
+<rect x="345" y="198" width="108" height="54" rx="12" fill="#E8F3FA" stroke="#0072B2" stroke-width="2"/>
+<text x="399" y="235.0" font-size="27" text-anchor="middle" style="fill:#172B4D;font-weight:700">d3</text>
+<rect x="35" y="300" width="80" height="55" rx="0" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="50" y="337.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:700">단계</text>
+<rect x="115" y="300" width="175" height="55" rx="0" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="130" y="337.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:700">machine</text>
+<rect x="290" y="300" width="175" height="55" rx="0" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="305" y="337.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:700">learning</text>
+<rect x="465" y="300" width="365" height="55" rx="0" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="480" y="337.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:700">판정</text>
+<rect x="830" y="300" width="335" height="55" rx="0" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="845" y="337.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:700">다음 동작</text>
+<rect x="35" y="355" width="80" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="50" y="396.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">1</text>
+<rect x="115" y="355" width="175" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="130" y="396.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d1</text>
+<rect x="290" y="355" width="175" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="305" y="396.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d1</text>
+<rect x="465" y="355" width="365" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="480" y="396.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">같음 → d1 반환</text>
+<rect x="830" y="355" width="335" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="845" y="396.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">두 커서 이동</text>
+<rect x="35" y="419" width="80" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="50" y="460.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">2</text>
+<rect x="115" y="419" width="175" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="130" y="460.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d2</text>
+<rect x="290" y="419" width="175" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="305" y="460.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d3</text>
+<rect x="465" y="419" width="365" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="480" y="460.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d2 &lt; d3</text>
+<rect x="830" y="419" width="335" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="845" y="460.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">machine만 이동</text>
+<rect x="35" y="483" width="80" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="50" y="524.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">3</text>
+<rect x="115" y="483" width="175" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="130" y="524.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d3</text>
+<rect x="290" y="483" width="175" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="305" y="524.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">d3</text>
+<rect x="465" y="483" width="365" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="480" y="524.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">같음 → d3 반환</text>
+<rect x="830" y="483" width="335" height="64" rx="0" fill="white" stroke="#CFD8E3" stroke-width="2"/>
+<text x="845" y="524.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">두 커서 이동</text>
+<rect x="35" y="580" width="550" height="90" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="53" y="615.0" font-size="25" text-anchor="start" style="fill:#00856A;font-weight:700">교집합 결과: [d1, d3]</text>
+<rect x="615" y="580" width="550" height="90" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="633" y="615.0" font-size="25" text-anchor="start" style="fill:#D55E00;font-weight:700">주의: 이 순서는 BM25 순위가 아니다.</text>
+</svg>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html" aria-current="page">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>KV cache가 재사용하는 값과 남는 연산을 설명한다.</li><li>MHA·GQA·MLA의 저장 표현과 payload 조건을 비교한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-kv-cache" id="lab-llm-kv-cache"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-kv-cache-과거-토큰의-k와-v는-다시-만들지-않는다">1. KV cache: 과거 토큰의 K와 V는 다시 만들지 않는다</a></li><li><a href="#sec-2-gqa-query는-여러-개-저장할-kv는-그룹별로">2. GQA: query는 여러 개, 저장할 K·V는 그룹별로</a></li><li><a href="#sec-3-mla-kv의-공통-저차원-표현을-저장한다">3. MLA: K·V의 공통 저차원 표현을 저장한다</a></li><li><a href="#sec-4-큰-수치도-같은-식으로-검산하기">4. 큰 수치도 같은 식으로 검산하기</a></li><li><a href="#sec-5-mla와-rope-위치-성분은-따로-남긴다">5. MLA와 RoPE: 위치 성분은 따로 남긴다</a></li><li><a href="#sec-6-성능표와-메모리-곡선-읽기">6. 성능표와 메모리 곡선 읽기</a></li><li><a href="#sec-7-작은-활동과-확인-문제">7. 작은 활동과 확인 문제</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-19-kv-캐시-gqa와-mla-무엇을-저장하고-다시-읽을까">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">이전: GRPO</a> · <a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">다음: 효율적인 구조</a></p>
+<p>이 장은 생성 중 과거 계산을 재사용하는 KV 캐시, KV head를 공유하는 GQA, 저장 표현을 압축하는 MLA를 비교한다. <strong>캐시가 줄이는 것은 과거 표현의 재계산이며, 과거를 조회하는 attention은 남는다.</strong> 240~250쪽이 대상이다.</p>
+<p>선행 배경은 <a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">Attention의 계산</a>과 <a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">위치정보와 RoPE</a>다. Q는 찾을 내용, K는 비교할 표지, V는 가져올 내용이다. head는 서로 다른 투영으로 정보를 읽는 attention 갈래다. causal mask는 미래 위치 접근을 막는다. 처음에는 1~3절, 계산 복습은 4절과 확인 문제를 읽는다.</p>
+<p>학습 목표는 과거 K·V의 재사용 조건을 설명하고, 주어진 차원과 정밀도로 캐시 bytes를 계산하며, GQA와 MLA의 공유 대상을 구별하고, RoPE가 단순 선형 재배열에 주는 제약을 말하는 것이다.</p>
+<h2 id="sec-1-kv-cache-과거-토큰의-k와-v는-다시-만들지-않는다">1. KV cache: 과거 토큰의 K와 V는 다시 만들지 않는다</h2>
+<p><strong>Prefill</strong>은 입력 prompt의 토큰을 한꺼번에 처리하는 단계다. <strong>Decode</strong>는 이전 출력까지 문맥에 넣고 다음 토큰을 한 개씩 생성하는 단계다. causal 모델에서는 미래에 새 토큰을 붙여도 과거 위치가 볼 수 있는 문맥은 변하지 않는다. 따라서 각 층의 과거 K·V를 저장해 다음 decode에서 재사용할 수 있다.</p>
+<p>캐시가 없으면 <code>A B</code>로 다음 토큰 C를 만들고, 다시 <code>A B C</code>를 모델에 넣으며 A·B의 표현도 계산한다. 캐시가 있으면 A·B의 K·V를 보존하고 C의 Q·K·V를 새로 만든다. C의 Q는 저장된 A·B와 새 C의 K 전체에 점수를 내고 V를 합친다. <strong>과거를 읽는 attention까지 사라지는 것은 아니다.</strong> 통상 Q는 과거 토큰의 값을 이후 query로 재사용할 필요가 없어 K·V처럼 모두 보존하지 않는다.</p>
+<p>아래 그림을 왼쪽에서 오른쪽으로 읽으며 새로 만드는 값과 계속 보존하는 값을 구별한다.</p>
+<p><img alt="prefill에서 A B의 K V를 저장하고 decode에서 C의 Q K V만 새로 만들되 A B C의 K V 전체를 조회하는 흐름" decoding="async" id="figure-1" loading="lazy" src="../resources/35cdd6f9509efabc839c-14_kv.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/35cdd6f9509efabc839c-14_kv.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/1208a9be9d5c27ec20bb-14_kv.png">SVG가 표시되지 않으면 PNG로 보기</a></p>
+<p>캐시의 장점은 반복되는 과거 계산을 줄인다는 것이다. 대신 생성 길이에 따라 캐시가 커지고, 매 decode마다 이를 읽는 메모리 대역폭이 병목이 될 수 있다. prompt·모델 가중치·위치 처리 등 조건이 달라지면 기존 캐시를 무조건 재사용할 수 없다.</p>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p241.html">241쪽 상세 도식</a>의 가중치 1.7·2.1은 그림에 적힌 q와 k의 직접 내적으로 재현되지 않는다. 예를 들어 [0.1,0.5]·[0.3,0.7]=0.38이다. 따라서 그 그림에서는 재사용 연결만 배우며 표시 숫자를 검증된 attention 계산으로 사용하지 않는다.</p>
+<h3 id="sec-작은-메모리-계산">작은 메모리 계산</h3>
+<p>동일 길이 배치를 가정하고 <code>B=배치 수</code>, <code>L=층 수</code>, <code>T=저장 토큰 수</code>, <code>Hkv=KV head 수</code>, <code>dh=head 폭</code>, <code>s=원소당 바이트</code>라 하자.</p>
+<p><code>KV bytes = 2 × B × L × T × Hkv × dh × s</code></p>
+<p>2는 K와 V 두 개를 뜻한다. 예제는 <code>B=1,L=2,T=4,Hkv=4,dh=8,s=2</code>이다.</p>
+<pre><code class="language-text">한 토큰·한 층: 2×4×8 = 64개 원소
+4토큰·2층: 64×4×2 = 512개 원소
+2바이트 저장: 512×2 = 1,024 bytes
+T=8로 두 배면 2,048 bytes
+</code></pre>
+<p>가중치·활성값·임시 버퍼·페이지 관리 메타데이터를 제외한 <strong>교육용 KV 데이터만의 계산</strong>이다. 실제 전체 GPU 메모리를 뜻하지 않는다. <code>MiB=2^20 bytes</code>, <code>MB=10^6 bytes</code>도 구별한다.</p>
+<h2 id="sec-2-gqa-query는-여러-개-저장할-kv는-그룹별로">2. GQA: query는 여러 개, 저장할 K·V는 그룹별로</h2>
+<p>MHA는 query head마다 대응 K·V head를 둔다. **Grouped-query attention(GQA)**는 여러 query head가 하나의 K·V head를 공유한다. query head 수 Hq는 유지하면서 Hkv를 줄이는 구조다. Hkv=1인 끝점은 MQA라고 부른다. 단순 캐시 삭제 설정이 아니라 모델의 투영·학습 구조와 연결되므로 임의의 MHA 모델에서 K·V head를 버리면 같은 결과가 보장되지 않는다. <a href="https://arxiv.org/abs/2305.13245">GQA 원 논문</a></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>같은 Hq=4일 때</th>
+<th>Hkv</th>
+<th>query와 KV 연결</th>
+<th>위 예제의 캐시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MHA</td>
+<td>4</td>
+<td>Q0→KV0, Q1→KV1, Q2→KV2, Q3→KV3</td>
+<td>1,024 bytes</td>
+</tr>
+<tr>
+<td>GQA</td>
+<td>2</td>
+<td>Q0·Q1→KV0, Q2·Q3→KV1</td>
+<td>512 bytes</td>
+</tr>
+<tr>
+<td>MQA</td>
+<td>1</td>
+<td>모든 Q→KV0</td>
+<td>256 bytes</td>
+</tr>
+</tbody>
+</table></div>
+<p>위 비율은 B·L·T·dh·dtype가 같다는 조건의 저장량이다. 품질이나 생성 속도가 정확히 같은 비율로 바뀐다는 뜻은 아니다. 그룹이 줄면 공유가 강해져 저장은 줄지만 표현 및 학습 조건을 평가해야 한다.</p>
+<h2 id="sec-3-mla-kv의-공통-저차원-표현을-저장한다">3. MLA: K·V의 공통 저차원 표현을 저장한다</h2>
+<p>**Multi-head latent attention(MLA)**은 K·V를 만드는 데 필요한 작은 공유 latent, 즉 압축된 중간 표현을 캐시에 둔다. 여러 query가 K·V를 공유하는 GQA와는 압축 방식이 다르다. 여기서는 원문 247~248쪽처럼 위치 성분을 생략한 선형 부분부터 설명한다.</p>
+<p>행벡터 배치 X의 모양을 <code>[T,C]</code>, 공유 latent Z를 <code>[T,r]</code>라 하자. <code>Z=X Wdown</code>, <code>K=Z UK</code>, <code>V=Z UV</code>이다. UK는 <code>[r,dk]</code>, UV는 <code>[r,dv]</code>이다. 작은 r은 저장을 줄이지만 정보 병목이 될 수 있다.</p>
+<pre><code class="language-text">점수: Q Kᵀ = Q (Z UK)ᵀ = (Q UKᵀ) Zᵀ
+출력: A V = A (Z UV) = (A Z) UV
+</code></pre>
+<p>Q가 <code>[1,dk]</code>이면 <code>Q UKᵀ</code>는 <code>[1,r]</code>, Zᵀ는 <code>[r,T]</code>이므로 점수는 <code>[1,T]</code>이다. 전체 K를 복원하지 않고 작은 latent 공간에서 점수를 구할 수 있다. V도 먼저 latent 가중합을 만든 다음 UV를 적용할 수 있다. 출력 투영과 UV를 결합하는 것도 선형 연산의 결합법칙을 활용한다.</p>
+<p>교육용 숫자로 <code>Z=[[1,2],[3,4]]</code>, <code>UK=[[1],[2]]</code>, <code>Q=[[2]]</code>라 하자. 직접 K는 <code>[[5],[11]]</code>, 점수는 <code>[10,22]</code>다. 재배열하면 <code>Q UKᵀ=[2,4]</code>, <code>[2,4] Zᵀ=[10,22]</code>로 같다. 이는 <strong>선형 부분이 같은 계산임</strong>을 보일 뿐, 실제 모든 연산 비용이 항상 줄어든다는 증명은 아니다.</p>
+<blockquote>
+<p><strong>원문 조건 보충:</strong> 실제 DeepSeek MLA에는 RoPE를 위한 분리된 위치 key 성분도 있어 ‘latent만 저장한다’는 도식은 전체 캐시를 단순화했다. latent 폭에 추가 위치 성분 등을 포함해 비교해야 한다. 원문 249쪽의 ‘4 MB/500 KB/70 KB’, ‘57배’, ‘6배’는 비교 모델 구성·층수·정밀도·측정 조건이 충분히 적혀 있지 않아 일반 성능 수치로 사용하지 않는다. 구조와 상세 조건은 <a href="https://arxiv.org/html/2412.19437v2#S2.SS1.SSS1">DeepSeek-V3 §2.1.1</a>을 참고한다.</p>
+</blockquote>
+<h2 id="sec-4-큰-수치도-같은-식으로-검산하기">4. 큰 수치도 같은 식으로 검산하기</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p244.html">244쪽</a>은 층마다 쌓이는 K·V를 입체 블록으로 그린다. 다음 그림에서 토큰 길이 n, head 폭 dh, head 수 nh, 층수 l, 원소당 2 bytes라는 각주를 먼저 확인한다.</p>
+<p><img alt="KV 데이터 원소 수 2 n dh nh l과 FP16 2 bytes 조건 및 10만 토큰 약 400GB 계산" decoding="async" id="figure-2" loading="lazy" src="../resources/108cd1d73ded4ba7ecd3-p244_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/108cd1d73ded4ba7ecd3-p244_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>그림의 조건을 대입하면 토큰당 <code>2×128×128×61×2=3,997,696 bytes</code>다. 100,000토큰이면 399,769,600,000 bytes, 즉 399.7696 GB 또는 약 372.3145 GiB다. 원문의 400GB는 십진 근사다. 이 수치는 <strong>동일 head 폭과 층수로 전체 K·V를 저장하는 MHA 가정</strong>이다. 그림의 DeepSeek R1/V3 문구를 실제 MLA 캐시가 400GB라는 뜻으로 읽지 않는다.</p>
+<p><strong>보충:</strong> DeepSeek-V3 보고서의 층수 61, KV latent 폭 512, 분리된 위치 key 폭 64를 사용하면, 아래의 이상적인 압축 캐시는 토큰당 <code>61×(512+64)×2=70,272 bytes</code>다. 동일 기준 MHA와의 비율은 <code>3,997,696/70,272=56.8889</code>다. 따라서 <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p249.html">249쪽</a>의 약 70KB·57배는 이 저장 가정 아래 설명할 수 있지만, 전체 GPU 메모리나 실측 속도 배수로 확장할 수 없다. <a href="https://arxiv.org/html/2412.19437v2#S4.SS2">DeepSeek-V3 §4.2</a></p>
+<p>GQA를 Hkv=16으로 가정하면 토큰당 499,712 bytes로 약 500KB가 된다. <strong>이는 교안에 빠진 head 수를 역으로 맞춘 교육용 조건이며 원문 실험 설정의 확인이 아니다.</strong> 전통적 Transformer 대비 생성 6배라는 문구에는 장치·배치·길이·커널과 비교 모델이 부족하므로 성능 검증은 미확인이다.</p>
+<h2 id="sec-5-mla와-rope-위치-성분은-따로-남긴다">5. MLA와 RoPE: 위치 성분은 따로 남긴다</h2>
+<p>RoPE는 위치에 따라 Q·K의 좌표쌍을 회전해 상대 위치가 내적에 영향을 주게 한다. 3절의 선형 재배열은 행렬의 결합법칙을 썼다. 그러나 K 투영 뒤에 위치마다 다른 회전 행렬이 끼면, 그 회전을 무시하고 고정 UK를 query 가중치에 한 번 흡수할 수 없다. 행렬 곱은 순서를 마음대로 바꾸는 교환법칙을 따르지 않기 때문이다.</p>
+<p><strong>원문 단순화의 보충:</strong> DeepSeek MLA는 내용용 latent와 분리된 RoPE key 성분을 저장한다. 각 head는 내용 점수와 위치 점수를 함께 사용한다. 따라서 이상적인 캐시 식은 <code>B×L×T×(r+dR)×s</code>이며 r은 KV latent 폭, dR은 공유 위치 key 폭이다. query latent까지 과거 위치마다 캐시에 추가하는 식은 이 구성의 의도가 아니다. <a href="https://arxiv.org/html/2405.04434v5#S2.SS1.SSS3">DeepSeek-V2 §2.1.3</a>, <a href="https://arxiv.org/html/2412.19437v2#S2.SS1.SSS1">DeepSeek-V3 §2.1.1</a></p>
+<p>작은 예: B=1,L=2,T=4,r=4,dR=2,s=2이면 96 bytes다. latent만 세면 64 bytes가 되어 위치용 32 bytes를 빠뜨린다. 이것은 학습용 차원이며 실제 모델 설정이 아니다. 낮은 r은 저장을 줄이지만 표현 병목·학습 변화가 생길 수 있다. 임의 MHA 모델의 K·V를 사후에 작은 벡터로 바꿔도 출력이 동일하다는 뜻이 아니다.</p>
+<p>3절 Value 재배열도 검산하자. <code>Z=[[1,2],[3,4]], UV=[[1],[2]], A=[0.25,0.75]</code>이면 <code>V=[5,11]</code>, 직접 가중합은 9.5다. 먼저 <code>AZ=[2.5,3.5]</code>를 만든 뒤 UV를 곱해도 9.5다. softmax를 선형 변환과 교환한 것이 아니라 <strong>같은 A가 정해진 뒤</strong> 행렬 곱의 괄호만 바꾼 것이다.</p>
+<h2 id="sec-6-성능표와-메모리-곡선-읽기">6. 성능표와 메모리 곡선 읽기</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p250.html">250쪽</a>의 왼쪽은 벤치마크 표, 오른쪽은 고정 차원의 저장량 곡선이다. 표를 볼 때 품질 지표의 예외와 파라미터 수 차이를 찾는다.</p>
+<p><img alt="DeepSeek-V2 표 8의 MHA GQA MQA 비교와 표 9의 MoE MHA MLA 비교 및 원소 수 단위 캐시 행" decoding="async" id="figure-3" loading="lazy" src="../resources/dd092ffb3006712ac427-p250_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/dd092ffb3006712ac427-p250_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>원문 표 9의 작은 MoE에서 C-Eval은 MHA 51.6, MLA 50.9로 내려간다. 따라서 'MLA는 모든 지표가 높다'는 결론은 표와 맞지 않는다. KV Cache per Token의 단위는 <strong>원소 수</strong>이며 작은 모델 110.6K→15.6K, 큰 모델 860.2K→34.6K다. bytes로 바꾸려면 정밀도를 곱한다. 활성 파라미터 수도 서로 다르므로 순수 attention 교체만의 효과로 단정하지 않는다. <a href="https://arxiv.org/html/2405.04434v5#A4">DeepSeek-V2 부록 D, 표 9</a></p>
+<p>오른쪽 그래프는 가로축 문맥 길이를 로그 눈금으로 표시한다. 세로축은 KV cache GB이고, 범례의 latent 폭은 1024·512·256·64다.</p>
+<p><img alt="배치 1 층 48 임베딩 2048 head 24 bf16 조건에서 문맥 길이에 따른 MHA 및 네 latent 폭의 이상적 캐시 GB 곡선" decoding="async" id="figure-4" loading="lazy" src="../resources/fe4457ad19556c0e050b-p250_fig02.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/fe4457ad19556c0e050b-p250_fig02.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>이 그림은 측정 latency가 아니다. x축 로그 눈금에서는 길이에 선형인 y도 휘어 보일 수 있다. 범례의 4·8·16·64배는 RoPE 없는 <code>2×2048/r</code> 계산과 맞는다. 실제 MLA를 비교할 때는 dR 등 추가 저장을 포함해야 한다. head 수 24와 임베딩 폭 2048은 통상 균등 head 분할로 정수 폭을 만들지 못하므로, 이 그림의 파라미터 표기는 실제 모델 구성으로 사용하지 않는다.</p>
+<h2 id="sec-7-작은-활동과-확인-문제">7. 작은 활동과 확인 문제</h2>
+<ol>
+<li>1절의 B=1,L=2,T=4,Hkv=4,dh=8,s=2에서 배치를 3으로, Hkv를 2로 바꾸면?</li>
+<li>캐시가 있으면 새 query가 과거 K를 읽지 않아도 되는가? 한 토큰 decode 비용과 생성 전체 비용도 같은가?</li>
+<li>r=4,dR=2인 캐시에서 dR을 누락하면 몇 퍼센트를 적게 세는가?</li>
+<li>GQA는 무엇을 공유하고 MLA는 무엇을 저장하는가? 저장량이 절반이면 속도도 두 배인가?</li>
+<li>길이가 두 배가 된 메모리 곡선을 보고 품질 향상을 결론낼 수 있는가?</li>
+</ol>
+<details><summary>해설</summary>
+<ol>
+<li><code>2×3×2×4×2×8×2=1,536 bytes</code>. 1·2절의 축을 각각 바꾼다.</li>
+<li>아니다. QK 점수와 V 가중합이 남는다. 단일 decode의 과거 조회는 길이 T에 비례하며, 여러 decode의 전체 비용은 그 길이들을 합해야 한다. 243쪽의 정성 곡선을 전체 생성의 보편 선형 시간으로 읽지 않는다.</li>
+<li>실제 96 bytes에서 32 bytes가 빠지므로 1/3, 약 33.33% 과소계산이다. 5절로 돌아간다.</li>
+<li>GQA는 여러 Q가 KV head를 공유하며 MLA는 저차원 KV 표현과 위치 성분을 저장한다. 속도는 메모리 이동·계산·커널·배치에 의존하므로 저장 비율만으로 확정할 수 없다.</li>
+<li>아니다. 저장량 그래프에는 정답률 측정이 없다. 6절의 표와 그래프의 측정 대상을 구별한다.</li>
+</ol>
+</details>
+<p>활동: 종이에 A B의 K·V 두 칸을 그린 뒤 C의 한 칸을 추가한다. C의 Q에서 세 K로 화살표를 긋고 세 V의 가중합을 표시한다. 예상 결과는 기존 두 칸을 다시 계산하지 않으면서 세 칸을 모두 참조하는 그림이다. 실제 GPU 실행이나 원문 벤치마크 재현은 수행하지 않았다. <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p240.html">240쪽부터 상세 읽기</a>.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.md">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html"><small>이전 장</small>18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a><a rel="next" href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html"><small>다음 장</small>20. 효율적인 구조와 상태 갱신</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

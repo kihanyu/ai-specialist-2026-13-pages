@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>시각화로 공부할 주제와 그림 읽는 법 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html" aria-current="page">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>시각화로 공부할 주제와 그림 읽는 법</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>원문 그림의 축·단위·조건·읽는 순서와 연결 계산기를 사용해 전 과정을 복습한다.</li><li>교육용 지정 확률·toy 알고리즘·가정 가격·과거 보고 사례를 실제 실행·현재 성능·confidence로 오해하지 않는다.</li></ul></details></header><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-어떤-분야에-그림이-중요한가">어떤 분야에 그림이 중요한가</a></li><li><a href="#sec-그림을-읽는-공통-순서">그림을 읽는 공통 순서</a></li><li><a href="#sec-bm25-화면-발췌를-읽을-때">BM25 화면 발췌를 읽을 때</a></li><li><a href="#sec-이미지와-본문을-함께-쓰기">이미지와 본문을 함께 쓰기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-시각화로-공부할-주제와-그림-읽는-법">시각화로 공부할 주제와 그림 읽는 법</h1>
+<p>RAG에서는 문서·벡터·확률·검색 상태가 서로 다른 형태로 변합니다. 글과 수식만 읽으면 <strong>어느 축을 계산하는지</strong>, <strong>무엇이 저장되고 다시 사용되는지</strong>, <strong>어떤 후보를 버렸는지</strong>를 놓치기 쉽습니다. 이 안내는 특히 그림이 도움이 되는 분야와 본문에 포함한 이미지를 연결합니다. 모든 그림은 이 폴더 안에 있으며 교안이나 HTML 파일을 열 필요가 없습니다.</p>
+<h2 id="sec-어떤-분야에-그림이-중요한가">어떤 분야에 그림이 중요한가</h2>
+<p>가장 우선해서 그림으로 볼 주제는 <strong>신경 검색 구조·벡터 탐색·청킹·확률 혼합·도구 사용·평가 분모</strong>입니다. 내부 상태와 여러 경로가 동시에 존재하기 때문입니다. 역색인·점수·순위 지표·RAG 전체 흐름·검색 고도화·근거 관리도 작은 예제의 대상을 그림으로 고정해 읽으면 계산과 설명이 연결됩니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>분야</th>
+<th>글만 읽을 때 놓치기 쉬운 점</th>
+<th>포함한 시각화와 확인할 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01 검색·역색인</a></td>
+<td>같은 문서를 행렬의 열로 볼 때와 term별 목록으로 볼 때의 방향 차이</td>
+<td><a href="../resources/c24a6f22e692efb8c63d-01_document_index.svg">문서→행렬→posting</a>, <a href="../resources/e3fc2183398e6370fbbd-01_posting_merge.svg">AND 커서 이동</a>: term 횟수와 등장 문서 수, 후보와 관련성 순위를 구분</td>
+</tr>
+<tr>
+<td><a href="02_TF_IDF%EC%99%80_BM25.html">02 TF-IDF·BM25</a></td>
+<td>희귀도·길이·횟수가 다른 위치에서 점수에 기여함</td>
+<td><a href="../resources/c64dbd273470fbdda44d-02_tfidf_heatmap.svg">TF-IDF heatmap</a>, <a href="../resources/efb599abee7833d6f997-02_bm25_saturation.svg">BM25 곡선</a>, <a href="../resources/a407e5d0584fdcb1613b-02_bm25_html_crop.png">화면 발췌</a>: 같은 문서·term을 세로로 추적하고 곡선의 포화와 길이 보정을 읽기</td>
+</tr>
+<tr>
+<td><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03 검색 평가</a></td>
+<td>첫 관련 문서와 전체 관련 문서, 집합과 순서의 차이</td>
+<td><a href="../resources/20e18b3e30428a533429-03_rank_metrics.svg">순위와 지표</a>, <a href="../resources/3c3f554d190f9dc98535-03_ap_order.svg">AP 순서 비교</a>: 같은 Top-5 집합도 AP가 달라지는 이유</td>
+</tr>
+<tr>
+<td><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04 신경 검색 학습</a></td>
+<td>Cross·Bi-Encoder의 만나는 위치와 연산 재사용, 점수 행렬의 두 축</td>
+<td><a href="../resources/2fd38f8e776d17eec010-04_encoder_architectures.svg">인코더 비교</a>, <a href="../resources/ca0fe08cf84b5e222b55-04_score_softmax_gradient.svg">점수→softmax→gradient</a>: 사전 계산 가능 여부와 대각선 positive의 갱신 방향</td>
+</tr>
+<tr>
+<td><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05 벡터 인덱스</a></td>
+<td>영역 하한·해시 경계·탐색 경로와 정답 후보가 다름</td>
+<td><a href="../resources/264917d25f74b08a5b15-05_kdtree_lsh.svg">kd-tree·LSH</a>, <a href="../resources/d6af236ffec0654dd697-05_graph_hnsw.svg">그래프·HNSW</a>: 가까운 점을 놓치는 조건, 후보 폭과 계층의 역할</td>
+</tr>
+<tr>
+<td><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06 RAG 구조</a></td>
+<td>문서 변경 때 할 일과 질문마다 할 일을 섞기 쉬움</td>
+<td><a href="../resources/b7f7a55170fdf433ea58-06_indexing_query.svg">인덱싱·질의</a>, <a href="../resources/f9d3563628a7cb9a898d-06_failure_locator.svg">실패 위치</a>: 근거가 어느 단계에서 빠졌는지 추적</td>
+</tr>
+<tr>
+<td><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07 청킹·컨텍스트</a></td>
+<td>겹치는 구간과 중복 비용, 검색 단위와 읽는 범위의 차이</td>
+<td><a href="../resources/a8d40ace21ed47b50135-07_overlap_tokens.svg">overlap 띠</a>, <a href="../resources/7ffc76371e97c8afebdc-07_parent_context.svg">parent·문맥 보강</a>: 1,000토큰이 1,200토큰 저장량이 되는 이유와 parent 중복 제거</td>
+</tr>
+<tr>
+<td><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08 확률·디코딩</a></td>
+<td>문서별 곱과 문서 간 합, 사전확률과 정답 기여도, 후보와 문서의 두 축</td>
+<td><a href="../resources/7cb380b22251c06cc8b9-08_01_document_mixture.svg">확률 경로</a>, <a href="../resources/46a95cebc1a61fab15f9-08_02_posterior_gradient.svg">기여도·gradient</a>, <a href="../resources/a15dd58df9a472ef9fa2-08_03_thorough_matrix.svg">재평가 행렬</a>: 0.32를 만든 항과 beam에 없던 항을 구분</td>
+</tr>
+<tr>
+<td><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09 검색 고도화</a></td>
+<td>질의 변환·순위 융합·재정렬을 같은 단계로 보기 쉬움</td>
+<td><a href="../resources/92bf2beb54e3cc959aa0-09_hybrid_rrf.svg">Hybrid·RRF</a>, <a href="../resources/bf764dd598d5d7eef53c-09_query_hops.svg">질문 변환·순차 hop</a>: 후보를 새로 찾는 단계와 기존 후보 순서를 바꾸는 단계</td>
+</tr>
+<tr>
+<td><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10 답변·근거</a></td>
+<td>인용 ID 존재와 실제 주장 지지를 혼동하기 쉬움</td>
+<td><a href="../resources/259ad404c9dec0ac0f73-10_claim_support.svg">주장-근거 매트릭스</a>, <a href="../resources/37ec369d8e9812c4fcae-10_answer_states.svg">답변 상태</a>: 지지되지 않는 주장, 부분 답변·충돌·거절의 차이</td>
+</tr>
+<tr>
+<td><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11 도구·Agentic</a></td>
+<td>학습 데이터 제작과 추론 실행, 프로토콜과 판단 알고리즘을 혼동하기 쉬움</td>
+<td><a href="../resources/1ceeefd4b490acf33b6a-11_01_toolformer_train_infer.svg">Toolformer 학습·추론</a>, <a href="../resources/a03705446dfc9cafe58a-11_02_agent_mcp_roles.svg">Agent·MCP 역할</a>: 누가 호출을 생성하고 누가 실제 실행하며 언제 멈추는지</td>
+</tr>
+<tr>
+<td><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12 평가·운영</a></td>
+<td>지표마다 다른 분모, 평가 축의 차이, 캐시가 줄이지 못하는 비용</td>
+<td><a href="../resources/de19667b2f89d1a816e4-12_01_precision_rank.svg">P와 CP</a>, <a href="../resources/f53c09a6eedf5efcf23d-12_02_retrieval_generation_diagnosis.svg">검색·생성 진단</a>, <a href="../resources/605f19f3e1ba685ef762-12_03_cache_cost.svg">캐시 비용 분해</a>: 순서 가중과 단순 비율, 남는 비용을 구분</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-그림을-읽는-공통-순서">그림을 읽는 공통 순서</h2>
+<ol>
+<li><strong>대상:</strong> 같은 질문·문서·배치·후보 집합을 비교하는지 확인합니다. 그림 사이에서 문서 A와 다른 장의 문서 A가 같은 자료라고 가정하지 않습니다.</li>
+<li><strong>축과 단위:</strong> 행과 열, 원시 횟수·토큰·거리·확률·비용 중 무엇인지 확인합니다. 화살표가 데이터 이동인지 학습 갱신인지도 구분합니다.</li>
+<li><strong>계산:</strong> 색이 진한 이유, 남아 있는 후보, 합산하는 항을 식과 연결합니다. 숫자가 함께 표시되어 있으므로 색만으로 판단하지 않아도 됩니다.</li>
+<li><strong>조건 변화:</strong> 하나의 근거가 빠지면, K나 후보 폭을 줄이면, 길이를 늘리면 결과가 어떻게 바뀔지 예상합니다.</li>
+<li><strong>한계:</strong> schematic 화살표는 실제 공간의 거리를 뜻하지 않을 수 있습니다. 가상 2차원 벡터는 실제 임베딩의 좌표마다 사람이 정한 의미가 있다는 주장이 아닙니다.</li>
+</ol>
+<h2 id="sec-bm25-화면-발췌를-읽을-때">BM25 화면 발췌를 읽을 때</h2>
+<p>화면 발췌의 <code>TF</code>는 문서 내 <strong>원시 등장 횟수 f</strong>이며, TF-IDF 예제의 <code>횟수/문서 길이</code>와 다릅니다. 화면의 <code>k</code>는 본문의 포화 계수 <code>k₁</code>입니다. 표시 조건은 <code>k₁=1.2</code>, <code>b=0.75</code>이고 정지된 슬라이더는 이 조건을 보여 줍니다.</p>
+<p>왼쪽은 평균 길이 조건에서 f를 늘릴 때의 <strong>빈도 항</strong>입니다. IDF를 곱하기 전이므로 전체 BM25 점수로 읽지 않습니다. 오른쪽은 f를 고정하고 상대 문서 길이를 바꿉니다. <code>b=0</code>이면 길이 영향이 없고, 길이 비율이 1일 때 여러 b 곡선이 만납니다. 화면의 작은 축·범례는 02장의 큰 SVG 그래프와 계산표로 함께 확인할 수 있습니다.</p>
+<h2 id="sec-이미지와-본문을-함께-쓰기">이미지와 본문을 함께 쓰기</h2>
+<p>이미지는 설명을 대신하는 장식이 아니라 <strong>검산할 대상과 과정을 고정하는 도구</strong>입니다. 각 이미지 다음의 ‘그림 읽기’에서 먼저 따라갈 경로와 주의할 오해를 읽고, 해당 절의 표·수식·확인 질문으로 돌아가세요. SVG는 개별 파일을 확대해 볼 수 있고, PNG는 촬영 시점의 고정 화면입니다. 이미지가 표시되지 않는 뷰어에서도 대체 텍스트·표·본문으로 같은 계산을 따라갈 수 있습니다.</p>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내로 돌아가기</a> · <a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.md">시각화로 공부할 주제와 그림 읽는 법 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="%EC%9A%A9%EC%96%B4%EC%A7%91.html"><small>이전 장</small>RAG 용어집</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

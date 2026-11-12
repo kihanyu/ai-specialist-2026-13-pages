@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1020" viewBox="0 0 1200 1020" role="img" aria-labelledby="title desc">
+<title id="title">Toolformer: 학습 데이터 제작과 추론 실행은 다른 과정</title><desc id="desc">상단은 후보샘플링 API실행 손실필터링 미세튜닝의 학습데이터 제작, 하단은 호출생성 실행 결과삽입 생성재개의 추론 과정이다.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+<rect width="1200" height="1020" fill="white"/>
+<text x="40" y="52" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="32" fill="#172b4d" font-weight="700" text-anchor="start">Toolformer: 학습 데이터 제작과 추론 실행은 다른 과정</text>
+<text x="40" y="99" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">A. 학습 준비: 이미 존재하는 텍스트에서 유용한 호출 예제를 만든다</text>
+<rect x="40" y="135" width="260" height="180" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="55" y="177" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">① 후보 샘플링</text>
+<text x="55" y="228" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">소수 시연 + 텍스트</text>
+<text x="55" y="264" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">시작 위치와 인자 후보</text>
+<path d="M305,225 L320,225" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="325" y="135" width="260" height="180" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="340" y="177" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">② API 실행</text>
+<text x="340" y="228" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">외부 계산기·검색기</text>
+<text x="340" y="264" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">실제 응답 r 수집</text>
+<path d="M590,225 L605,225" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="610" y="135" width="260" height="180" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="625" y="177" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">③ 손실 필터</text>
+<text x="625" y="228" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">후속 토큰 예측 비교</text>
+<text x="625" y="264" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">도움이 된 호출만 유지</text>
+<path d="M875,225 L890,225" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="895" y="135" width="260" height="180" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="910" y="177" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">④ 미세튜닝</text>
+<text x="910" y="228" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">통과한 예제 C*</text>
+<text x="910" y="264" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">다음 토큰 학습</text>
+<rect x="40" y="350" width="1115" height="164" rx="12" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+<text x="65" y="390" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">필터 예: 결과가 없을 때의 더 강한 기준과 비교</text>
+<text x="65" y="433" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#172b4d" font-weight="400" text-anchor="start">Lnone=2.0   Lcall=1.8   Lplus=0.6   임계값 τf=0.5</text>
+<text x="65" y="477" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="27" fill="#b45309" font-weight="700" text-anchor="start">min(2.0, 1.8) − 0.6 = 1.2 ≥ 0.5 → 유지</text>
+<text x="40" y="568" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">B. 추론: 학습된 모델의 호출 요청을 실행기가 처리한다</text>
+<rect x="40" y="605" width="260" height="180" rx="12" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+<text x="55" y="647" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">① 모델</text>
+<text x="55" y="698" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">API 이름·인자 생성</text>
+<text x="55" y="734" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">결과 구분자에서 중단</text>
+<path d="M305,695 L320,695" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="325" y="605" width="260" height="180" rx="12" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+<text x="340" y="647" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">② 실행기</text>
+<text x="340" y="698" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">허용된 도구 실행</text>
+<text x="340" y="734" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">결과를 텍스트로 수집</text>
+<path d="M590,695 L605,695" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="610" y="605" width="260" height="180" rx="12" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+<text x="625" y="647" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">③ 실행기</text>
+<text x="625" y="698" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">호출 결과·종료 표식</text>
+<text x="625" y="734" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">문맥에 삽입</text>
+<path d="M875,695 L890,695" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="895" y="605" width="260" height="180" rx="12" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+<text x="910" y="647" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">④ 모델</text>
+<text x="910" y="698" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">갱신된 문맥을 참고</text>
+<text x="910" y="734" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#172b4d" font-weight="400" text-anchor="start">답변 생성 재개</text>
+<rect x="40" y="825" width="1115" height="145" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<text x="65" y="865" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#172b4d" font-weight="400" text-anchor="start">학습 준비에서는 원래 후속 텍스트를 기준으로 호출의 유용성을 선별한다.</text>
+<text x="65" y="902" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#172b4d" font-weight="400" text-anchor="start">추론에서는 미래 답변을 미리 알지 못한다. 실제 API 실행과 결과 삽입이 필요하다.</text>
+<text x="65" y="939" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#172b4d" font-weight="400" text-anchor="start">새 호출을 할 때마다 모델 가중치를 다시 학습한다는 그림이 아니다.</text>
+</svg>

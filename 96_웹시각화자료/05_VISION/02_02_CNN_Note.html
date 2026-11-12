@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>CNN | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vision-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">VISION 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">Vision 자습 교재: 이미지에서 예측과 영역까지</a></li><li><a href="01_%EB%B9%84%EC%A0%84_%EC%9E%85%EB%AC%B8.html">비전 입문: 사진을 숫자로 표현하고 예측을 평가하기</a></li><li><a href="02_01_DNN_Note.html">DNN: 예측 확률에서 손실과 가중치 업데이트까지</a></li><li><a href="02_02_CNN_Note.html" aria-current="page">CNN</a></li><li><a href="02_03_CNN_ResNet_18Layer.html">ResNet-18: 잔차를 이해하고 차원을 추적하며 구현하기</a></li><li><a href="03_01_Attention_Note.html">Attention 학습 지도</a></li><li><a href="03_02_Attention%EA%B3%BC_ViT.html">Attention과 ViT: 관계 계산에서 이미지 분류까지</a></li><li><a href="03_03_DeiT%EC%99%80_Swin.html">DeiT와 Swin: 데이터 효율과 계산 효율</a></li><li><a href="03_04_CLIP%EA%B3%BC_DINO.html">CLIP과 DINO: 정답 신호를 어디서 얻을까</a></li><li><a href="04_01_Application_note.html">Vision Applications: 검출·추적·분할 학습 안내</a></li><li><a href="04_02_%EA%B0%9D%EC%B2%B4_%EA%B2%80%EC%B6%9C.html">객체 검출: 박스를 만들고, 중복을 줄이고, 성능을 판단하기</a></li><li><a href="04_03_%EA%B0%9D%EC%B2%B4_%EC%B6%94%EC%A0%81.html">객체 추적 — 위치를 갱신하면서 같은 ID를 유지하기</a></li><li><a href="04_04_%EC%98%81%EC%83%81_%EB%B6%84%ED%95%A0.html">영상 분할 — 픽셀의 의미와 개체의 경계를 예측하기</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">VISION</p><h1>CNN</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>필터·stride·padding·dilation에 따른 shape와 수치를 계산한다.</li><li>수용영역 r와 출력 간격 j를 함께 누적한다.</li><li>1×1·group·depthwise 합성곱의 역할과 비용을 구별한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="vision-conv" id="lab-vision-conv"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="vision-receptive" id="lab-vision-receptive"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-convolution-합성곱의-기초">1. Convolution — 합성곱의 기초</a></li><li><a href="#sec-2-수용영역과-합성곱-변형">2. 수용영역과 합성곱 변형</a></li><li><a href="#sec-3-cnn은-무엇을-학습할까">3. CNN은 무엇을 학습할까?</a></li><li><a href="#sec-4-cnn-모델의-발전-vggnet">4. CNN 모델의 발전 — VGGNet</a></li><li><a href="#sec-5-사람의-시각계와-cnn-비교">5. 사람의 시각계와 CNN 비교</a></li><li><a href="#sec-6-직접-계산하고-확인하기">6. 직접 계산하고 확인하기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-cnn">CNN</h1>
+<p>앞 문서에서는 완전연결 신경망이 비선형 함수를 통해 복잡한 입력과 출력의 관계를 학습하는 과정을 살펴봤습니다. 이를 이미지에 적용할 때는 픽셀의 값뿐 아니라 이웃 관계와 공간 구조도 함께 활용해야 합니다. **CNN(Convolutional Neural Network, 합성곱 신경망)**은 작은 영역을 처리하는 필터를 이미지 여러 위치에서 공유하여 이러한 구조를 효율적으로 학습합니다. CNN도 DNN의 한 종류이며, 여기서는 완전연결 신경망과 비교하면서 설명합니다.</p>
+<p>먼저 합성곱의 원리를 살펴보고, 필터와 특징 맵의 크기를 결정하는 방법을 익힙니다. 이어서 계산을 줄이는 합성곱 변형과 대표적인 CNN 구조를 통해, 특징 추출에서 깊은 모델의 학습까지 연결해 보겠습니다.</p>
+<p><strong>학습 목표:</strong> 합성곱의 출력 차원·가중치 수·수용영역을 계산하고, 경량 합성곱의 제약과 깊은 모델이 필요한 이유를 설명합니다.</p>
+<p><strong>선수지식:</strong> 가중합, ReLU, 역전파의 역할은 <a href="02_01_DNN_Note.html">DNN 노트</a>에서 복습합니다. 본문 그림은 H×W×C 표기도 사용하며, 실습 텐서는 N×C×H×W입니다. N은 배치 수입니다.</p>
+<p><strong>읽는 순서:</strong> 핵심은 1절의 연산 → 2절의 수용영역 → 3절의 특징 → 4절의 VGG → 6절의 계산 확인입니다. 2절의 합성곱 변형과 5절의 시각계 비교는 보충·심화입니다. 다음은 <a href="02_03_CNN_ResNet_18Layer.html">ResNet의 잔차 원리와 구현</a>입니다.</p>
+<ul>
+<li><a href="#cnn-convolution">1. 합성곱 연산과 차원</a></li>
+<li><a href="#cnn-receptive">2. 수용영역과 합성곱 변형</a></li>
+<li><a href="#cnn-features">3. 학습되는 특징</a></li>
+<li><a href="#cnn-vgg">4. VGG와 깊은 특징 추출</a></li>
+<li><a href="#cnn-human">5. 사람의 시각과 비교</a></li>
+<li><a href="#cnn-practice">6. 직접 계산하고 확인하기</a></li>
+</ul>
+<p>원문은 <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%EA%B5%90%EC%95%88/02_00_DNN_CNN.pdf">DNN·CNN 교안</a>의 실제 PDF 14~36, 43쪽입니다. 37~42쪽은 ResNet 노트에서 다룹니다. 작은 계산, 실행 절차, 질문은 <strong>교육용 보충</strong>이며 원문의 속도·불변성·규제 설명을 한정한 부분은 해당 위치에 정정 이유를 적었습니다.</p>
+<hr/>
+<p><a id="cnn-convolution"></a></p>
+<h2 id="sec-1-convolution-합성곱의-기초">1. Convolution — 합성곱의 기초</h2>
+<p>합성곱을 이해하려면 **Convolution(합성곱), Cross-correlation(상호상관), Autocorrelation(자기상관)**을 구분하면 도움이 됩니다. 합성곱은 수학적으로 필터를 뒤집어 적용하고, 상호상관은 뒤집지 않고 적용합니다. CNN에서 관례적으로 합성곱이라 부르는 연산은 보통 상호상관 방식으로 구현됩니다. <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">PyTorch의 Conv2d 설명</a>에서도 이 정의를 확인할 수 있습니다. 자기상관은 하나의 신호를 이동시킨 자기 자신과 비교하여 반복성 등을 살펴봅니다.</p>
+<p>아래에서는 세 연산의 활용을 직소 퍼즐에 빗대어 살펴봅니다. 이는 역할을 이해하기 위한 예시이며, 세 연산을 차례로 실행하면 퍼즐이 자동으로 풀린다는 뜻은 아닙니다.</p>
+<p><img alt="섞인 자동차 조각으로 보는 국소 패턴과 전체 구조" decoding="async" id="figure-1" loading="lazy" src="../resources/49035529eed67298a434-orca-paste-1793759315651-37f947cf-a64a-4f3f-a.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/49035529eed67298a434-orca-paste-1793759315651-37f947cf-a64a-4f3f-a.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>사진을 조각내 무작위로 섞은 뒤 복원하는 것은 <strong>직소 퍼즐을 맞추는 문제</strong>와 비슷합니다. 세 연산은 복원 과정에서 다음 역할을 할 수 있습니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>연산</th>
+<th>복원에 활용하는 방법</th>
+<th>한계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Convolution(합성곱)</strong></td>
+<td>조각에서 선·윤곽·질감 같은 특징을 추출</td>
+<td>조각의 원래 위치를 직접 알려주지는 않음</td>
+</tr>
+<tr>
+<td><strong>Cross-correlation(상호상관)</strong></td>
+<td>서로 다른 조각의 경계나 특징을 비교해 이웃 후보를 찾음</td>
+<td>하늘처럼 비슷한 무늬가 많으면 구별하기 어려움</td>
+</tr>
+<tr>
+<td><strong>Autocorrelation(자기상관)</strong></td>
+<td>한 조각 안의 반복 무늬와 방향성을 파악</td>
+<td>서로 다른 조각의 연결을 직접 결정하기 어려움</td>
+</tr>
+</tbody>
+</table></div>
+<p>예를 들어 <strong>나뭇가지가 조각 경계에서 끊겨 있다면</strong> 다음처럼 활용할 수 있습니다.</p>
+<ol>
+<li><strong>Convolution</strong>으로 각 조각의 나뭇가지 윤곽과 방향을 추출합니다.</li>
+<li><strong>Cross-correlation</strong>으로 다른 조각의 경계 특징을 비교해 가지가 이어질 후보를 찾습니다.</li>
+<li><strong>Autocorrelation</strong>으로 나무껍질 같은 반복 무늬를 분석해 보조 정보로 사용합니다.</li>
+</ol>
+<p>다만 <strong>맞닿는 두 조각의 경계는 같은 그림이 아니라 ‘이어지는 그림’입니다.</strong> 따라서 상호 상관 점수가 높다는 이유만으로 정답 이웃이라고 볼 수는 없습니다. 색의 변화, 선의 연결, 물체의 형태까지 함께 확인해야 합니다.</p>
+<p>최종 복원에는 이런 비교 점수를 바탕으로 <strong>모든 조각이 가장 자연스럽게 이어지도록 전체 배치를 찾는 과정</strong>이 추가로 필요합니다. 조각이 회전되어 있다면 방향도 함께 찾아야 합니다.</p>
+<h3 id="sec-완전연결-신경망에서-cnn으로">완전연결 신경망에서 CNN으로</h3>
+<p>이 예시에서 중요한 것은 조각 내부의 작은 무늬와 경계 사이의 관계입니다. <strong>CNN은 지역 연결과 가중치 공유를 통해 이런 공간 구조를 활용하도록 설계되어 있습니다.</strong> 완전연결 신경망과 비교하면 다음과 같습니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>비교</th>
+<th>완전연결 DNN</th>
+<th>CNN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>이미지 처리</td>
+<td>보통 픽셀을 한 줄로 펼쳐 입력</td>
+<td>가로·세로 구조를 유지</td>
+</tr>
+<tr>
+<td>주변 픽셀 관계</td>
+<td>학습으로 알아내야 함</td>
+<td>작은 필터로 가까운 픽셀을 함께 처리</td>
+</tr>
+<tr>
+<td>같은 무늬가 다른 위치에 등장</td>
+<td>위치마다 별도로 학습할 부담이 큼</td>
+<td>같은 필터를 여러 위치에서 재사용</td>
+</tr>
+<tr>
+<td>가중치 수</td>
+<td>이미지가 커지면 매우 많아짐</td>
+<td>지역 연결과 가중치 공유로 줄어듦</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>완전연결 신경망의 한계</strong>는 이미지의 위치 관계를 활용하는 구조가 기본적으로 없다는 점입니다. 픽셀을 펼쳐도 정보 자체가 사라지는 것은 아니지만, “이 픽셀과 저 픽셀이 이웃이다”라는 관계까지 데이터로 배워야 합니다. 많은 가중치가 필요해 계산량과 과적합의 부담도 커질 수 있습니다.</p>
+<p><strong>CNN이 convolution을 사용하는 이유</strong>는 작은 영역에서 유용한 특징을 찾고, 같은 특징을 이미지 어디서든 찾기 위해서입니다.</p>
+<p>퍼즐 조각에 적용하면 다음처럼 작동할 수 있습니다.</p>
+<ol>
+<li>작은 필터가 <strong>경계선·색 변화·질감</strong>을 찾습니다.</li>
+<li>더 깊은 층이 특징들을 조합해 <strong>나뭇가지·창문·물체의 일부</strong>를 파악합니다.</li>
+<li>이 특징으로 두 조각의 가장자리가 자연스럽게 이어지는지 판단합니다.</li>
+</ol>
+<p>예를 들어 나뭇가지가 조각의 왼쪽에 있든 오른쪽에 있든, <strong>같은 필터로 가지의 특징을 찾을 수 있습니다.</strong> 이것이 가중치 공유의 장점입니다.</p>
+<p>다만 <strong>CNN만 사용한다고 원래 사진이 자동으로 복원되지는 않습니다.</strong> CNN이 추출한 특징을 이용해 조각 간 연결 점수를 구하고, 전체 배치를 결정하는 모델이나 탐색 과정이 필요합니다. 또한 일반적인 CNN은 조각 회전을 자동으로 해결하지 않으므로 회전도 별도로 고려해야 합니다.</p>
+<h3 id="sec-손으로-계산하는-필터-한-번-고정-필터와-학습-필터">손으로 계산하는 필터 한 번: 고정 필터와 학습 필터</h3>
+<p>교안 17쪽의 Sobel·Prewitt·Scharr·Roberts는 사람이 정한 경계 검출 필터의 예입니다. 다음은 계산을 단순화한 교육용 필터이며, 특정 Sobel 필터를 재현한 것은 아닙니다.</p>
+<pre><code class="language-text">입력의 작은 영역 X      필터 W
+1 2 3                  1 0 -1
+4 5 6                  1 0 -1
+7 8 9                  1 0 -1
+</code></pre>
+<p>CNN 방식인 상호상관의 출력은 위치끼리 곱한 뒤 모두 더합니다. 편향 0이면 <code>(1-3)+(4-6)+(7-9)=-6</code>입니다. 필터를 오른쪽 한 칸 옮기면 새로운 3×3 영역으로 같은 계산을 합니다. RGB라면 각 채널에서 계산한 세 합을 더해 <strong>출력 채널 하나의 값</strong>을 만듭니다. 음수도 의미 있는 반응이며, 뒤에 ReLU를 붙이면 이 예의 출력은 0입니다.</p>
+<p>고정 필터는 모든 이미지에 같은 수치를 적용합니다. CNN은 초기 필터에서 시작해 정답과 손실에 따라 수치를 바꿉니다. 모든 필터가 사람이 이름 붙일 수 있는 경계 검출기로 수렴하는 것은 아닙니다.</p>
+<p>교안 15쪽의 섞인 자동차 조각은 국소 통계와 전체 의미가 다를 수 있음을 환기합니다. 앞의 퍼즐 복원 이야기는 <strong>교육용 비유</strong>이지 교안에 제시된 복원 알고리즘이 아닙니다. 분류를 잘했다는 사실만으로 물체의 의미를 사람처럼 이해한다고 결론 내릴 수 없습니다.</p>
+<h3 id="sec-합성곱의-설정과-학습-파라미터">합성곱의 설정과 학습 파라미터</h3>
+<p><img alt="다채널 입력에 두 합성곱 필터를 적용하는 예" decoding="async" id="figure-2" loading="lazy" src="../resources/2726ab89780ded7a35aa-orca-paste-1793759587355-8110aade-359d-4a89-9.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/2726ab89780ded7a35aa-orca-paste-1793759587355-8110aade-359d-4a89-9.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>이제 작은 필터가 실제로 어떤 크기의 출력을 만드는지 살펴보겠습니다. 합성곱에서는 <strong>설계자가 정하는 하이퍼파라미터</strong>, <strong>설정에 따라 계산되는 크기</strong>, <strong>학습으로 갱신되는 파라미터</strong>를 구분해야 합니다.</p>
+<h4 id="sec-1-설계자가-정하는-값">1. 설계자가 정하는 값</h4>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>그림의 값</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>필터의 가로·세로 크기</td>
+<td><code>3 × 3</code></td>
+<td>한 번에 볼 이미지 영역의 크기</td>
+</tr>
+<tr>
+<td>필터 개수</td>
+<td><code>2개</code></td>
+<td>출력할 특징 맵의 개수</td>
+</tr>
+<tr>
+<td>Stride</td>
+<td><code>1</code>로 해석</td>
+<td>필터를 한 번에 몇 칸 이동할지</td>
+</tr>
+<tr>
+<td>Padding</td>
+<td><code>0</code>으로 해석</td>
+<td>입력 가장자리에 몇 겹을 추가할지</td>
+</tr>
+<tr>
+<td>활성화 함수</td>
+<td>그림에 명시되지 않음</td>
+<td>합성곱 결과에 ReLU 등을 적용할지</td>
+</tr>
+</tbody>
+</table></div>
+<p>예를 들어 <strong>필터 개수를 2개에서 10개로 바꾸면, 출력 채널도 10개가 됩니다.</strong> 각 필터는 학습을 통해 서로 다른 특징을 찾을 수 있습니다.</p>
+<h4 id="sec-2-설정에-따라-결정되는-크기">2. 설정에 따라 결정되는 크기</h4>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>그림의 값</th>
+<th>결정되는 이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>필터의 깊이</td>
+<td><code>3</code></td>
+<td>입력 채널이 3개이므로</td>
+</tr>
+<tr>
+<td>출력의 가로·세로</td>
+<td><code>4 × 4</code></td>
+<td>입력 크기, 필터 크기, Stride, Padding으로 계산</td>
+</tr>
+<tr>
+<td>출력 채널 수</td>
+<td><code>2</code></td>
+<td>필터가 2개이므로</td>
+</tr>
+</tbody>
+</table></div>
+<p>그림은 일반적인 합성곱이므로 입력이 <code>6 × 6 × 3</code>이면, 필터 하나는 <strong>세 채널 전체를 처리하는</strong> <code>3 × 3 × 3</code>이어야 합니다.</p>
+<p>일반 합성곱에서는 필터 깊이만 독립적으로 <code>1</code>이나 <code>5</code>로 바꿀 수는 없습니다.</p>
+<p>출력 한 변의 크기는 이 그림의 조건에서 다음과 같습니다.</p>
+<div class="math-raw math-display">$$
+N_{\text{out}} = \left\lfloor \frac{N_{\text{in}} - K + 2P}{S} \right\rfloor + 1
+$$</div><p>여기서 <span class="math-raw math-inline">$N_{\text{in}}$</span>은 입력 한 변의 크기, <span class="math-raw math-inline">$K$</span>는 필터 한 변의 크기, <span class="math-raw math-inline">$P$</span>는 Padding, <span class="math-raw math-inline">$S$</span>는 Stride입니다. <span class="math-raw math-inline">$\lfloor \cdot \rfloor$</span>는 소수점 아래를 내림한다는 뜻이며, 위 식은 dilation이 1인 경우입니다.</p>
+<p>그림의 값을 대입하면 다음과 같습니다.</p>
+<div class="math-raw math-display">$$
+N_{\text{out}} = \left\lfloor \frac{6 - 3 + 2 \times 0}{1} \right\rfloor + 1 = 4
+$$</div><p>따라서 최종 출력은 **<code>4 × 4 × 2</code>**입니다.</p>
+<p>입력 크기 <code>6 × 6 × 3</code>은 현재 데이터의 조건입니다. 전처리로 이미지 크기를 조정하거나 흑백으로 바꿀 수는 있지만, 그에 맞춰 모델의 입력 구조도 맞춰야 합니다.</p>
+<h4 id="sec-3-학습으로-정해지는-값">3. 학습으로 정해지는 값</h4>
+<p>그림에서 필터 안에 적힌 <code>1</code>, <code>0</code>, <code>-1</code> 같은 숫자가 <strong>가중치</strong>입니다. 이 값들은 보통 사람이 최종 값을 정하는 대신, 초기값을 설정한 뒤 <strong>역전파와 최적화 알고리즘으로 수정</strong>합니다.</p>
+<pre><code>사람: 필터 크기와 개수를 정함
+              ↓
+학습: 각 필터 안의 숫자를 수정함
+              ↓
+결과: 선·경계·질감 등을 찾는 필터가 만들어짐
+
+</code></pre>
+<p>이 그림의 필터 가중치는 다음 개수입니다.</p>
+<div class="math-raw math-display">$$
+3 \times 3 \times 3 \times 2 = 54
+$$</div><p>즉, 필터 가중치는 총 54개입니다.</p>
+<p>일반적으로 필터마다 편향을 하나씩 사용한다면 <strong>편향 2개를 더해 총 56개</strong>가 학습됩니다. 그림에는 편향이 표시되어 있지 않습니다.</p>
+<p>즉, <strong>필터의 ‘틀’은 내가 정하고, 필터 안의 ‘숫자’는 모델이 학습하며, 출력 크기는 설정에 따라 계산됩니다.</strong></p>
+<h3 id="sec-출력-크기-파라미터-연산량은-서로-다른-수입니다">출력 크기, 파라미터, 연산량은 서로 다른 수입니다</h3>
+<p><strong>교육용 보충.</strong> 높이·너비 각각에 다음 식을 적용합니다. K는 커널 크기, S는 stride, P는 양쪽 각각의 padding, D는 dilation(커널 표본 간격)입니다.</p>
+<pre><code class="language-text">유효 커널 폭 K_eff = D × (K - 1) + 1
+출력 폭 = floor((입력 폭 + 2P - K_eff) / S) + 1
+가중치 수 = C_out × (C_in / G) × K_h × K_w
+편향 사용 시 총 파라미터 = 가중치 수 + C_out
+</code></pre>
+<p>G는 그룹 수이며 일반 합성곱에서는 1입니다. 유효 커널이 패딩된 입력보다 크면 정상적인 양수 출력 크기가 나오지 않으므로 설정을 바꿔야 합니다. 비정사각형 입력에는 높이와 너비를 따로 계산합니다.</p>
+<p><code>N×3×32×32 → Conv(3→16, K=3, S=2, P=1, D=1)</code>이면 한 변은 <code>floor((32+2-3)/2)+1=16</code>, 출력은 <code>N×16×16×16</code>입니다. 가중치는 <code>16×3×3×3=432</code>, 편향까지 448개입니다. N이나 입력 공간 크기가 바뀌어도 이 파라미터 수는 같습니다. 반면 곱셈·누적 쌍(MAC)은 한 이미지당 <code>16×16×16×27=110,592</code>번으로 공간 크기에 비례합니다. 편향과 활성화 연산은 이 MAC 계산에서 제외했습니다.</p>
+<p>교안 19쪽의 100×100 흑백 입력을 FC 1,000개에 연결하면 가중치만 <code>10,000×1,000=10,000,000</code>개, 편향까지는 10,001,000개입니다. CNN의 작은 공유 필터는 이 부담을 줄이지만 <strong>과적합을 없애지는 않습니다.</strong> 데이터 수, 모델 규모, 증강, 정규화와 검증 결과도 함께 봐야 합니다.</p>
+<p>출력 공식·그룹 조건 확인: <a href="https://docs.pytorch.org/docs/2.15/generated/torch.nn.Conv2d.html">PyTorch 2.15 Conv2d</a>. 공식 문서 확인일 2026-11-09이며 로컬 설치 버전을 뜻하지 않습니다.</p>
+<h3 id="sec-합성곱의-구조적-장점">합성곱의 구조적 장점</h3>
+<p>앞의 계산에서 보았듯이, 필터는 작은 영역을 보면서 같은 가중치를 여러 위치에서 사용합니다. 이 구조가 CNN에 주는 장점을 정리하면 다음과 같습니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>특징</th>
+<th>의미</th>
+<th>장점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Parameter sharing — 가중치 공유</strong></td>
+<td>같은 필터를 이미지 전체에서 반복 사용</td>
+<td>가중치 수를 줄이고 같은 특징을 여러 위치에서 검출</td>
+</tr>
+<tr>
+<td><strong>Local connectivity — 지역 연결</strong></td>
+<td>가까운 픽셀들을 묶어 처리</td>
+<td>선·경계·질감 같은 지역 특징을 효율적으로 추출</td>
+</tr>
+<tr>
+<td><strong>Translation equivariance — 이동 등변성</strong></td>
+<td>입력이 이동하면 특징 맵도 함께 이동</td>
+<td>위치가 달라져도 같은 필터로 특징을 추적</td>
+</tr>
+</tbody>
+</table></div>
+<p>합성곱의 이동 등변성은 출력이 완전히 같아지는 <strong>이동 불변성</strong>과 구분해야 합니다. Pooling이나 전역 평균 등을 함께 사용하면 위치 변화에 덜 민감한 분류 결과를 만들 수 있지만, 경계 처리와 Stride 등의 조건에 따라 그 성질은 달라질 수 있습니다.</p>
+<h3 id="sec-padding-stride-pooling">Padding / Stride / Pooling</h3>
+<p>이러한 장점을 유지하면서 특징 맵의 크기와 계산량을 조절하는 도구가 Padding, Stride, Pooling입니다. 앞서 출력 크기 공식에서 사용한 설정을 구체적인 예로 살펴보겠습니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>개념</th>
+<th>쉬운 설명</th>
+<th>사용하는 이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Padding(패딩)</strong></td>
+<td>이미지 가장자리에 값을 덧붙임. 보통 0을 사용</td>
+<td>출력 크기가 줄어드는 것을 조절하고, 가장자리 정보도 충분히 활용</td>
+</tr>
+<tr>
+<td><strong>Stride(스트라이드)</strong></td>
+<td>필터를 한 번에 몇 칸씩 이동할지 설정</td>
+<td>값이 클수록 출력 크기와 계산량이 줄어듦</td>
+</tr>
+<tr>
+<td><strong>Pooling(풀링)</strong></td>
+<td>작은 영역을 대표값 하나로 요약</td>
+<td>특징 맵 크기를 줄이고 작은 위치 변화에 덜 민감하게 만듦</td>
+</tr>
+</tbody>
+</table></div>
+<p>예를 들어 <strong>5×5 입력에 3×3 필터</strong>를 적용하면:</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>설정</th>
+<th>출력 크기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Padding 0, Stride 1</td>
+<td>3×3</td>
+</tr>
+<tr>
+<td>Padding 1, Stride 1</td>
+<td>5×5</td>
+</tr>
+<tr>
+<td>Padding 1, Stride 2</td>
+<td>3×3</td>
+</tr>
+</tbody>
+</table></div>
+<p>Pooling은 보통 다음 두 방법을 사용합니다.</p>
+<pre><code>입력 영역
+1  3
+2  8
+
+Max Pooling → 최댓값 8
+Average Pooling → 평균값 3.5
+
+</code></pre>
+<p><strong>Padding은 테두리 추가, Stride는 이동 간격, Pooling은 영역 요약</strong>으로 기억하면 됩니다. Pooling 자체에는 일반적으로 학습하는 가중치가 없습니다.</p>
+<h3 id="sec-cnn-architecture">CNN Architecture</h3>
+<p>합성곱과 크기 조절 연산을 연결하면 하나의 CNN이 됩니다. 아래 그림은 특징 추출부 뒤에 완전연결 분류부를 붙인 대표적인 구성을 보여줍니다.</p>
+<p><img alt="합성곱과 풀링 뒤 분류부를 연결한 CNN" decoding="async" id="figure-3" loading="lazy" src="../resources/31bccb4a69c61f614bbd-orca-paste-1793759865514-4b07e73b-64df-45e8-a.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/31bccb4a69c61f614bbd-orca-paste-1793759865514-4b07e73b-64df-45e8-a.png" rel="noopener" target="_blank">그림 원본</a></div>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>순서</th>
+<th>단계</th>
+<th>명칭</th>
+<th>쉬운 설명</th>
+<th>반복 여부</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Input</td>
+<td>입력부</td>
+<td>이미지를 입력합니다.</td>
+<td>시작</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Convolution + ReLU</td>
+<td>합성곱 기반 특징 추출부</td>
+<td>선·경계·질감을 찾고 비선형성을 더합니다.</td>
+<td>4번에서 같은 종류의 연산 반복</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Pooling</td>
+<td>합성곱 기반 특징 추출부</td>
+<td>특징 맵의 크기를 줄여 계산량을 줄입니다.</td>
+<td>5번에서 반복</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Convolution + ReLU</td>
+<td>합성곱 기반 특징 추출부</td>
+<td>앞의 특징을 조합해 모양·물체의 일부 등 더 복잡한 특징을 찾습니다.</td>
+<td>2번과 별도의 필터를 학습</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Pooling</td>
+<td>합성곱 기반 특징 추출부</td>
+<td>특징 맵의 크기를 다시 줄입니다.</td>
+<td>3번과 같은 종류의 연산</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Flatten</td>
+<td>형태 변환 단계</td>
+<td>가로·세로·채널로 구성된 특징을 한 줄로 펼칩니다.</td>
+<td>—</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Fully Connected</td>
+<td>분류부</td>
+<td>특징을 종합해 클래스별 점수를 계산합니다.</td>
+<td>—</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Softmax</td>
+<td>분류부</td>
+<td>점수를 각 값이 0~1 사이이고 합이 1인 클래스별 확률분포로 바꿉니다. 예: 고양이 0.7, 강아지 0.2, 토끼 0.1은 모델이 각 종류일 가능성을 70%, 20%, 10%로 예측한다는 뜻입니다.</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Output</td>
+<td>출력부</td>
+<td>보통 가장 높은 확률의 클래스를 최종 결과로 선택합니다.</td>
+<td>끝</td>
+</tr>
+</tbody>
+</table></div>
+<p>그림의 전체 구조가 CNN입니다. 2~5번은 특징 추출부, 6번은 형태 변환, 7~8번은 분류부에 해당합니다. Flatten은 학습 가중치 없이 배열의 형태를 바꾸며, Softmax는 클래스별 점수를 확률분포로 변환합니다.</p>
+<p>Convolution + ReLU → Pooling 블록을 여러 번 쌓으면 앞선 특징을 다음 층에서 조합하게 됩니다. 이는 입력에서 출력으로 진행하는 순방향 계산입니다. 학습할 때는 이 순방향 계산에 손실 계산과 역전파를 더한 다음 과정을 반복합니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>학습 순환</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>예측 → 손실 계산 → 역전파로 기울기 계산 → 가중치 수정 → 다시 예측</td>
+<td>정답과의 차이가 줄어들도록 반복 학습합니다.</td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="cnn-receptive"></a></p>
+<h2 id="sec-2-수용영역과-합성곱-변형">2. 수용영역과 합성곱 변형</h2>
+<h3 id="sec-receptive-field">Receptive field</h3>
+<p>층을 쌓으면 뒤쪽 특징은 원본 이미지의 더 넓은 영역을 바탕으로 계산됩니다. **수용 영역(Receptive field)**은 특정 출력값에 영향을 줄 수 있는 입력 영역을 뜻합니다. 이를 통해 작은 필터를 여러 번 쌓는 이유를 이해할 수 있습니다.</p>
+<p><img alt="3×3 두 층과 5×5 한 층의 수용영역 비교" decoding="async" id="figure-4" loading="lazy" src="../resources/f5beb53078890187275a-orca-paste-1793760603594-fbcb5762-af11-49c1-a.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/f5beb53078890187275a-orca-paste-1793760603594-fbcb5762-af11-49c1-a.png" rel="noopener" target="_blank">그림 원본</a></div>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>계산 과정</th>
+<th>최종 수용 영역(Receptive field)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>큰 필터 한 번</td>
+<td><code>5×5 입력 → 5×5 필터 → 1×1 출력</code></td>
+<td>원본의 <code>5×5</code> 영역</td>
+</tr>
+<tr>
+<td>작은 필터 두 번</td>
+<td><code>5×5 입력 → 3×3 필터 → 3×3 출력 → 3×3 필터 → 1×1 출력</code></td>
+<td>원본의 <code>5×5</code> 영역</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>두 방법 모두 마지막 출력 하나가 원본의 5×5 영역을 봅니다.</strong></p>
+<p>작은 필터를 두 번 사용하는 이유는 다음과 같습니다.</p>
+<ol>
+<li><strong>가중치를 줄일 수 있습니다.</strong> 입력·중간·출력 채널이 모두 1이고 편향을 제외하면 다음과 같습니다.
+<ul>
+<li><code>5×5</code> 필터 한 개: <strong>25개</strong></li>
+<li><code>3×3</code> 필터 두 개: <strong>9 + 9 = 18개</strong></li>
+</ul>
+</li>
+<li><strong>중간에 ReLU를 넣어 더 복잡한 특징을 학습할 수 있습니다.</strong> <code>Conv → ReLU → Conv</code>처럼 구성하면, 한 번의 선형 합성곱보다 다양한 관계를 표현할 수 있습니다.</li>
+<li><strong>단순한 특징을 조합해 복잡한 특징을 만듭니다.</strong> 첫 층에서 작은 선·경계를 찾고, 다음 층에서 이를 조합해 모서리·모양을 찾는 식입니다.</li>
+</ol>
+<p>다만 <strong>가중치가 적다고 계산량도 항상 적은 것은 아닙니다.</strong> 이 작은 예에서는 중간 <code>3×3</code> 출력도 계산해야 합니다. 또한 중간에 활성화 함수가 없다면 두 합성곱을 쌓는 것만으로 비선형 표현력이 늘어나지는 않습니다.</p>
+<h3 id="sec-수용영역을-층별로-누적하는-방법">수용영역을 층별로 누적하는 방법</h3>
+<p><strong>교육용 보충.</strong> 출력 칸 사이의 간격까지 함께 추적해야 stride가 있는 층을 계산할 수 있습니다. r은 원본 입력 기준 수용영역 한 변, j는 인접 출력 두 칸 사이의 원본 좌표 간격입니다. 입력에서는 <code>r=1, j=1</code>입니다.</p>
+<pre><code class="language-text">r_new = r_old + (K_eff - 1) × j_old
+j_new = j_old × S
+</code></pre>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>연산</th>
+<th>계산</th>
+<th style="text-align:right">r</th>
+<th style="text-align:right">j</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력</td>
+<td>한 픽셀에서 시작</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td>3×3 Conv, S=1</td>
+<td>1+2×1</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td>2×2 Pool, S=2</td>
+<td>3+1×1</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td>3×3 Conv, S=1</td>
+<td>4+2×2</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right">2</td>
+</tr>
+</tbody>
+</table></div>
+<p>마지막 특징 한 칸은 원본의 최대 8×8 범위에 의존합니다. 마지막 두 칸의 중심 간격은 2픽셀입니다. Padding은 경계 근처 실제 이미지와 겹치는 범위를 바꾸지만 이 이론적 폭의 누적식은 바꾸지 않습니다. 이 값은 가능한 의존 범위이며, 모든 픽셀이 동일한 강도로 기여한다는 뜻은 아닙니다. 학습된 가중치·비선형성에 따른 <strong>실제 영향의 분포</strong>와 구별합니다.</p>
+<p>**Dilated convolution(팽창 합성곱)**은 필터 값 사이의 샘플링 간격을 넓힙니다. K=3, D=2이면 <code>K_eff=2×(3-1)+1=5</code>이므로 3×3의 9개 가중치로 5×5 범위의 띄엄띄엄한 9개 위치를 봅니다. S=1, P=2이면 공간 크기를 유지합니다. 5×5의 모든 픽셀을 보는 일반 필터와 같지 않으며, 여러 층에서 빈틈 있는 샘플링이 문제가 될 수도 있습니다.</p>
+<p>교안 22쪽의 두 3×3 대 한 5×5 비교는 채널·출력 크기·구현 조건을 고정해야 합니다. 표의 ‘항상 더 빠름’으로 일반화하지 않습니다. 같은 C채널을 유지하면 가중치는 18C² 대 25C²지만 중간 활성화 저장 비용도 생깁니다.</p>
+<h3 id="sec-11-convolution-위치를-유지하며-채널-조합하기">1×1 Convolution: 위치를 유지하며 채널 조합하기</h3>
+<p>지금까지 공간적으로 더 넓은 영역을 보는 방법을 살펴봤다면, 이번에는 같은 위치의 채널들을 조합하는 방법을 살펴보겠습니다.</p>
+<p><img alt="1×1 합성곱으로 입력 채널 C개를 출력 채널 K개로 변환하는 구조" decoding="async" id="figure-5" loading="lazy" src="../resources/bc3a8699cc235e28aac9-orca-paste-1793765169291-7b5ec91e-30a1-4eef-b.png"/></p><div class="image-actions"><button data-image-zoom="figure-5" type="button">그림 확대</button><a href="../resources/bc3a8699cc235e28aac9-orca-paste-1793765169291-7b5ec91e-30a1-4eef-b.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>1×1 합성곱은 같은 위치에 있는 여러 채널의 값을 가중합하여 새로운 특징을 만드는 연산</strong>입니다.</p>
+<p>그림의 길쭉한 필터는 가로·세로가 각각 1이고, 입력 채널 전체를 관통하는 깊이 C를 가집니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구성</th>
+<th>크기</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력</td>
+<td>H × W × C</td>
+<td>높이 H, 너비 W, 입력 채널 C개</td>
+</tr>
+<tr>
+<td>필터 하나</td>
+<td>1 × 1 × C</td>
+<td>한 위치의 C개 값을 가중합해 출력값 하나를 만듦</td>
+</tr>
+<tr>
+<td>필터 개수</td>
+<td>K개</td>
+<td>서로 다른 채널 조합을 K개 학습</td>
+</tr>
+<tr>
+<td>출력</td>
+<td>H × W × K</td>
+<td>공간 크기는 유지하고 채널 수를 K개로 변환</td>
+</tr>
+</tbody>
+</table></div>
+<p>위 표는 <strong>Stride 1, Padding 0</strong>인 경우입니다. 교안 23쪽의 ‘FC 대체’는 위치마다 같은 채널 변환을 적용한다는 맥락입니다. H=W=1인 특징에서는 1×1 Conv가 채널 벡터의 FC와 같은 가중합을 수행합니다. H,W가 클 때 1×1 Conv 하나가 전체 H×W×C를 펼친 FC와 같지는 않습니다. 각 필터를 모든 위치에 같은 가중치로 적용하면 특징 맵 하나가 만들어지고, 필터 K개를 사용하면 출력 채널도 K개가 됩니다.</p>
+<p>예를 들어 한 위치의 채널 값이 <code>[2, 3, 1]</code>, 필터 가중치가 <code>[1, 0, -1]</code>이라면, 편향을 제외한 출력은 다음과 같습니다.</p>
+<div class="math-raw math-display">$$
+2 \times 1 + 3 \times 0 + 1 \times (-1) = 1
+$$</div><h4 id="sec-왜-사용할까">왜 사용할까?</h4>
+<ul>
+<li><strong>채널 수 조절</strong>: 그림 위쪽 예처럼 <code>64 × 64 × 192</code>를 <code>64 × 64 × 64</code>로 바꿀 수 있습니다. 채널을 줄인 뒤 3×3 합성곱을 적용하면 그 합성곱의 계산량을 줄일 수 있습니다.</li>
+<li><strong>새로운 특징 조합</strong>: 같은 위치의 여러 채널에 담긴 정보를 학습된 비율로 섞습니다. 단순히 채널 일부를 버리는 방식이 아닙니다.</li>
+<li><strong>비선형 변환 추가</strong>: 뒤에 ReLU 등을 붙이면 채널을 조합한 결과에 비선형성을 더할 수 있습니다.</li>
+</ul>
+<p><strong>3×3 합성곱은 주변 위치와 채널을 함께 보고, 1×1 합성곱은 현재 위치의 채널들을 조합합니다.</strong> 따라서 1×1 합성곱 자체는 공간 수용 영역을 넓히지 않습니다. 학습 파라미터 수는 가중치 C × K개이며, 편향을 사용하면 K개가 추가됩니다.</p>
+<h3 id="sec-group-convolution-채널을-나누어-계산하기">Group Convolution: 채널을 나누어 계산하기</h3>
+<p>1×1 합성곱을 포함한 일반 합성곱은 각 출력 채널을 만들 때 모든 입력 채널을 사용합니다. 계산 비용을 더 줄이려면 이 연결 자체를 그룹별로 제한할 수 있습니다.</p>
+<p><img alt="일반 합성곱과 3개 그룹으로 나눈 그룹 합성곱 비교" decoding="async" id="figure-6" loading="lazy" src="../resources/92762e4848df98a21104-orca-paste-1793765390449-8ada2943-4194-4018-9.png"/></p><div class="image-actions"><button data-image-zoom="figure-6" type="button">그림 확대</button><a href="../resources/92762e4848df98a21104-orca-paste-1793765390449-8ada2943-4194-4018-9.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그룹 합성곱은 입력·출력 채널을 여러 그룹으로 나누고, 각 그룹 안에서만 합성곱하는 방식</strong>입니다. 그림의 판 하나는 특징 맵, 즉 채널 하나를 나타냅니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구분</th>
+<th>일반 합성곱 — 왼쪽</th>
+<th>그룹 합성곱 — 오른쪽</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>연결 방식</td>
+<td>각 출력 채널이 입력 12개 채널 전체를 사용</td>
+<td>각 출력 채널이 자기 그룹의 입력 4개 채널만 사용</td>
+</tr>
+<tr>
+<td>그림의 구성</td>
+<td>입력 12개 → 출력 6개</td>
+<td>3개 그룹에서 각각 입력 4개 → 출력 2개</td>
+</tr>
+<tr>
+<td>특징</td>
+<td>모든 입력 채널의 정보를 조합</td>
+<td>그룹별로 독립적으로 계산해 가중치와 계산량을 줄임</td>
+</tr>
+</tbody>
+</table></div>
+<p>같은 입력·출력 채널 수, 필터 크기, 출력 공간 크기라면 <strong>3개 그룹으로 나눌 때 합성곱 가중치 수와 곱셈·덧셈 연산량은 일반 합성곱의 약 1/3</strong>이 됩니다. 편향은 이 비교에서 제외합니다.</p>
+<p>다만 <strong>이 층에서는 서로 다른 그룹의 정보가 섞이지 않습니다.</strong> 필요하면 뒤에 일반 1×1 합성곱 등을 사용해 그룹 사이의 정보를 조합합니다. 일반적인 구현에서는 입력·출력 채널 수 모두 그룹 수로 나누어떨어져야 합니다.</p>
+<h4 id="sec-그룹을-나눌-때의-장점과-제약">그룹을 나눌 때의 장점과 제약</h4>
+<p>그룹별로 독립적으로 계산하면 연결과 가중치 수가 줄어 모델을 가볍게 만들 수 있습니다. 그룹을 서로 다른 연산 장치에 나누어 처리할 수도 있지만, 실제 병렬 처리 효과는 하드웨어와 구현에 따라 달라집니다. 따라서 그룹 수를 늘릴 때는 연산 절감과 채널 간 정보 교환의 제약을 함께 고려해야 합니다.</p>
+<p>그룹 내부의 연결만 남는다는 점이 핵심입니다.</p>
+<h3 id="sec-depthwise-separable-convolution-공간-처리와-채널-조합을-분리하기">Depthwise Separable Convolution: 공간 처리와 채널 조합을 분리하기</h3>
+<p>그룹 수를 입력 채널 수까지 늘리면 채널별 공간 처리가 가능합니다. 여기에 앞서 배운 1×1 합성곱을 연결하면, 공간 특징 추출과 채널 조합을 분리할 수 있습니다.</p>
+<p><img alt="Depthwise 합성곱 후 Pointwise 합성곱으로 채널 정보를 조합하는 구조" decoding="async" id="figure-7" loading="lazy" src="../resources/e542bdb07989d5a032dc-orca-paste-1793765514868-fd9d55bd-8ccc-41ad-9.png"/></p><div class="image-actions"><button data-image-zoom="figure-7" type="button">그림 확대</button><a href="../resources/e542bdb07989d5a032dc-orca-paste-1793765514868-fd9d55bd-8ccc-41ad-9.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>일반 합성곱이 한 번에 수행하는 공간 특징 추출과 채널 조합을 두 단계로 나눠, 가중치와 계산량을 줄이는 방식</strong>입니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>순서</th>
+<th>단계</th>
+<th>쉬운 설명</th>
+<th>채널 간 정보 조합</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Depthwise convolution</td>
+<td>각 입력 채널에 별도의 3×3 같은 필터를 적용해 선·경계 등 공간 특징을 추출합니다.</td>
+<td>없음: 각 채널을 독립적으로 처리</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Pointwise convolution</td>
+<td>1×1 합성곱으로 여러 채널의 특징을 섞고 원하는 출력 채널 수로 바꿉니다.</td>
+<td>있음: 서로 다른 채널의 정보를 조합</td>
+</tr>
+</tbody>
+</table></div>
+<p>기본 구성에서는 Depthwise 단계가 입력 채널 C개를 그대로 C개로 처리하고, Pointwise 단계의 필터 K개가 출력 채널을 K개로 만듭니다. Depthwise는 앞서 설명한 그룹 합성곱에서 <strong>그룹 수를 입력 채널 수와 같게 한 경우</strong>로 이해할 수 있습니다.</p>
+<p>예를 들어 <strong>입력 3채널 → 출력 8채널</strong>, 필터 크기 3×3이고 편향을 제외하면 가중치 수는 다음과 같습니다.</p>
+<ul>
+<li><strong>일반 합성곱</strong>: 3 × 3 × 3 × 8 = <strong>216개</strong></li>
+<li><strong>Depthwise + Pointwise</strong>: (3 × 3 × 3) + (1 × 1 × 3 × 8) = 27 + 24 = <strong>51개</strong></li>
+</ul>
+<p>즉, <strong>채널별로 특징을 먼저 찾고 → 채널들을 섞는다</strong>고 기억하면 됩니다. 효율적인 대신 일반 합성곱과 표현 방식이 달라, 같은 정확도가 항상 보장되는 것은 아닙니다.</p>
+<h4 id="sec-경량-모델에-사용하는-이유">경량 모델에 사용하는 이유</h4>
+<p>앞의 예에서는 가중치가 <strong>216개에서 51개로 줄어듭니다.</strong> 같은 출력 공간 크기를 가정하면 곱셈·덧셈 연산량도 줄일 수 있어, 메모리와 연산 자원이 제한된 모바일·임베디드 기기에 유용합니다. 다만 실제 속도는 하드웨어와 구현에 따라 달라지므로, 정확도와 실행 효율을 함께 평가해야 합니다.</p>
+<h3 id="sec-심화-해상도와-샘플링-위치를-바꾸는-합성곱">심화: 해상도와 샘플링 위치를 바꾸는 합성곱</h3>
+<p>기존 수업 메모에는 아래 주제가 시험 제외로 적혀 있었으나, 교안 26~31쪽에는 실제 내용이 있습니다. <strong>현재 시험 범위를 확정하는 근거로 쓰지 않고</strong>, 원문 이해를 위한 심화로 남깁니다.</p>
+<p>**전치 합성곱(Transposed convolution)**은 작은 특징 맵의 각 값을 커널로 펼친 뒤 겹친 위치를 합해 더 큰 맵을 만드는 학습 연산입니다. 일반 합성곱의 행렬 표현을 전치한 연산이지 손실된 원본을 정확히 복원하는 역함수가 아닙니다. 교육용 1차원 예에서 입력 <code>[1,2]</code>, 커널 <code>[1,2]</code>, stride 1이면 <code>[1,2,0]+[0,2,4]=[1,4,4]</code>입니다. 겹침이 균일하지 않으면 체커보드 형태의 흔적이 생길 수 있습니다. 분할의 업샘플링·생성 모델에 쓰며, 크기 확대만 필요하면 보간 뒤 합성곱도 비교할 수 있습니다.</p>
+<p>출력 한 변은 <code>(입력-1)×S-2P+D×(K-1)+output_padding+1</code>입니다. 입력 4, K=3, S=2, P=1, D=1, output_padding=1이면 <code>6-2+2+1+1=8</code>입니다. output_padding은 출력 크기 모호성을 조정하는 설정이며 원본 정보의 복구를 보장하지 않습니다. <a href="https://docs.pytorch.org/docs/2.15/generated/torch.nn.ConvTranspose2d.html">공식 ConvTranspose2d 설명</a></p>
+<p>**변형 합성곱(Deformable convolution)**은 고정된 격자의 각 표본 위치에 학습한 offset(좌표 이동량)을 더합니다. 보통 합성곱이 <code>x(p0+pk)</code>를 읽는다면 변형 합성곱은 <code>x(p0+pk+Δpk)</code>를 읽습니다. p0는 출력 중심, pk는 기본 커널 위치, Δpk는 입력 특징에서 예측한 이동량입니다. 3×3의 9개 위치를 2차원에서 움직이려면 위치당 두 값, 총 18개 offset 값이 필요합니다. 분수 좌표는 주변 픽셀 보간으로 읽습니다. 예를 들어 (2,3)에 (0.5,-1)을 더하면 (2.5,2)를 읽습니다. 이미지를 통째로 회전시키는 전처리와는 다릅니다.</p>
+<p>교안 28쪽은 offset 예측 경로와 표본을 읽는 경로가 만나는 구조입니다. 29쪽의 <strong>변형 RoI pooling</strong>은 관심 사각형(RoI)을 여러 bin으로 나눠 요약하되 bin의 표본 위치를 이동시킵니다. 고정 사각형 격자보다 물체의 변형에 맞추려는 목적이며, pooling으로 출력 크기를 고정하는 역할은 남습니다. 일반 합성곱의 가중치 공유와 학습된 이동량을 함께 사용하므로 계산·메모리 비용이 추가됩니다. <a href="https://arxiv.org/abs/1703.06211">원 논문, Dai 등 (2017)</a></p>
+<p>30쪽의 빨간 점은 학습된 샘플링 위치, 빨간 사각형은 변형된 pooling bin입니다. 물체와 배경에서 참조 위치가 달라지는 정성 예시이지 모든 점이 항상 물체 안에 모인다는 보장은 아닙니다. 31쪽 데모의 표는 Regular MNIST에서 일반 CNN 98.74%, 변형 CNN 97.27%, Scaled MNIST에서 57.01%, 92.55%를 제시합니다. 해당 데모에서는 크기 변화 조건의 차이가 크지만, 일반 MNIST에서는 오히려 낮습니다. 학습 설정이 모두 제시되지 않아 보편적 우위나 재현 결과로 단정하지 않습니다. 데모 동영상은 실행하지 않았습니다.</p>
+<p><a id="cnn-features"></a></p>
+<h2 id="sec-3-cnn은-무엇을-학습할까">3. CNN은 무엇을 학습할까?</h2>
+<p>이제 합성곱의 구조와 계산 방법을 배웠으므로, 실제 학습을 통해 어떤 특징이 만들어지고 그 특징이 어떻게 활용되는지 살펴보겠습니다.</p>
+<p><strong>CNN은 학습을 통해 필터의 가중치를 조정하고, 층이 깊어질수록 단순한 특징들을 조합해 복잡한 특징을 찾습니다.</strong></p>
+<p><img alt="얕은 층에서 깊은 층으로 조합되는 얼굴 특징" decoding="async" id="figure-8" loading="lazy" src="../resources/81f706d14a598b0e9229-orca-paste-1793765924473-acc44cc7-7964-499e-8.png"/></p><div class="image-actions"><button data-image-zoom="figure-8" type="button">그림 확대</button><a href="../resources/81f706d14a598b0e9229-orca-paste-1793765924473-acc44cc7-7964-499e-8.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽 그림은 합성곱 블록 하나의 흐름을 보여줍니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>그림의 예</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력</td>
+<td>224 × 224 × 3</td>
+<td>RGB 3채널 이미지</td>
+</tr>
+<tr>
+<td>합성곱</td>
+<td>3 × 3 × 3 필터 1개</td>
+<td>세 채널의 주변 픽셀을 함께 계산해 특징 맵 하나를 만듦</td>
+</tr>
+<tr>
+<td>활성화 함수</td>
+<td>f(wx + b)</td>
+<td>계산 결과에 비선형성을 더함. 그림은 Sigmoid 형태이며, CNN에서는 ReLU 등도 사용</td>
+</tr>
+<tr>
+<td>활성화 맵</td>
+<td>224 × 224 × 1</td>
+<td>특정 특징이 어느 위치에서 강하게 검출됐는지 나타냄</td>
+</tr>
+<tr>
+<td>Max Pooling</td>
+<td>112 × 112 × 1</td>
+<td>영역별 최댓값을 선택해 공간 크기를 줄이고 다음 블록에 전달</td>
+</tr>
+</tbody>
+</table></div>
+<p>그림처럼 3×3 합성곱 후 크기를 유지하려면 Stride 1, Padding 1로 설정할 수 있습니다.</p>
+<p>2×2 Max Pooling을 Stride 2로 적용하면 가로·세로가 절반이 됩니다. 필터 하나의 학습 파라미터는 <strong>가중치 27개(3 × 3 × 3) + 편향 1개 = 28개</strong>이며, 모든 위치에서 같은 값을 공유합니다.</p>
+<p>오른쪽 그림은 얼굴 이미지에서 학습할 수 있는 특징을 단계별로 보여주는 예시입니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>층</th>
+<th>학습하는 특징의 예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Layer 1 — 입력에 가까움</td>
+<td>선, 방향, 경계 같은 단순한 특징</td>
+</tr>
+<tr>
+<td>Layer 2</td>
+<td>선과 경계를 조합한 눈·코·입 같은 부분 특징</td>
+</tr>
+<tr>
+<td>Layer 3 — 더 깊은 층</td>
+<td>부분들을 조합한 얼굴 형태 같은 복잡한 특징</td>
+</tr>
+</tbody>
+</table></div>
+<p>위쪽의 <strong>Effective filter</strong>는 깊은 층의 특징이 원본 이미지에서 어떤 패턴에 반응하는지를 나타내는 관점입니다. 작은 필터를 여러 층 쌓으면 원본에서 영향을 받는 영역인 **수용 영역(Receptive field)**도 커집니다. 오른쪽 그림은 이런 특징의 시각화 예시이며, 깊은 층에 실제로 얼굴 모양의 큰 필터가 그대로 저장된다는 뜻은 아닙니다.</p>
+<h3 id="sec-학습한-특징을-얼굴-검출에-활용하기">학습한 특징을 얼굴 검출에 활용하기</h3>
+<p>앞의 그림은 얼굴 특징이 여러 층에서 조합되는 모습을 설명합니다. 이 특징 추출부에 얼굴 여부와 위치를 예측하는 출력을 연결하면 <strong>얼굴 검출(Face detection)</strong> 모델을 만들 수 있습니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>하는 일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 특징 추출</td>
+<td>앞쪽 층에서 선·경계를 찾고, 깊은 층에서 눈·코·입과 얼굴 형태를 파악</td>
+</tr>
+<tr>
+<td>2. 얼굴 여부 예측</td>
+<td>이미지의 여러 위치에서 “여기에 얼굴이 있는가?”라는 점수 계산</td>
+</tr>
+<tr>
+<td>3. 위치 예측</td>
+<td>얼굴을 둘러싸는 사각형인 <strong>바운딩 박스</strong>의 좌표와 크기 계산</td>
+</tr>
+<tr>
+<td>4. 결과 정리</td>
+<td>점수가 낮은 박스를 제거하고, 같은 얼굴에 겹친 박스는 NMS 같은 방법으로 정리</td>
+</tr>
+</tbody>
+</table></div>
+<p>학습할 때는 <strong>얼굴에 사각형을 표시한 정답 이미지</strong>를 사용합니다.</p>
+<ul>
+<li><strong>분류 손실:</strong> 얼굴인지 아닌지 잘 맞히도록 학습</li>
+<li><strong>위치 손실:</strong> 사각형이 실제 얼굴 위치에 맞도록 학습</li>
+</ul>
+<p>얼굴 크기가 다양하므로 여러 크기의 특징 맵을 활용하기도 합니다.</p>
+<p>즉, 앞서 본 <strong>CNN 특징 추출부 뒤에 ‘얼굴 여부’와 ‘박스 위치’를 예측하는 부분을 붙이면 얼굴 검출 모델</strong>을 만들 수 있습니다.</p>
+<p>얼굴 검출은 “누구인가?”가 아니라 **“얼굴이 어디 있는가?”**를 찾는 작업입니다.</p>
+<p><a id="cnn-vgg"></a></p>
+<h2 id="sec-4-cnn-모델의-발전-vggnet">4. CNN 모델의 발전 — VGGNet</h2>
+<p>앞에서는 개별 연산과 특징의 활용을 살펴봤습니다. 이제 이를 조합한 대표 모델인 VGGNet과 ResNet을 통해, 층을 깊게 쌓는 방법과 그 과정에서 생기는 학습 문제를 연결해 보겠습니다.</p>
+<h3 id="sec-cnn-models">CNN Models</h3>
+<p>교안 35쪽의 발전사는 문제별 설계 선택을 보여줍니다. LeNet-5(1998)는 지역 연결·공유 가중치로 문자 인식을 수행했고, AlexNet(2012)은 대규모 이미지 학습에서 GPU·ReLU·Dropout을 활용했습니다. VGG는 작은 필터를 반복하는 단순한 깊은 구조, ResNet은 깊은 구조의 최적화 문제에 초점을 둡니다. 이 연대표는 같은 데이터·학습 조건에서 모델을 평가한 순위표가 아닙니다. 교안의 ResNet 파라미터 범위 ‘25M~60M+’를 모든 변형에 적용하면 안 되며, ResNet-18은 1,000개 분류 기준 약 11.69M입니다.</p>
+<p><img alt="CNN 모델의 구조와 발전 비교" decoding="async" id="figure-9" loading="lazy" src="../resources/f618d56321425863ff4e-orca-paste-1793766256211-bd1310e7-3a3f-436e-b.png"/></p><div class="image-actions"><button data-image-zoom="figure-9" type="button">그림 확대</button><a href="../resources/f618d56321425863ff4e-orca-paste-1793766256211-bd1310e7-3a3f-436e-b.png" rel="noopener" target="_blank">그림 원본</a></div>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구분</th>
+<th>VGGNet</th>
+<th>ResNet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>핵심 아이디어</td>
+<td><strong>작은 3×3 합성곱을 여러 층 쌓습니다.</strong></td>
+<td><strong>입력을 뒤쪽에 더해주는 지름길을 만듭니다.</strong></td>
+</tr>
+<tr>
+<td>대표 구조</td>
+<td>VGG-16, VGG-19</td>
+<td>ResNet-18, 50, 101, 152</td>
+</tr>
+<tr>
+<td>장점</td>
+<td>구조가 단순하고 이해하기 쉬움</td>
+<td>매우 깊은 신경망도 학습하기 쉬움</td>
+</tr>
+<tr>
+<td>특징</td>
+<td>대표 모델은 파라미터가 많아 무거움</td>
+<td>잔차 연결로 정보와 기울기의 전달을 도움</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>VGGNet</strong>은 작은 필터를 반복해서 사용하여 <strong>선·경계 → 물체의 부분 → 복잡한 형태</strong>를 단계적으로 학습합니다.</li>
+<li><strong>ResNet</strong>은 여러 층의 계산 결과 F(x)에 원래 입력 x를 더합니다.</li>
+</ul>
+<pre><code>y=F(x)+x
+</code></pre>
+<p>이 <strong>잔차 연결(Residual connection 또는 Skip connection)</strong> 덕분에, 층을 깊게 쌓았을 때 학습이 어려워지는 문제를 완화합니다.</p>
+<p>특히 층을 추가했는데 오히려 <strong>학습 오차가 커지는 현상인 degradation 문제</strong>를 해결하는 데 중요한 역할을 했습니다.</p>
+<h3 id="sec-vggnet">VGGNet</h3>
+<p><img alt="VGG 구조의 특징 맵과 필터 차원" decoding="async" id="figure-10" loading="lazy" src="../resources/12127f572a1231fec120-orca-paste-1793766430116-8065ee94-d901-422d-a.png"/></p><div class="image-actions"><button data-image-zoom="figure-10" type="button">그림 확대</button><a href="../resources/12127f572a1231fec120-orca-paste-1793766430116-8065ee94-d901-422d-a.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>이 그림은 <strong>VGGNet에서 이미지가 여러 합성곱·풀링 층을 지나 1,000개 클래스의 확률로 바뀌는 과정</strong>을 보여줍니다.</p>
+<h4 id="sec-1-왼쪽-표-vggnet의-여러-버전">1. 왼쪽 표: VGGNet의 여러 버전</h4>
+<p>A~E는 깊이가 다른 구성입니다. 대표적으로 <strong>D가 VGG-16, E가 VGG-19</strong>입니다.</p>
+<ul>
+<li><code>conv3-64</code>: <strong>3×3 필터를 사용하고 출력 채널이 64개</strong>인 합성곱 층</li>
+<li><code>maxpool</code>: 특징 맵의 가로·세로 크기를 줄이는 층</li>
+<li><code>FC-4096</code>: 출력값이 4,096개인 완전연결 층</li>
+</ul>
+<p>VGG-16의 ‘16’은 <strong>합성곱 13개 + 완전연결 3개</strong>입니다. Pooling과 ReLU는 이 층 수에 포함하지 않습니다.</p>
+<h4 id="sec-2-가운데-특징-맵의-크기-변화">2. 가운데: 특징 맵의 크기 변화</h4>
+<p>이 그림은 <strong>채널 × 높이 × 너비</strong> 순서로 표시합니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>크기</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력 (input)</td>
+<td><code>3 × 224 × 224</code></td>
+<td>RGB 이미지</td>
+</tr>
+<tr>
+<td>첫 합성곱 (maxpool-con3-64)</td>
+<td><code>64 × 224 × 224</code></td>
+<td>특징 맵 64개 생성</td>
+</tr>
+<tr>
+<td>두 번째 합성곱 (maxpool-con3-64)</td>
+<td><code>64 × 224 × 224</code></td>
+<td>공간 크기를 유지하며 특징을 조합</td>
+</tr>
+<tr>
+<td>첫 Pooling (maxpool-con3-64)</td>
+<td><code>64 × 112 × 112</code></td>
+<td>높이·너비를 절반으로 축소</td>
+</tr>
+<tr>
+<td>마지막 Pooling 이후 (maxpool-con3-512)</td>
+<td><code>512 × 7 × 7</code></td>
+<td>작은 공간에 많은 특징 채널이 존재</td>
+</tr>
+<tr>
+<td>Flatten</td>
+<td><code>25,088</code></td>
+<td><code>512 × 7 × 7</code>을 한 줄로 펼침</td>
+</tr>
+<tr>
+<td>Fully Connected (FC-4096 ~ FC-1000)</td>
+<td><code>4,096 → 4,096 → 1,000</code></td>
+<td>특징을 종합해 클래스별 점수 계산</td>
+</tr>
+<tr>
+<td>Softmax</td>
+<td><code>1,000</code></td>
+<td>1,000개 클래스의 확률분포 생성</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>깊어질수록 공간 크기는 줄이고, 채널 수는 늘려 더 다양한 특징을 표현하는 구조</strong>입니다.</p>
+<h5 id="sec-512-7-7의-의미">512 × 7 × 7의 의미</h5>
+<p><strong>가로·세로가 7칸인 특징 맵이 512장 쌓여 있다는 뜻</strong>입니다. 여기서는 <code>채널 수 × 높이 × 너비</code> 순서로 표시하며, 이미지 한 장에 대한 크기입니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>숫자</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>512</td>
+<td>학습된 특징을 표현하는 채널 수. 클래스가 512개라는 뜻은 아님</td>
+</tr>
+<tr>
+<td>7 × 7</td>
+<td>각 특징 맵의 공간 크기. 채널마다 49개의 값이 있음</td>
+</tr>
+</tbody>
+</table></div>
+<p>각 값은 해당 위치 주변의 입력 정보에 대해 그 채널이 얼마나 반응했는지를 나타냅니다. 원본 사진을 단순히 7×7로 축소한 것이 아니라, 여러 합성곱과 Pooling을 거쳐 얻은 특징입니다. 채널마다 눈·코 같은 이름이 하나씩 정해져 있는 것은 아닙니다.</p>
+<p>VGGNet에서는 Pooling을 다섯 번 거치며 한 변의 크기가 <code>224 → 112 → 56 → 28 → 14 → 7</code>로 줄어듭니다. 이때 채널 수는 합성곱 필터 개수로 정해집니다.</p>
+<p>Flatten은 이 값들을 순서대로 한 줄로 펼쳐 <strong>512 × 7 × 7 = 25,088개</strong>의 벡터로 만듭니다. 값의 개수는 그대로이며, 이후 Fully Connected 층이 이를 종합해 분류합니다.</p>
+<h4 id="sec-3-오른쪽-합성곱-필터-숫자의-의미">3. 오른쪽: 합성곱 필터 숫자의 의미</h4>
+<p>첫 번째 합성곱의 가중치 형태는 다음과 같습니다.</p>
+<pre><code>64 × 3 × 3 × 3
+ ↑   ↑   └──┘
+출력 입력  필터의 가로·세로
+채널 채널
+
+</code></pre>
+<p>즉, <strong>입력 3채널 전체를 보는 3×3 필터가 64개</strong> 있다는 뜻입니다.</p>
+<p>두 번째 합성곱은 입력이 이미 64채널이므로 다음처럼 바뀝니다.</p>
+<pre><code>64 × 64 × 3 × 3
+출력  입력   필터 크기
+채널  채널
+
+</code></pre>
+<p>두 층 모두 출력 채널은 64개지만, <strong>각 필터가 받아들이는 입력 채널 수가 다릅니다.</strong></p>
+<p>그림 아래 파라미터 표의 <code>138M</code>은 약 <strong>1억 3,800만 개</strong>라는 뜻입니다. VGG-16은 특히 Flatten 이후의 큰 완전연결 층 때문에 파라미터가 많습니다.</p>
+<p><a id="cnn-human"></a></p>
+<h2 id="sec-5-사람의-시각계와-cnn-비교">5. 사람의 시각계와 CNN 비교</h2>
+<p>지금까지 CNN의 연산과 깊은 구조의 학습을 살펴봤습니다. 마지막으로 이러한 계층적 특징 처리를 사람의 시각과 비교해, CNN이 설명하는 부분과 한계를 함께 정리하겠습니다.</p>
+<p><strong>CNN은 작은 특징을 조합해 물체를 인식하는 계층적 처리 방식을 사람의 시각과 공유합니다. 다만 뇌의 구조와 학습 과정을 그대로 재현한 것은 아닙니다.</strong></p>
+<p><img alt="사람의 시각 시스템과 CNN의 계층적 특징 처리 비교" decoding="async" id="figure-11" loading="lazy" src="../resources/25615c6160240a5deab4-orca-paste-1793768537083-d6043c53-d745-451a-8.png"/></p><div class="image-actions"><button data-image-zoom="figure-11" type="button">그림 확대</button><a href="../resources/25615c6160240a5deab4-orca-paste-1793768537083-d6043c53-d745-451a-8.png" rel="noopener" target="_blank">그림 원본</a></div>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>비교 항목</th>
+<th>사람의 시각 시스템</th>
+<th>CNN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>기본 처리</td>
+<td>뉴런이 특정 시야 영역인 수용 영역의 자극에 반응</td>
+<td>필터가 이미지의 작은 영역에서 특징을 추출</td>
+</tr>
+<tr>
+<td>특징의 계층</td>
+<td>선·방향에서 형태·물체로 이어지는 처리</td>
+<td>얕은 층의 경계·질감을 깊은 층에서 복잡한 특징으로 조합</td>
+</tr>
+<tr>
+<td>정보 흐름</td>
+<td>앞뒤 방향의 피드백과 반복 처리가 풍부</td>
+<td>기본적인 CNN은 입력에서 출력으로 순서대로 계산</td>
+</tr>
+<tr>
+<td>학습</td>
+<td>경험에 따른 신경 연결의 변화 등 다양한 생물학적 과정</td>
+<td>손실 함수와 역전파·최적화 알고리즘으로 가중치 조정</td>
+</tr>
+<tr>
+<td>인식의 한계</td>
+<td>착시와 문맥의 영향을 받을 수 있음</td>
+<td>사람이 알아보기 어려운 작은 교란에도 오분류할 수 있음</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sec-그림의-뇌-영역과-cnn-층의-대응">그림의 뇌 영역과 CNN 층의 대응</h3>
+<p>그림은 <strong>V1의 선·방향 처리 → V2·V4의 형태·질감 처리 → IT의 물체 표현</strong>을 CNN의 얕은 층에서 깊은 층으로 이어지는 특징 처리에 빗대어 설명합니다. 각 영역의 기능은 서로 겹치며, 뇌 영역과 CNN 층이 정확히 일대일로 대응하지는 않습니다. 오른쪽 도식은 V1을 비롯한 실제 시각 경로의 여러 단계를 생략한 단순화입니다.</p>
+<h3 id="sec-사람의-시각과의-유사성">사람의 시각과의 유사성</h3>
+<ul>
+<li><strong>특징 표현은 일부 닮았습니다.</strong> 물체 인식에 맞춰 학습한 계층형 모델이 영장류 V4·IT 영역의 신경 반응 일부를 예측한 연구가 있습니다. 이는 내부 표현의 유사성을 보여주지만, 사람의 시각 전체를 재현했다는 뜻은 아닙니다. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4060707/">Yamins 등의 연구</a></li>
+<li><strong>반복 처리에는 차이가 있습니다.</strong> 어려운 이미지를 인식할 때 영장류 시각계의 반복 회로가 중요하다는 연구가 있습니다. 단방향 CNN만으로는 이런 시간에 따른 처리를 충분히 설명하기 어렵습니다. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8785116/">Kar 등의 연구</a></li>
+<li><strong>유사성을 하나의 퍼센트로 표시할 수는 없습니다.</strong> 같은 정답을 맞혀도 사용하는 특징, 학습 방식, 실수하는 조건이 다를 수 있습니다. 과제 성능과 뇌와의 유사성은 따로 평가해야 합니다.</li>
+</ul>
+<h3 id="sec-판다-이미지가-보여주는-인식의-한계">판다 이미지가 보여주는 인식의 한계</h3>
+<p>판다 사진에 사람이 거의 알아차리지 못하는 교란을 더해 모델이 긴팔원숭이로 오분류하도록 만든 **적대적 공격(Adversarial attack)**의 예시입니다. 아무 잡음이나 넣으면 반드시 이런 결과가 나는 것은 아니며, 모델의 판단을 바꾸도록 교란을 설계합니다. 사람의 착시와 CNN의 적대적 취약성은 모두 인식의 한계이지만, 같은 원리로 발생한다고 볼 수는 없습니다.</p>
+<p>CNN의 핵심은 <strong>지역적인 특징을 공유된 필터로 추출하고, 이를 여러 층에서 조합하는 것</strong>입니다. 잔차 연결은 이 과정을 깊게 쌓아 학습하도록 돕습니다. 다음 <a href="02_03_CNN_ResNet_18Layer.html">ResNet 노트</a>에서는 잔차 연결과 실행을 배우고, 그 뒤 <a href="03_01_Attention_Note.html">Attention</a>에서 여러 위치의 정보를 결합하는 방법을 배웁니다.</p>
+<p><a id="cnn-practice"></a></p>
+<h2 id="sec-6-직접-계산하고-확인하기">6. 직접 계산하고 확인하기</h2>
+<p><strong>실행 실습(표준 Python 3):</strong> 저장소 루트에서 아래 명령을 실행합니다. 패키지 설치나 데이터 다운로드 없이 손계산·차원·파라미터 수를 검산합니다. <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/assets/cnn-selfstudy/check_arithmetic.py">실행 파일</a>은 교육용 계산기이며 CNN을 학습하는 코드는 아닙니다.</p>
+<pre><code class="language-text">python 05_VISION/학습자료/assets/cnn-selfstudy/check_arithmetic.py
+</code></pre>
+<p>필터 결과 -6, 합성곱 출력 한 변 16, 수용영역 8, 출력 간격 2를 확인한 뒤 <code>all arithmetic checks passed</code>가 나와야 합니다. 이 스크립트는 집필 환경의 Python 3.12.8에서 실행해 모든 assert가 통과했습니다. 실제 CNN의 forward/backward는 <a href="02_03_CNN_ResNet_18Layer.html#resnet-code">ResNet 실습</a>에서 다루며 그 실행 검증 범위는 별도로 표시했습니다.</p>
+<p><strong>질문:</strong> 먼저 계산하거나 이유를 적고 해설을 확인하세요.</p>
+<ol>
+<li>6×6×3 입력에 3×3 필터 2개, stride 1, padding 0, bias 사용이면 출력과 파라미터 수는?</li>
+<li>3×3 Conv(S=1) → 2×2 Pool(S=2) → 3×3 Conv(S=1)의 수용영역을 왜 단순히 3+2+3으로 더하면 안 될까요?</li>
+<li>위 첫 질문에서 stride만 2로 바꾸면 무엇이 달라지고 무엇이 유지될까요?</li>
+<li>3입력·8출력 채널의 depthwise+pointwise에서 pointwise를 빼면 8채널 혼합 특징을 얻을 수 있나요?</li>
+<li>모든 입력을 한 픽셀 옮기면 분류 결과가 반드시 같나요?</li>
+</ol>
+<p><strong>해설 1:</strong> 한 변은 <code>(6-3)/1+1=4</code>이므로 HWC 출력은 4×4×2, NCHW는 N×2×4×4입니다. 각 필터는 세 채널 전체를 보므로 <code>3×3×3×2+2=56</code>개입니다. 출력 32개와 학습 파라미터 56개를 구별합니다. <a href="#cnn-convolution">1절</a>로 돌아갑니다.</p>
+<p><strong>해설 2:</strong> 각 층의 필터는 원본 픽셀이 아니라 직전 특징 맵을 봅니다. 이미 한 칸이 원본 두 칸 간격이면 마지막 커널이 추가하는 폭은 2×2=4입니다. <code>(r,j): (1,1)→(3,1)→(4,2)→(8,2)</code>로 계산합니다. 8이라는 우연한 단순 합의 일치는 일반 규칙이 아닙니다. <a href="#cnn-receptive">2절</a>을 복습합니다.</p>
+<p><strong>해설 3:</strong> <code>floor((6-3)/2)+1=2</code>여서 출력은 2×2×2입니다. 필터 크기·채널·bias가 그대로이므로 파라미터 56개는 유지되고 공간 연산은 줄어듭니다. <a href="#cnn-convolution">1절</a>로 돌아갑니다.</p>
+<p><strong>해설 4:</strong> 기본 depth multiplier=1이면 depthwise 출력은 3채널이며 채널 간 정보를 섞지 않습니다. pointwise가 3채널을 조합해 8채널을 만듭니다. 가중치 27+24=51이라는 계산도 두 단계를 모두 포함합니다. <a href="#cnn-receptive">2절</a>로 돌아갑니다.</p>
+<p><strong>해설 5:</strong> 보장하지 않습니다. stride 1 합성곱의 이동 등변성과 최종 분류의 이동 불변성은 다릅니다. 경계 padding, 다운샘플링, 분류부 등이 영향을 줍니다. 교안 19쪽의 translation invariance는 이 조건을 구별해 읽어야 합니다. <a href="#cnn-convolution">1절</a>을 복습합니다.</p>
+<p>다음에는 <a href="02_03_CNN_ResNet_18Layer.html">ResNet</a>에서 합성곱을 깊게 쌓을 때 생기는 최적화 문제와 잔차 연결을 다룹니다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/05_VISION/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/02_02_CNN_Note.md">CNN 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="02_01_DNN_Note.html"><small>이전 장</small>DNN: 예측 확률에서 손실과 가중치 업데이트까지</a><a rel="next" href="02_03_CNN_ResNet_18Layer.html"><small>다음 장</small>ResNet-18: 잔차를 이해하고 차원을 추적하며 구현하기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

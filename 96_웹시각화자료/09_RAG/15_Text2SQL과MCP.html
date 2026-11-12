@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/rag-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html" aria-current="page">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>실제 실습 schema와 원본 행으로 키 JOIN·조건·LEFT JOIN·COUNT·SUM의 단위와 결과를 계산한다.</li><li>PDF/HTML과 실제 네 Tool의 차이를 구분하고 초기화·기능 탐색·스키마·SQL 생성·실행·ID 연결·오류·재시도를 추적한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="rag-sql-join" id="lab-rag-sql-join"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="rag-mcp-state" id="lab-rag-mcp-state"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-text2sql을-하는-주체">1. Text2SQL을 하는 주체</a></li><li><a href="#sec-2-pdf의-인터페이스와-실제-코드의-차이">2. PDF의 인터페이스와 실제 코드의 차이</a></li><li><a href="#sec-3-실제-실습-schema와-행의-단위">3. 실제 실습 schema와 행의 단위</a></li><li><a href="#sec-4-join집계null의-경계">4. JOIN·집계·NULL의 경계</a></li><li><a href="#sec-5-mcp-연결-상태와-요청결과의-연결">5. MCP 연결 상태와 요청·결과의 연결</a></li><li><a href="#sec-6-실행-전후-검증과-복구">6. 실행 전후 검증과 복구</a></li><li><a href="#sec-7-확인-질문과-해설">7. 확인 질문과 해설</a></li><li><a href="#sec-출처와-페이지코드-대응">출처와 페이지·코드 대응</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-15-text2sql과-mcp-스키마에서-질의행답변까지">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</h1>
+<p>“AI 제품의 매출 합계는?”은 관련 문서 몇 개를 읽는 문제와 다르다. 조건을 만족하는 <strong>모든 행</strong>을 올바른 키로 JOIN하고 집계해야 한다. 이 장은 <code>NL2SQL___mcp.pdf</code> 20쪽, <code>text2sql_mcp_lecture.html</code>, 실제 <code>mcp-text2sql/README.md·server.py·sample_db.py</code>를 함께 읽는다. 페이지 안의 실습은 작은 배열의 JOIN·집계와 요청 상태를 계산하는 교육용 데모이며 DB·LLM·MCP 서버를 실행하지 않는다.</p>
+<h2 id="sec-1-text2sql을-하는-주체">1. Text2SQL을 하는 주체</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>주체</th>
+<th>입력</th>
+<th>수행·출력</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Host 애플리케이션</td>
+<td>사용자 질문·대화·접근 조건</td>
+<td>schema 수집, 모델 호출, 도구 실행 제어, 결과 통합</td>
+</tr>
+<tr>
+<td>LLM</td>
+<td>질문·schema·질의 예시·도구 정의</td>
+<td>SQL 또는 구조화된 tool 요청 생성, 결과 행의 자연어 설명</td>
+</tr>
+<tr>
+<td>MCP Client</td>
+<td>서버와 협상한 기능·요청</td>
+<td>서버별 연결·request ID·응답·오류·세션 관리</td>
+</tr>
+<tr>
+<td>MCP Server</td>
+<td>허용된 도구 이름과 검증한 인자</td>
+<td>DB 조회·스키마 제공·결과/오류 반환</td>
+</tr>
+<tr>
+<td>DB</td>
+<td>SQL과 바인딩된 값</td>
+<td>계획·JOIN·필터·집계 후 결과 행</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>SQL 생성과 SQL 실행은 다른 단계다.</strong> 실습 <code>server.py</code>에는 LLM 호출이 없다. host 쪽 모델이 SQL을 만들고 server의 <code>query_db(sql)</code>이 실행한다. PDF 6쪽 그림의 서버 박스에 있는 “Text2SQL Logic”만 보고 생성까지 서버가 수행한다고 읽지 않는다. 그림 아래 설명과 11~13쪽은 생성 시점을 host의 LLM 호출로 명시한다.</p>
+<p><img alt="Host와 Client의 준비·호출, Server의 입력 검증·DB 실행, 같은 request ID의 결과를 연결하는 Text2SQL 흐름" decoding="async" id="figure-1" loading="lazy" src="../resources/9f83766fd31d1aba4b69-15_text2sql_mcp.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/9f83766fd31d1aba4b69-15_text2sql_mcp.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> 위의 파란 흐름은 준비·질문·schema, 보라색은 SQL/결과, 녹색은 확인된 성공, 주황색은 오류·보류다. Schema를 읽는 것과 SELECT를 실행하는 것을 나누고, SQL이 구문상 성공해도 질문의 의미에 맞는지 검증한다.</p>
+<h2 id="sec-2-pdf의-인터페이스와-실제-코드의-차이">2. PDF의 인터페이스와 실제 코드의 차이</h2>
+<p>PDF 8~10쪽은 <code>sqlite://schema</code> Resource, <code>run_read_only_sql</code> Tool, <code>text_to_sql_prompt</code> Prompt라는 설명용 구성을 보인다. 반면 로컬 실습 <code>server.py</code>는 아래 **네 함수 모두 <code>@mcp.tool()</code>**로 등록한다. 같은 기능 이름이라고 MCP primitive 종류까지 같지는 않다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>실제 Tool</th>
+<th>인자</th>
+<th>원본 코드의 반환</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list_tables()</code></td>
+<td>없음</td>
+<td>내부 sqlite 테이블을 제외한 이름 문자열</td>
+</tr>
+<tr>
+<td><code>get_schema()</code></td>
+<td>없음</td>
+<td><code>sqlite_master</code>의 CREATE TABLE SQL을 연결한 문자열</td>
+</tr>
+<tr>
+<td><code>sample_data(table_name, limit=5)</code></td>
+<td>허용 table 이름, 행 수</td>
+<td>최대20을 적용한 표본 행의 Python 표현 문자열</td>
+</tr>
+<tr>
+<td><code>query_db(sql)</code></td>
+<td>SQL 문자열</td>
+<td>SELECT 결과 행의 Python 표현 문자열, “결과가 없습니다”, 또는 오류 문자열</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>str([dict(row),...])</code>는 단일 따옴표 등을 포함할 수 있어 엄격한 JSON 직렬화가 아니다. 실행기에서 이를 JSON으로 처리하려면 명시적 형식 변환 계약이 필요하다. HTML의 표·차트·SQL/결과는 고정 JavaScript 자료를 렌더링한 시연이다. HTML의 예시 날짜·매출 값과 <code>sample_db.py</code>의 행을 혼합해 하나의 실제 실행 결과라고 주장하지 않는다.</p>
+<p>README는 의존성 설치→sample DB 생성→클라이언트 설정→재시작 흐름을 안내한다. 서버는 <code>FastMCP("text2sql")</code>, 파일 위치 기준 <code>company.db</code>, <code>mcp.run(transport="stdio")</code>를 사용한다. <code>sample_db.py</code>는 기존 세 테이블의 행을 DELETE하고 다시 삽입하므로 <strong>단순 조회 스크립트가 아니다</strong>. 이 교안 제작에서는 원본 스크립트를 실행하거나 원본 DB를 변경하지 않았다. 클라이언트 설정 경로·지원 옵션·SDK 생성자는 설치 버전별 실행 계약을 따로 확인해야 한다.</p>
+<h2 id="sec-3-실제-실습-schema와-행의-단위">3. 실제 실습 schema와 행의 단위</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>테이블</th>
+<th>열·키</th>
+<th>단위·의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>employees</td>
+<td>id PK, name, department, position, salary, hire_date</td>
+<td>직원10명, salary는 교안상 연봉 만원</td>
+</tr>
+<tr>
+<td>products</td>
+<td>id PK, name, category, price</td>
+<td>제품8개, price는 원/개</td>
+</tr>
+<tr>
+<td>sales</td>
+<td>id PK, product_id FK, employee_id FK, amount, quantity, sale_date</td>
+<td>거래18건, amount는 <strong>해당 거래의 총 매출 원</strong>, quantity는 개수</td>
+</tr>
+</tbody>
+</table></div>
+<p>질문에 “매출”이 있으면 <code>amount</code>와 <code>price</code>, <code>quantity</code>를 먼저 구분한다. 원본 거래 <code>product_id=4, amount=1500000, quantity=3</code>은 거래 총액150만원이다. <code>SUM(amount*quantity)</code>로 다시 수량을 곱하면450만원으로 부풀린다. <code>SUM(price*quantity)</code>는 가격·할인·변경 이력이 일치하는 경우에만 총액과 같고, 현재 제품 가격을 과거 매출에 적용해도 되는지 확인해야 한다.</p>
+<pre><code class="language-sql">SELECT e.id, e.name,
+       COUNT(s.id) AS transaction_count,
+       SUM(s.amount) AS revenue_won
+FROM sales AS s
+JOIN products AS p ON p.id=s.product_id
+JOIN employees AS e ON e.id=s.employee_id
+WHERE p.category='AI'
+GROUP BY e.id, e.name
+ORDER BY revenue_won DESC, e.id;
+</code></pre>
+<p>실습 원본 데이터에서 AI 제품4·7의 거래는 id3,9,10,15,18이다. <code>amount</code>는1500000+1000000+400000+2000000+800000=<strong>5700000원</strong>이다. 직원10은 네 거래5300000원, 직원7은 한 거래400000원이다. 이는 원본 리스트를 읽어 산술 검산한 값이며 HTML 화면의 별도 예제 값을 사용하지 않았다.</p>
+<h2 id="sec-4-join집계null의-경계">4. JOIN·집계·NULL의 경계</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>행의 의미</th>
+<th>확인할 문제</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FROM/키 JOIN</td>
+<td>거래 한 건과 해당 제품·직원</td>
+<td>ON 조건 누락, 다대다 증식, 중복 키</td>
+</tr>
+<tr>
+<td>WHERE</td>
+<td>질문의 날짜·제품·권한 조건을 만족한 거래</td>
+<td>연도·상대 시점·단위·접근 조건 오해</td>
+</tr>
+<tr>
+<td>GROUP BY</td>
+<td>직원별 또는 제품별 묶음</td>
+<td>이름만 묶어 동명이인 합산</td>
+</tr>
+<tr>
+<td>SUM/COUNT</td>
+<td>각 묶음의 거래액·건수</td>
+<td>amount에 수량 재곱, NULL과0 혼동</td>
+</tr>
+<tr>
+<td>HAVING</td>
+<td>집계 후 조건</td>
+<td>WHERE와 평가 시점 다름</td>
+</tr>
+<tr>
+<td>ORDER/LIMIT</td>
+<td>질문이 요구한 순위·개수</td>
+<td>동점 정렬, 정렬 전에 잘라내기</td>
+</tr>
+</tbody>
+</table></div>
+<p>AI 제품이 두 개라고 모든 거래와 그 두 제품을 곱집합으로 JOIN하면 각 거래액이 두 번 합산된다. 조건 없는18거래×8제품=144쌍, 그중 AI만 남기면36쌍이다. 올바른 키 JOIN의 AI 거래는5건이다. “실행 오류가 없다”는 것은 올바른 JOIN이라는 보장이 아니다.</p>
+<p>거래가 없는 직원도 보고하려면 employees를 기준으로 LEFT JOIN한다. AI/날짜 필터를 오른쪽 subquery 안에서 적용하면 거래 없는 직원도 남는다.</p>
+<pre><code class="language-sql">SELECT e.id, e.name, COUNT(f.id) AS n,
+       COALESCE(SUM(f.amount),0) AS revenue_won
+FROM employees AS e
+LEFT JOIN (
+  SELECT s.* FROM sales AS s
+  JOIN products AS p ON p.id=s.product_id
+  WHERE p.category='AI'
+) AS f ON f.employee_id=e.id
+GROUP BY e.id, e.name
+ORDER BY revenue_won DESC, e.id;
+</code></pre>
+<p>여기서 <code>COUNT(*)</code>는 LEFT JOIN이 만든 NULL 확장 행까지 세어 거래 없는 직원도1이 될 수 있다. COUNT(f.id)는0이다. SUM은 입력 없는 묶음에서 NULL일 수 있어 보고 정책에 따라 COALESCE로0을 표시한다. 날짜 조건은 예를 들어 <code>sale_date &gt;= '2026-01-01' AND sale_date &lt; '2027-01-01'</code>의 반열린 범위를 사용한다. 실제 시간대·timestamp 표현이 다르면 해당 저장 계약에 맞춰 변환한다. 질문이 모호하면 수익/매출·회계연도·통화·직원 기준을 먼저 확인한다.</p>
+<h2 id="sec-5-mcp-연결-상태와-요청결과의-연결">5. MCP 연결 상태와 요청·결과의 연결</h2>
+<p>연결 프로토콜의 상태와 DB 도구 함수의 업무 상태를 구분한다. MCP 자체는 세션·초기화·기능 협상을 가진다. 서버의 SELECT 함수가 업무 대화를 저장하지 않는다고 MCP 전체가 무상태라는 뜻은 아니다. 아래는 2025-11-25 명세를 참조한 개념 흐름이며 특정 SDK API 호출법이 아니다. <a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle">공식 lifecycle</a></p>
+<pre><code class="language-text">연결 → initialize(버전·capabilities) 요청/응답
+    → notifications/initialized
+    → tools/list로 사용 가능한 이름·입력 schema 확인
+    → list_tables / get_schema / 필요 시 sample_data 호출
+    → Host의 LLM이 SQL 생성
+    → Host가 인자·접근·실행 예산 검증
+    → tools/call(name="query_db", arguments={sql: ...}, id=4)
+    → Server가 DB 조회, 같은 id=4의 결과 또는 오류 반환
+    → Host가 결과 상태·행·단위·제약 검증 후 LLM에 전달
+    → 답변 또는 제한된 재시도/보류 → 연결 정리
+</code></pre>
+<p>JSON-RPC request ID는 요청/응답을 연결하는 식별자다. 결과가 다른 ID로 왔다면 현재 질의의 성공 결과로 채택하지 않는다. 미지원 도구·잘못된 인자·프로토콜 오류와, 도구가 실행되었지만 SQL이 실패한 오류를 구별한다. 빈 결과는 오류와도 다르다. 재시도는 SQL 수정의 근거·횟수·시간·토큰 상한을 남기고 같은 실패를 무제한 반복하지 않는다.</p>
+<p>PDF는 Stdio/SSE 예시를, Text2SQL 코드는 stdio를, 금융 실습 <code>finance_MCP.py</code>는 streamable-http를 사용한다. 클라이언트의 transport·주소·서버 구현을 맞추어야 한다. 코드가 켜져 있지 않은데 스키마 목록이 화면에 보인다는 이유로 실제 연결 성공을 주장하지 않는다. MCP는 tool/resource/prompt의 연결 규격이며 자연어 의미·SQL의 정답·권한·적절한 종료를 자동 보증하지 않는다. <a href="https://modelcontextprotocol.io/specification/2025-11-25/architecture">공식 architecture</a></p>
+<h2 id="sec-6-실행-전후-검증과-복구">6. 실행 전후 검증과 복구</h2>
+<p>원본 <code>query_db</code>는 공백 제거 후 SELECT 접두사와 위험 키워드 부분문자열을 검사한다. 이것은 완전한 SQL parser·권한 경계가 아니다. 안전한 읽기 CTE도 WITH로 시작하면 차단될 수 있고, 데이터 문자열에 키워드가 들어가면 오탐할 수 있다. 연결 자체도 일반 <code>sqlite3.connect</code>이며 OS 격리·read-only DB 계정을 구성한 코드가 아니다. “코드에 SELECT만 허용이라고 쓰였으므로 완전한 읽기 전용 보장”으로 설명하지 않는다.</p>
+<p>실제 서비스에서는 최소 권한/read-only 연결, 허용 schema·함수·단일 statement 검사, 구조적 SQL 검증, 값의 파라미터 바인딩, 행 수·실행시간·결과 크기·개인정보·접근 조건을 적용한다. 식별자(table/column)는 값 placeholder와 같은 방식으로 바인딩할 수 없으므로 확인한 schema의 허용 식별자만 쓴다. <code>sample_data</code>는 table whitelist와 상한20을 사용하지만 음수 limit의 하한까지 검증하지 않으므로 입력 계약 보강이 필요하다. 원본은 수정하지 않았다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>관측</th>
+<th>다음 확인</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>no such column</td>
+<td>생성 SQL과 실제 최신 schema·별칭의 불일치</td>
+</tr>
+<tr>
+<td>성공했지만 합계가 큼</td>
+<td>ON 조건·다대다 증식·amount 단위·중복</td>
+</tr>
+<tr>
+<td>결과0행</td>
+<td>조건에 맞는 행 부재/조건 오해/접근 제한을 구분</td>
+</tr>
+<tr>
+<td>도구 응답이 너무 큼</td>
+<td>DB에서 조건·집계·투영·LIMIT, 의미 보존 압축</td>
+</tr>
+<tr>
+<td>답변이 결과와 다름</td>
+<td>행→서술 변환의 단위·날짜·반올림·근거 연결</td>
+</tr>
+<tr>
+<td>일반 대화에도 DB 호출</td>
+<td>host의 intent router·대화 상태·사용자 override</td>
+</tr>
+</tbody>
+</table></div>
+<p>PDF 15~19쪽의 혼합 대화는 host에서 CHAT/TEXT2SQL 경로를 선택한다. 일반 chat은 DB 없이 모델 호출, 데이터 질문은 schema+도구 경로다. 후속 질문의 생략된 대상·시점은 대화에서 복원하되 사용자가 바꾼 조건을 보존한다. 서버가 대화 라우팅을 결정할 필요는 없다.</p>
+<h2 id="sec-7-확인-질문과-해설">7. 확인 질문과 해설</h2>
+<ol>
+<li>get_schema는 실습 코드에서 Resource인가 Tool인가?</li>
+<li>제품 가격50만원·수량3·amount150만원이면 SUM(amount×quantity)는 맞는가?</li>
+<li>LEFT JOIN에서 거래 없는 직원의 COUNT(*)와 COUNT(s.id)는 어떻게 다른가?</li>
+<li>query_db 결과가 <code>str(list)</code>이면 JSON parser에 그대로 넣어도 되는가?</li>
+<li>MCP 초기화가 성공하면 SQL의 의미적 정답도 보장되는가?</li>
+<li>SQL error·빈 결과·다른 request ID 응답을 같은 성공으로 처리해도 되는가?</li>
+</ol>
+<details><summary>해설</summary>
+<ol>
+<li>이 저장소의 실제 server.py는 Tool이다. PDF의 sqlite://schema Resource 예제와 구별한다.</li>
+<li>아니다. amount가 거래 총액이므로 수량을 다시 곱하면3배가 된다.</li>
+<li>NULL 확장 행이 있으면 COUNT(*)는1, COUNT(s.id)는0이다.</li>
+<li>안 된다. 엄격한 JSON 직렬화와 다를 수 있다. 반환 형식을 명시적으로 정해야 한다.</li>
+<li>아니다. 연결·capability와 SQL 생성·JOIN·조건·근거 검증은 별도다.</li>
+<li>안 된다. 오류는 복구/보류, 빈 결과는 정상0행의 의미 확인, ID 불일치는 현재 호출에 채택하지 않는다.</li>
+</ol>
+</details>
+<h2 id="sec-출처와-페이지코드-대응">출처와 페이지·코드 대응</h2>
+<ul>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EA%B5%90%EC%95%88/2%EC%9D%BC%EC%B0%A8/NL2SQL___mcp.pdf">NL2SQL___mcp.pdf</a>: 3~6쪽 통합 문제·역할·구조, 7~10쪽 초기화/Resource/Tool/Prompt 설명 코드, 11~13쪽 생성과 실행 시퀀스, 14쪽 실행 검증·오류 복구, 15~19쪽 router·대화 상태, 20쪽 결론.</li>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EA%B5%90%EC%95%88/2%EC%9D%BC%EC%B0%A8/text2sql_mcp_lecture.html">text2sql_mcp_lecture.html</a>: 절01~07 전체—구조, 네 도구, ER·schema, 고정 예제 결과와 SQL 시연.</li>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EC%8B%A4%EC%8A%B5/2%EC%9D%BC%EC%B0%A8/mcp-text2sql/README.md">실습 README</a>, <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EC%8B%A4%EC%8A%B5/2%EC%9D%BC%EC%B0%A8/mcp-text2sql/server.py">server.py</a>, <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EC%8B%A4%EC%8A%B5/2%EC%9D%BC%EC%B0%A8/mcp-text2sql/sample_db.py">sample_db.py</a>: 실제 함수·등록·연결·원본 행의 기준. 교안 폴더의 같은 이름 사본도 대조했다.</li>
+<li>실제 서버·설치·외부 계정·DB 실행은 이 웹 계산 실습의 전제가 아니다. 원본 환경 재현을 원하는 경우의 실행 절차와 계산 시각화의 검증 결과를 혼동하지 않는다.</li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/96_%EC%9B%B9%EC%8B%9C%EA%B0%81%ED%99%94%EC%9E%90%EB%A3%8C/%EA%B8%B0%EC%A4%80%EB%B3%B8%EB%AC%B8/09_RAG/15_Text2SQL%EA%B3%BCMCP.md">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="14_SPARQL%EA%B3%BCCypher.html"><small>이전 장</small>14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a><a rel="next" href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html"><small>다음 장</small>16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/rag-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html" aria-current="page">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>LlamaIndex의 Query Engine·Retriever·Synthesizer, Document/Node·CRUD·시점·웹/KG 결합·type1/type2 입력과 상태를 연결한다.</li><li>CRAG 세 과제와 네 판정·정규화 점수·평가 실패를 구분하고 동일 예산 L0~L3/MCP 비교의 한계를 설명한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="rag-crag-score" id="lab-rag-crag-score"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-query-engine은-모델벡터-db와-같은-객체가-아니다">1. Query Engine은 모델·벡터 DB와 같은 객체가 아니다</a></li><li><a href="#sec-2-insertupdaterefreshdelete는-무엇을-갱신하는가">2. Insert·update·refresh·delete는 무엇을 갱신하는가</a></li><li><a href="#sec-3-crag-데이터와-세-과제">3. CRAG 데이터와 세 과제</a></li><li><a href="#sec-4-전처리웹-ragkg-결합">4. 전처리→웹 RAG→KG 결합</a></li><li><a href="#sec-5-네-등급과-점수의-분모">5. 네 등급과 점수의 분모</a></li><li><a href="#sec-6-같은-평가자로-비교하는-l0l4">6. 같은 평가자로 비교하는 L0~L4</a></li><li><a href="#sec-7-type1type2의-핵심과-환경-차이">7. type1/type2의 핵심과 환경 차이</a></li><li><a href="#sec-8-확인-질문과-해설">8. 확인 질문과 해설</a></li><li><a href="#sec-출처와-코드-위치">출처와 코드 위치</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-17-실습-파이프라인과-crag-평가-코드의-입력상태채점을-연결하기">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</h1>
+<p>이 장은 원본 실습 type1/type2의 공통6개 노트북, 보조 코드, 실습 PDF 두 개를 대조한 학습 교안이다. 실행 환경·실측 성능을 새로 검증했다고 주장하지 않는다. 외부 계정·API key·DB·서버·모델을 켜지 않아도 아래의 데이터 흐름과 작은 계산은 학습할 수 있다. 자격증명은 포함하지 않는다.</p>
+<h2 id="sec-1-query-engine은-모델벡터-db와-같은-객체가-아니다">1. Query Engine은 모델·벡터 DB와 같은 객체가 아니다</h2>
+<p><code>1. Llama_index.ipynb</code>는 다음 단계를 분리한다.</p>
+<pre><code class="language-text">원본 Document → 파서/청킹 → 출처가 있는 Node
+             → 문서 임베딩 → vector store + 본문/메타데이터
+질문 → 질의 임베딩 → Retriever → 점수 있는 Node 목록
+     → Response Synthesizer → 답/요약 + source_nodes
+</code></pre>
+<p>Query Engine은 검색과 응답 합성을 연결하는 인터페이스다. index는 표현과 검색 구조, retriever는 후보 검색, synthesizer는 근거를 읽고 답/요약을 만드는 역할이다. 실습의 로컬 memory vector store도 외부 관리형 벡터 DB와 동일한 운영 기능을 자동 제공하지 않는다. <code>index.as_query_engine()</code>처럼 편의 API를 쓰더라도 내부 단계가 사라지지는 않는다.</p>
+<p>CustomQueryEngine의 <code>custom_query(query_str)</code>는 retriever에서 nodes를 얻고 <code>response_synthesizer.synthesize(query_str,nodes)</code>에 연결할 수 있다. 반환을 단순 문자열로 바꾸면 출처 목록·점수·구조 정보가 사라질 수 있으므로 답과 source_nodes를 함께 추적한다. summary를 잘 만든 것과 원질문에 직접 답한 것은 다르며 목적에 맞게 프롬프트·합성 모드를 정한다.</p>
+<h2 id="sec-2-insertupdaterefreshdelete는-무엇을-갱신하는가">2. Insert·update·refresh·delete는 무엇을 갱신하는가</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>동작</th>
+<th>논리 입력</th>
+<th>확인할 상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>insert</td>
+<td>새 document ID·본문·metadata</td>
+<td>새 nodes·벡터·본문 저장·참조 관계 추가</td>
+</tr>
+<tr>
+<td>update</td>
+<td>같은 ID의 새 버전</td>
+<td>예전 nodes·표현 제거/교체, 버전 일치</td>
+</tr>
+<tr>
+<td>refresh</td>
+<td>여러 document의 현재 상태</td>
+<td>변경 감지·해시 규약에 맞는 선택적 갱신</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>document ID 또는 node IDs</td>
+<td>검색 표현·본문·참조·캐시의 잔존 여부</td>
+</tr>
+</tbody>
+</table></div>
+<p>원문을 바꾼 뒤 벡터·본문·query engine/caches가 이전 상태를 읽으면 최신 답이 반영되지 않을 수 있다. update/refresh의 정확한 API 이름과 반환은 설치된 LlamaIndex 버전의 계약을 따른다. 실습은 같은 질문을 갱신 전후에 다시 보내 변화를 살피지만, 생성 응답 변화만으로 인덱스 정합성을 증명하지 않는다. ID·node 수·본문/metadata 버전·검색 결과를 함께 확인해야 한다. 이는 원본 실습 PDF 20~22쪽의 DB management 흐름이다.</p>
+<p><code>2. RAG.ipynb</code>는 도시 Wikipedia 자료를 청크로 만들고 Retriever→Generator를 직접 연결한다. 청크 크기·Top-K·응답 프롬프트를 바꾸면 회수 근거와 최종 응답이 함께 바뀔 수 있다. 한 번에 하나의 조건을 바꾸고 질문별 근거·답변을 저장해야 원인을 구분한다. 자료 밖 질문에 모델이 답했다고 검색 근거가 충분한 것은 아니다.</p>
+<h2 id="sec-3-crag-데이터와-세-과제">3. CRAG 데이터와 세 과제</h2>
+<p>여기서 CRAG는 <strong>Comprehensive RAG Benchmark</strong>라는 평가 자료다. 11장의 Corrective RAG 기법명과 구별한다. 실습 Graph RAG PDF14~22쪽은 다섯 분야(finance/sports/music/movie/open), static·slow/fast-changing·real-time의 변화 속도, head/torso/tail 개체의 빈도 차이, 단순 사실·조건·집합·비교·집계·multi-hop·후처리·false-premise 질문을 소개한다. 특정 판본의 표본 수를 현재 전체 규모로 일반화하지 않는다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>데이터 필드/구성</th>
+<th>역할</th>
+<th>확인할 문제</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>interaction_id</td>
+<td>질문의 고유 식별</td>
+<td>여러 구성의 같은 질문 비교</td>
+</tr>
+<tr>
+<td>query</td>
+<td>사용자 정보 요구</td>
+<td>조건·범위·비교 기준 보존</td>
+</tr>
+<tr>
+<td>query_time</td>
+<td>상대 시점의 기준</td>
+<td>“현재/어제”를 모델 실행일로 임의 해석하지 않음</td>
+</tr>
+<tr>
+<td>answer 및 대안 정답</td>
+<td>reference</td>
+<td>표기 변형·빈 정답·false premise 규약</td>
+</tr>
+<tr>
+<td>search_results</td>
+<td>검색된 웹 결과·HTML·자료 시각</td>
+<td>title/본문/출처/시간을 파싱·보존</td>
+</tr>
+<tr>
+<td>domain·question_type 등</td>
+<td>평가 층화</td>
+<td>질문 유형별 누락·어려운 사례 비율</td>
+</tr>
+</tbody>
+</table></div>
+<p>세 task는 제공 근거의 조건을 달리한다. 실습 PDF20쪽의 표에서 Task1은 웹 검색 결과5개, Task2는 같은5개와 mock KG/API, Task3는 웹 검색 결과50개와 mock KG/API를 사용하는 설정이다. 이는 <strong>제공되는 외부 자원 차이</strong>이며 다른 조건의 점수를 같은 설정처럼 비교하지 않는다. “mock” API도 호출 구조는 실제 외부 도구이며 값은 벤치마크용 고정 지식이다.</p>
+<h2 id="sec-4-전처리웹-ragkg-결합">4. 전처리→웹 RAG→KG 결합</h2>
+<p><code>1. Data_preprocessing.ipynb</code>는 bz2 JSONL 레코드·분포를 읽고 검색 결과 HTML을 텍스트로 파싱·분할한다. <code>&lt;script&gt;</code>, 메뉴, 빈 본문 등 노이즈를 제거하더라도 숫자·표 헤더·날짜·부정·출처를 없애지 않아야 한다. 질문별 웹 자료를 섞으면 원래 근거 범위가 달라지고 평가 누출이 생길 수 있다.</p>
+<p><code>2. Task_1.ipynb</code>는 Chunk Extractor→Retriever→Reader→RAG의 역할을 나눈다. 질문과 chunk 표현의 내적/cosine으로 Top-K를 고르고 Reader에 근거를 전달한다. 반환은 답뿐 아니라 검색 문서·source·설정도 남겨야 검색 누락과 생성 오류를 분리할 수 있다.</p>
+<p><code>3. Task_2.ipynb</code>의 KGQueryEngine은 LLM이 domain·entity·API 인자를 만들고 <strong>분기 코드/결정 트리</strong>가 mock API를 호출한다. 웹 검색 근거와 KG 응답을 합쳐 Reader에 전달한다. 이것은 SPARQL/Cypher 문자열을 임의 생성해 DB에 직접 보내는 것과 다른 구현이다. 회사명→ticker→지표 조회 같은 의존 호출이 있어 첫 entity 오류가 뒤 단계에 전파된다. KG 결과가 길면 본문을 전부 붙이는 대신 질문의 시점·지표·필드와 예산에 맞춰 선택해야 한다.</p>
+<p>금융 <code>finance_MCP.py</code>는 회사명/ticker 일치 확인, 회사 후보, ticker 변환, 일·분 단위 가격 이력, 배당, 시가총액, EPS, PER, 회사 정보 Tool을 제공한다. <code>metadata://finance-company-format</code> Resource는 이름/ticker 형식 예시다. <strong>일 단위와 분 단위 가격·거래량은 같은 집계값이라고 가정하지 않는다.</strong> 응답의 자료 시각·타임존·snapshot을 query_time과 대조한다. 이는 금융 투자 판단이 아니라 도구 입력·단위 학습이다.</p>
+<h2 id="sec-5-네-등급과-점수의-분모">5. 네 등급과 점수의 분모</h2>
+<p>원본 평가 노트북은 perfect=1, acceptable=0.5, missing=0, incorrect=−1이라는 네 판정을 사용한다. perfect/acceptable/incorrect/missing은 서로 배타적인 한 질문의 라벨이다. 각 개수를 P,A,M,I라 하면</p>
+<div class="math-raw math-display">$$S=P+0.5A-I,\qquad \bar S=\frac{P+0.5A-I}{N},\quad N=P+A+M+I.$$</div><p>예를 들어10질문에서 P4·A2·M3·I1이면 합점4, 질문당0.4다. 무조건 답하다 틀린 한 건을 적절히 보류하면 I가1 줄고 M이1 늘어 질문당0.1 오른다. 그렇다고 전부 보류하면 평균0이므로 유용한 답변 성능까지 좋다고 할 수 없다. answerable/null 유형별로 올바른 답·거절을 나눠 본다.</p>
+<p>원본 PDF22쪽의 “Exact Accuracy”는 완전 정답 범주, “Accuracy”는 비완전이지만 의미가 맞는 범주로 정의해 가중한다. 이것을 문자열 exact match나 모든 correct를 합한 일반 accuracy와 혼합하지 않는다. 부분 정답을 포함한 다른 교안 사례의 <code>(correct+0.5×partial)/N</code>은 incorrect의−1 벌점이 없어 <strong>같은 점수식이 아니다</strong>.</p>
+<p>LLM 판정기는 질문·prediction·대안 정답을 보고 라벨을 만든다. 판정 파싱 실패·timeout·모델 오류는 의미적 incorrect와 다르다. 원본 초기 코드의 단순 <code>나머지=hallucinate</code> 집계나 후속 코드의 inference 예외→missing 매핑은 각각의 구현 정책이다. 학습용 평가에서는 <strong>평가 성공 문항의 점수와 실패 수·가용성</strong>을 따로 보고한다. 실패를 조용히 평균 분모에서 빼거나 올바른 거절로 가장하지 않는다.</p>
+<h2 id="sec-6-같은-평가자로-비교하는-l0l4">6. 같은 평가자로 비교하는 L0~L4</h2>
+<p><code>4_RAG_framework_evaluation_with_MCP.ipynb</code>의 단계적 비교는 이름보다 변경 내용을 읽는다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구성</th>
+<th>바꾼 것</th>
+<th>비교에서 고정할 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>모델 단독 응답</td>
+<td>질문·판정·샘플</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>웹 RAG</td>
+<td>자료·Top-K·Reader 예산</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>검색/답변 후 self-verify 구조</td>
+<td>verifier 기준·추가 호출</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>plan→act→read→verify의 제한 반복</td>
+<td>최대 반복·누적 근거·재시도·호출/토큰 예산</td>
+</tr>
+<tr>
+<td>MCP 결합 구성</td>
+<td>Tool 선택·호출과 KG 결과 연결</td>
+<td>같은 query_time·출력 크기·평가셋</td>
+</tr>
+</tbody>
+</table></div>
+<p>원본 LLMCallCounter는 추론 비용과 judge 비용을 분리하려고 호출·토큰을 센다. 코드가 별도 측정하지 않은 모델/도구 호출이 있으면 총 비용 추정에 누락될 수 있다. 반복 구조가 더 잘 나왔다고 <strong>구조 자체의 효과</strong>가 확인된 것은 아니다. 같은 예산으로 단일 RAG를 여러 번 실행해 투표하는 self-consistency 같은 대조군, 같은 참조 길이·질문, 실패·지연·비용 기록이 필요하다. 원본 노트북의 “What This Experiment Cannot Show”도 이 차이를 명시한다.</p>
+<p>Self-verifier의 자신감은 사실 참 확률이 아니다. 최대 단계에 도달해도 미확인 사실을 추측하도록 강요하지 않는다. 새 검색이 실제로 새로운 근거를 추가했는지, 같은 질의만 반복했는지, claim–evidence가 맞는지 확인한다.</p>
+<h2 id="sec-7-type1type2의-핵심과-환경-차이">7. type1/type2의 핵심과 환경 차이</h2>
+<p>로컬 type1은 Conda/Jupyter와 설정한 외부 KG 주소를, Colab type2는 Drive 경로·subset·로컬 mock 서버 준비를 사용한다. 여섯 노트북의 핵심 학습 흐름은 겹치지만 설치 패키지·주소·도시 목록·데이터 판본·예제 인덱스·MCP 준비가 다르다. type2를 축약되어 다른 알고리즘이라고 단정하지 않는다. type1의 생성자 server 인자가 실제 주소 선택에 반영되는지 등 <strong>코드가 정말 사용하는 값</strong>을 확인한다. 실행 성공 여부는 이번 정적 교안 대조로 보장하지 않는다.</p>
+<p>Notebook의 <code>YOUR CODE HERE</code> 표식과 실제 미완성 여부도 다르다. 이미 채워진 셀이라도 입력·출력·상태를 읽어야 하며 현재 웹 교안은 시험 문제/정답 파일을 바꾸지 않는다. 서버·환경 명령은 실행 전제 자료이고 이 페이지의 계산 시각화가 실제 외부 실행을 대신했다고 주장하지 않는다.</p>
+<h2 id="sec-8-확인-질문과-해설">8. 확인 질문과 해설</h2>
+<ol>
+<li>Query Engine을 사용하면 retriever와 synthesizer의 구분이 없어지는가?</li>
+<li>문서 본문만 수정하면 인덱스의 모든 이전 표현도 자동 제거되는가?</li>
+<li>query_time이2024년인데 실행일이2026년이면 “현재 가격”을 어느 시점에 맞춰야 하는가?</li>
+<li>P4,A2,M3,I1의10문항 점수 합과 질문당 점수는?</li>
+<li>L3가 L1보다 높으면 agent 구조가 원인이라고 확정할 수 있는가?</li>
+<li>평가 timeout을 전부 incorrect 또는 성공한 missing으로 바꿔도 되는가?</li>
+</ol>
+<details><summary>해설</summary>
+<ol>
+<li>아니다. 인터페이스가 연결할 뿐 검색·생성의 데이터와 역할은 분리된다.</li>
+<li>보장되지 않는다. ID·본문·node·벡터·metadata·캐시·engine의 갱신 계약을 확인해야 한다.</li>
+<li>데이터셋이 지정한 query_time이다. 상대 시점 표현을 그 시각에 맞춰 해석한다.</li>
+<li>4+1−1=4점, 평균0.4다. 벌점 없는 가중 정확도와 다르다.</li>
+<li>아니다. 추가 호출·토큰·여러 시도 자체의 효과를 동일 예산 대조군으로 구분해야 한다.</li>
+<li>안 된다. 의미 판정과 실행/판정 실패를 구분해 개수·평균 모집단·가용성을 함께 보고한다.</li>
+</ol>
+</details>
+<h2 id="sec-출처와-코드-위치">출처와 코드 위치</h2>
+<ul>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EC%8B%A4%EC%8A%B5/1%EC%9D%BC%EC%B0%A8/A%20Tutorial%20on%20Retrieval%20Augmented%20Generation.pptx.pdf">RAG 실습 교안25쪽</a>: 8~18쪽 목적·파이프라인·Query Engine, 19~22쪽 저장·CRUD, 24쪽 청크·프롬프트 활동.</li>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EC%8B%A4%EC%8A%B5/2%EC%9D%BC%EC%B0%A8/A%20Tutorial%20on%20Graph%20RAG%20%20%26%20Meta%20KDD%20cup.pptx.pdf">Graph RAG·Meta KDD Cup 교안30쪽</a>: 14~22쪽 benchmark·과제·네 등급 점수, 25~29쪽 웹/KG/API/MCP.</li>
+<li><code>09.RAG/실습/1일차/Code/1. Llama_index.ipynb</code> 전체—특히 셀56~83 CRUD·custom engine; <code>2. RAG.ipynb</code> 전체 Retriever·Reader 연결. type2의 대응 노트북도 셀 내용으로 대조했다.</li>
+<li><code>2일차/[Local]_Code/1. Data_preprocessing.ipynb</code>, <code>2. Task_1.ipynb</code>, <code>3. Task_2.ipynb</code>의 전처리·클래스·질의 생성/분기 코드를 확인했다.</li>
+<li><code>4_RAG_framework_evaluation_with_MCP.ipynb</code>: 셀3~26 판정/집계, 27~43 호출 계량·L0~L3·비교 한계, 44~76 KG 실패 분석·MCP·시점·응답 크기. <code>import_function.py</code>, <code>MCP server/finance_MCP.py</code>, type2의 같은 역할 코드도 확인했다. 원본 노트북 실행 결과를 새 실측으로 사용하지 않았다.</li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/96_%EC%9B%B9%EC%8B%9C%EA%B0%81%ED%99%94%EC%9E%90%EB%A3%8C/%EA%B8%B0%EC%A4%80%EB%B3%B8%EB%AC%B8/09_RAG/17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.md">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html"><small>이전 장</small>16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a><a rel="next" href="%EC%9A%A9%EC%96%B4%EC%A7%91.html"><small>다음 장</small>RAG 용어집</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

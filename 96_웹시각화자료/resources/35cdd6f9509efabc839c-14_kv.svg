@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="516.6pt" height="286.056pt" viewBox="0 0 516.6 286.056" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-09T12:12:48.766496</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 286.056
+L 516.6 286.056
+L 516.6 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 19.755 122.382144
+L 135.261 122.382144
+Q 136.2654 122.382144 136.2654 121.29552
+L 136.2654 61.5312
+Q 136.2654 60.444576 135.261 60.444576
+L 19.755 60.444576
+Q 18.7506 60.444576 18.7506 61.5312
+L 18.7506 121.29552
+Q 18.7506 122.382144 19.755 122.382144
+z
+" clip-path="url(#pa6254ba921)" style="fill: #e8f1f8; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 185.481 122.382144
+L 311.031 122.382144
+Q 312.0354 122.382144 312.0354 121.29552
+L 312.0354 61.5312
+Q 312.0354 60.444576 311.031 60.444576
+L 185.481 60.444576
+Q 184.4766 60.444576 184.4766 61.5312
+L 184.4766 121.29552
+Q 184.4766 122.382144 185.481 122.382144
+z
+" clip-path="url(#pa6254ba921)" style="fill: #e8f1f8; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 19.755 236.477664
+L 135.261 236.477664
+Q 136.2654 236.477664 136.2654 235.39104
+L 136.2654 175.62672
+Q 136.2654 174.540096 135.261 174.540096
+L 19.755 174.540096
+Q 18.7506 174.540096 18.7506 175.62672
+L 18.7506 235.39104
+Q 18.7506 236.477664 19.755 236.477664
+z
+" clip-path="url(#pa6254ba921)" style="fill: #fff0da; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 185.481 236.477664
+L 311.031 236.477664
+Q 312.0354 236.477664 312.0354 235.39104
+L 312.0354 175.62672
+Q 312.0354 174.540096 311.031 174.540096
+L 185.481 174.540096
+Q 184.4766 174.540096 184.4766 175.62672
+L 184.4766 235.39104
+Q 184.4766 236.477664 185.481 236.477664
+z
+" clip-path="url(#pa6254ba921)" style="fill: #e8f1f8; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 363.762 236.477664
+L 491.823 236.477664
+Q 492.8274 236.477664 492.8274 235.39104
+L 492.8274 175.62672
+Q 492.8274 174.540096 491.823 174.540096
+L 363.762 174.540096
+Q 362.7576 174.540096 362.7576 175.62672
+L 362.7576 235.39104
+Q 362.7576 236.477664 363.762 236.477664
+z
+" clip-path="url(#pa6254ba921)" style="fill: #e9f3e9; stroke: #385269; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Malgun Gothic'; text-anchor: start" x="17.244" y="23.49936" transform="rotate(-0 17.244 23.49936)">KV cache: 새로 계산할 값과 계속 읽을 값</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(36.729563 88.964141)">Prefill 입력 A B</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(32.520188 101.708985)">각 층의 K·V 계산</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(206.690063 89.011016)">보존한 과거 KV</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(203.46225 101.66211)">[A의 KV, B의 KV]</text>
+   </g>
+   <g id="patch_7">
+    <path d="M 139.772034 91.41336
+Q 160.370429 91.41336 178.956363 91.41336
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 174.156363 89.01336
+L 178.956363 91.41336
+L 174.156363 93.81336
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(51.480188 203.106536)">새 토큰 C</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(34.676438 215.75763)">Q·K·V 새로 계산</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(194.771625 203.197474)">캐시에 C의 KV 추가</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(210.826313 215.848567)">[A, B, C의 KV]</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 139.772034 205.50888
+Q 160.370429 205.50888 178.956363 205.50888
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 174.156363 203.10888
+L 178.956363 205.50888
+L 174.156363 207.90888
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 248.256 126.014681
+Q 248.256 148.462056 248.256 168.89697
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 250.656 164.09697
+L 248.256 168.89697
+L 245.856 164.09697
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(367.558125 203.106536)">C의 Q로 전체 KV 조회</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(373.464375 215.75763)">다음 토큰 분포 계산</text>
+   </g>
+   <g id="patch_10">
+    <path d="M 315.542493 205.50888
+Q 337.396594 205.50888 357.238234 205.50888
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 352.438234 203.10888
+L 357.238234 205.50888
+L 352.438234 207.90888
+" style="fill: none; stroke: #385269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(366.273 83.577896)">과거 K·V 재계산 생략</text>
+    <text style="font-size: 12px; font-family: 'Malgun Gothic'" transform="translate(366.273 96.22899)">과거 K·V 읽기는 유지</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 11px; font-family: 'Malgun Gothic'; text-anchor: start" x="22.266" y="267.98976" transform="rotate(-0 22.266 267.98976)">화살표: 데이터 전달 / 색과 라벨로 기존·신규·출력 구별</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pa6254ba921">
+   <rect x="7.2" y="7.2" width="502.2" height="271.656"/>
+  </clipPath>
+ </defs>
+</svg>

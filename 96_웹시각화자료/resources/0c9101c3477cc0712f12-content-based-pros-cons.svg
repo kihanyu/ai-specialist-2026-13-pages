@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="448" viewBox="0 0 720 448" role="img" aria-labelledby="title desc">
+<title id="title">콘텐츠 기반 추천의 장점과 한계</title>
+<desc id="desc">다른 사람의 기록 없이 독특한 취향과 신작을 반영하고 이유를 설명할 수 있다. 반면 새 사용자의 취향이나 적절한 콘텐츠 특징이 부족하면 어렵고, 비슷한 항목에 치우칠 수 있다.</desc>
+<rect x="1" y="1" width="718" height="446" rx="16" fill="#f8fafc" stroke="#cbd5e1"/>
+<g font-family="Malgun Gothic, Noto Sans CJK KR, sans-serif" fill="#152c45">
+<text x="24" y="37" font-size="24" font-weight="700">콘텐츠 기반 추천의 장점과 한계</text>
+<text x="24" y="65" font-size="15">사용자 취향과 영화 속성을 비교하는 방식</text>
+<rect x="24" y="84" width="324" height="39" rx="9" fill="#dff4ea"/>
+<rect x="372" y="84" width="324" height="39" rx="9" fill="#ffebd9"/>
+<text x="38" y="110" font-size="19" font-weight="700" fill="#135840">장점 · 언제 잘 작동하나</text>
+<text x="386" y="110" font-size="19" font-weight="700" fill="#8b431d">한계 · 언제 추천이 막히나</text>
+<rect x="24" y="135" width="324" height="57" rx="9" fill="#eef9f3" stroke="#b9d8c7"/>
+<text x="38" y="158" font-size="16" font-weight="700">다른 사용자 기록 없이 시작</text>
+<text x="38" y="179" font-size="14">내 기록이나 직접 고른 관심사로 추천</text>
+<rect x="372" y="135" width="324" height="57" rx="9" fill="#fff6eb" stroke="#e4c9ad"/>
+<text x="386" y="158" font-size="16" font-weight="700">새 사용자는 취향을 모름</text>
+<text x="386" y="179" font-size="14">기록도 선택한 관심사도 없으면 어려움</text>
+<rect x="24" y="202" width="324" height="57" rx="9" fill="#eef9f3" stroke="#b9d8c7"/>
+<text x="38" y="225" font-size="16" font-weight="700">독특한 취향도 반영</text>
+<text x="38" y="246" font-size="14">인기보다 내 프로필과의 유사도를 봄</text>
+<rect x="372" y="202" width="324" height="57" rx="9" fill="#fff6eb" stroke="#e4c9ad"/>
+<text x="386" y="225" font-size="16" font-weight="700">좋은 특징을 고르기 어려움</text>
+<text x="386" y="246" font-size="14">장르만 쓰면 작품 분위기의 차이를 놓침</text>
+<rect x="24" y="269" width="324" height="57" rx="9" fill="#eef9f3" stroke="#b9d8c7"/>
+<text x="38" y="292" font-size="16" font-weight="700">신작·비인기 영화도 비교</text>
+<text x="38" y="313" font-size="14">평점이 없어도 장르·줄거리가 있으면 가능</text>
+<rect x="372" y="269" width="324" height="57" rx="9" fill="#fff6eb" stroke="#e4c9ad"/>
+<text x="386" y="292" font-size="16" font-weight="700">비슷한 영화에 치우칠 수 있음</text>
+<text x="386" y="313" font-size="14">프로필에 없는 장르는 순위에서 밀림</text>
+<rect x="24" y="336" width="324" height="57" rx="9" fill="#eef9f3" stroke="#b9d8c7"/>
+<text x="38" y="359" font-size="16" font-weight="700">추천 이유를 설명하기 쉬움</text>
+<text x="38" y="380" font-size="14">예: “즐겨 본 영화와 같은 모험 장르”</text>
+
+<text x="24" y="425" font-size="15" font-weight="700">기억할 점: 영화의 기록이 없는 것과 사용자의 취향을 모르는 것은 다르다.</text>
+</g></svg>

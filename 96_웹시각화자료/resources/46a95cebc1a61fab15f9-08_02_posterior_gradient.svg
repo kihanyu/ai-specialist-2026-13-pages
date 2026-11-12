@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="810" viewBox="0 0 1200 810" role="img" aria-labelledby="title desc">
+<title id="title">정답을 본 뒤의 문서 기여도가 검색 점수를 가르친다</title><desc id="desc">문서 사전확률 .6 .3 .1에 비해 posterior responsibility는 .9375 .046875 .015625이다. score gradient는 prior minus responsibility이며 첫 문서점수는 증가한다.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+<rect width="1200" height="810" fill="white"/>
+<text x="40" y="52" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="32" fill="#172b4d" font-weight="700" text-anchor="start">정답을 본 뒤의 문서 기여도가 검색 점수를 가르친다</text>
+<text x="40" y="98" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#475569" font-weight="400" text-anchor="start">선택한 Top-k 집합 고정 · 내부 softmax 정규화 · 정답 가능도 0.32</text>
+<rect x="45" y="125" width="640" height="55" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="65" y="141" width="24" height="24" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<text x="103" y="161" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#172b4d" font-weight="400" text-anchor="start">검색 사전확률 pη</text>
+<rect x="385" y="141" width="24" height="24" rx="3" fill="#0f766e" stroke="#0f766e" stroke-width="2"/>
+<text x="423" y="161" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#172b4d" font-weight="400" text-anchor="start">정답 기여도 r</text>
+<text x="45" y="255" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="28" fill="#172b4d" font-weight="700" text-anchor="start">z₁</text>
+<rect x="110" y="220" width="490" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="110" y="220" width="294.0" height="38" rx="4" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<text x="625" y="249" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#2563eb" font-weight="700" text-anchor="start">0.6</text>
+<rect x="110" y="272" width="490" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="110" y="272" width="459.375" height="38" rx="4" fill="#0f766e" stroke="#0f766e" stroke-width="2"/>
+<text x="625" y="301" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#0f766e" font-weight="700" text-anchor="start">0.9375</text>
+<rect x="800" y="214" width="350" height="105" rx="12" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+<text x="820" y="249" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#172b4d" font-weight="700" text-anchor="start">∂L/∂s = −0.337500</text>
+<text x="820" y="290" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#b45309" font-weight="700" text-anchor="start">경사하강 후 점수 ↑</text>
+<text x="45" y="405" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="28" fill="#172b4d" font-weight="700" text-anchor="start">z₂</text>
+<rect x="110" y="370" width="490" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="110" y="370" width="147.0" height="38" rx="4" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<text x="625" y="399" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#2563eb" font-weight="700" text-anchor="start">0.3</text>
+<rect x="110" y="422" width="490" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="110" y="422" width="22.96875" height="38" rx="4" fill="#0f766e" stroke="#0f766e" stroke-width="2"/>
+<text x="625" y="451" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#0f766e" font-weight="700" text-anchor="start">0.046875</text>
+<rect x="800" y="364" width="350" height="105" rx="12" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+<text x="820" y="399" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#172b4d" font-weight="700" text-anchor="start">∂L/∂s = +0.253125</text>
+<text x="820" y="440" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#b45309" font-weight="700" text-anchor="start">경사하강 후 점수 ↓</text>
+<text x="45" y="555" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="28" fill="#172b4d" font-weight="700" text-anchor="start">z₃</text>
+<rect x="110" y="520" width="490" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="110" y="520" width="49.0" height="38" rx="4" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<text x="625" y="549" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#2563eb" font-weight="700" text-anchor="start">0.1</text>
+<rect x="110" y="572" width="490" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="110" y="572" width="7.65625" height="38" rx="4" fill="#0f766e" stroke="#0f766e" stroke-width="2"/>
+<text x="625" y="601" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="24" fill="#0f766e" font-weight="700" text-anchor="start">0.015625</text>
+<rect x="800" y="514" width="350" height="105" rx="12" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+<text x="820" y="549" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#172b4d" font-weight="700" text-anchor="start">∂L/∂s = +0.084375</text>
+<text x="820" y="590" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="23" fill="#b45309" font-weight="700" text-anchor="start">경사하강 후 점수 ↓</text>
+<rect x="45" y="697" width="1105" height="76" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<text x="65" y="729" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="25" fill="#172b4d" font-weight="700" text-anchor="start">r(z₁) = 0.300 / 0.320 = 0.9375</text>
+<text x="65" y="761" font-family="Malgun Gothic, Noto Sans KR, sans-serif" font-size="22" fill="#475569" font-weight="400" text-anchor="start">부호를 읽기: 음수 gradient를 빼면 점수는 올라간다. ID 선택까지 미분한 것은 아니다.</text>
+</svg>

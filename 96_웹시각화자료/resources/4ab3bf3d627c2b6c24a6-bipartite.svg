@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="318" viewBox="0 0 740 318" role="img" aria-labelledby="title desc">
+  <title id="title">상호작용 3개로 이어지는 3-hop 경로</title>
+  <desc id="desc">사용자 u0에서 영화 i0, 사용자 u1, 영화 i1 순으로 관측 간선 세 개가 연결된다. u0와 i1의 점선은 아직 관측되지 않아 전파에 사용하지 않는 추천 후보다.</desc>
+  <rect x="1" y="1" width="738" height="316" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <g font-family="Malgun Gothic, Noto Sans CJK KR, sans-serif" fill="#172554">
+    <text x="28" y="39" font-size="22" font-weight="700">관측 간선 세 개로 간접 단서를 얻는다</text>
+    <text x="28" y="66" font-size="15">아래 실선을 번호 순으로 따라가면 u0 → i0 → u1 → i1이다.</text>
+    <path d="M111 146L281 204L453 146L625 204" fill="none" stroke="#0f766e" stroke-width="4"/>
+    <path d="M111 146 C220 66 552 72 625 204" fill="none" stroke="#475569" stroke-width="2.5" stroke-dasharray="7 6"/>
+    <g text-anchor="middle" font-size="15" font-weight="700">
+      <rect x="313" y="80" width="109" height="26" rx="7" fill="#f8fafc"/>
+      <text x="367" y="98">미관측 후보</text>
+      <rect x="69" y="125" width="84" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8"/>
+      <rect x="239" y="183" width="84" height="42" rx="10" fill="#dcfce7" stroke="#15803d"/>
+      <rect x="411" y="125" width="84" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8"/>
+      <rect x="583" y="183" width="84" height="42" rx="10" fill="#dcfce7" stroke="#15803d"/>
+      <text x="111" y="152">사용자 u0</text><text x="281" y="210">영화 i0</text>
+      <text x="453" y="152">사용자 u1</text><text x="625" y="210">영화 i1</text>
+      <g fill="#134e4a">
+        <text x="193" y="160">1</text><text x="365" y="158">2</text><text x="537" y="160">3</text>
+      </g>
+    </g>
+    <path d="M30 266H72" stroke="#0f766e" stroke-width="4"/>
+    <text x="82" y="272" font-size="15">관측 간선: 양방향으로 전파</text>
+    <path d="M350 266H392" stroke="#475569" stroke-width="2.5" stroke-dasharray="7 6"/>
+    <text x="402" y="272" font-size="15">미관측 후보: 전파 입력에 넣지 않음</text>
+  </g>
+</svg>

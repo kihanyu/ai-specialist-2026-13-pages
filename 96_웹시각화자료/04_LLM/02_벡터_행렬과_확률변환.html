@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>02. 벡터·행렬과 확률 변환 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html" aria-current="page">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>02. 벡터·행렬과 확률 변환</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>내적과 코사인, 행렬의 출력 shape를 구분한다.</li><li>가중합·비선형 변환·softmax의 연결을 계산한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-temperature" id="lab-llm-temperature"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-벡터는-값을-묶고-덧셈은-성분별로-한다">1. 벡터는 값을 묶고, 덧셈은 성분별로 한다</a></li><li><a href="#sec-2-내적은-길이와-방향을-코사인은-방향을-비교한다">2. 내적은 길이와 방향을, 코사인은 방향을 비교한다</a></li><li><a href="#sec-3-행렬은-어떤-연산을-하느냐에-따라-결과가-달라진다">3. 행렬은 어떤 연산을 하느냐에 따라 결과가 달라진다</a></li><li><a href="#sec-4-가중합은-예측을-만들고-손실은-예측의-오차를-잰다">4. 가중합은 예측을 만들고, 손실은 예측의 오차를 잰다</a></li><li><a href="#sec-5-활성화는-선형층-사이에-비선형성을-넣는다">5. 활성화는 선형층 사이에 비선형성을 넣는다</a></li><li><a href="#sec-6-지수로그를-거쳐-점수를-확률로-바꾼다">6. 지수·로그를 거쳐 점수를 확률로 바꾼다</a></li><li><a href="#sec-7-확인-질문과-해설">7. 확인 질문과 해설</a></li><li><a href="#sec-페이지별-상세-읽기">페이지별 상세 읽기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-02-벡터행렬과-확률-변환">02. 벡터·행렬과 확률 변환</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">다음: 신경망과 역전파</a></p>
+<p>LLM은 숫자 목록으로 표현한 입력을 변환하고, 후보별 점수를 구한 다음 확률로 바꾼다. 이 장에서는 <strong>목록 → 가중합 → 비선형 변환 → 확률</strong>을 손으로 계산한다. 사칙연산과 좌표를 알면 시작할 수 있다. 처음에는 1~6절을 순서대로 읽고, 복습할 때에는 끝의 확인 문제에서 시작하자. 학습 목표는 내적과 코사인을 구별하고, 행렬의 출력 크기를 예측하며, softmax의 확률을 계산하는 것이다.</p>
+<p>원문 범위는 파일 순서 31~45쪽이다. <strong>원문</strong>은 슬라이드에서 확인한 내용, <strong>보충</strong>은 독립 학습을 위한 예제·조건, <strong>정정</strong>은 계산이나 해석의 수정이다. 이 구분은 다음 세 장에서도 같다. 아래의 추가 숫자는 교육용 예이며 실제 모델 측정값이 아니다.</p>
+<p><a id="vector"></a></p>
+<h2 id="sec-1-벡터는-값을-묶고-덧셈은-성분별로-한다">1. 벡터는 값을 묶고, 덧셈은 성분별로 한다</h2>
+<p>스칼라는 숫자 하나, 벡터는 순서가 있는 숫자 목록, 행렬은 행과 열을 가진 숫자 표다. 이 장에서 텐서는 이러한 배열을 여러 축으로 확장한 표현이다. 3성분 벡터의 <strong>성분 수 3</strong>과 3개 축을 가진 <strong>3차 텐서</strong>를 혼동하지 않는다. 벡터 <code>(2,3)</code>은 좌표 평면에서 원점에서 <code>(2,3)</code>으로 향하는 화살표로 그릴 수 있다. 데이터에서 각 성분이 무엇을 뜻하는지는 별도의 정의가 필요하다.</p>
+<p>원문 그림에서 빨간 벡터를 이동한 초록 벡터와 이어 보자. 끝점은 어디인가?</p>
+<p><img alt="원점에서 출발한 (2,3), (4,1)과 두 벡터의 합 (6,4); 청록색은 두 번째 벡터를 평행이동한 화살표" decoding="async" id="figure-1" loading="lazy" src="../resources/89db31bb76cbbea1f508-p032_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/89db31bb76cbbea1f508-p032_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>빨강 <code>(2,3)</code>에 초록 <code>(4,1)</code>을 더하면 파랑 <code>(6,4)</code>다. 청록 화살표는 초록 벡터를 <code>(2,3)</code>에서 시작하도록 옮긴 것으로 길이와 방향은 같다. 덧셈은 같은 좌표계·같은 성분 수에서 <code>(2+4,3+1)</code>로 계산한다. 축의 단위가 다르면 각 성분의 단위를 유지한다. 크기나 의미가 다른 목록을 임의로 더하지 않는다.</p>
+<p><a id="similarity"></a></p>
+<h2 id="sec-2-내적은-길이와-방향을-코사인은-방향을-비교한다">2. 내적은 길이와 방향을, 코사인은 방향을 비교한다</h2>
+<p>내적 <code>a·b=Σᵢaᵢbᵢ</code>는 대응 성분끼리 곱한 뒤 더한 <strong>스칼라</strong>다. 기하학적으로 <code>a·b=||a|| ||b|| cosθ</code>이며 <code>||a||=√Σᵢaᵢ²</code>는 유클리드 길이다. 두 영벡터가 아닌 벡터가 이루는 각도가 예각이면 양수, 직각이면 0, 둔각이면 음수다. ‘같은 방향/반대 방향’은 그 양끝 사례다.</p>
+<p>원문은 가상의 두 특징 Tech와 Fruitness로 체리 <code>(1,4)</code>, 오렌지 <code>(0,3)</code>, 휴대전화 <code>(3,0)</code>를 놓는다. 그림의 선은 물체 간 이동거리를 재는 선이 아니라 비교하는 쌍을 표시한다.</p>
+<p><img alt="Tech 가로축과 Fruitness 세로축의 세 물체, 체리-오렌지 내적 12, 체리-전화 3, 오렌지-전화 0의 성분별 계산" decoding="async" id="figure-2" loading="lazy" src="../resources/8dc4b7f0e1dfe384e45b-p034_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/8dc4b7f0e1dfe384e45b-p034_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>오른쪽 계산을 읽으면 <code>1×0+4×3=12</code>, <code>1×3+4×0=3</code>, <code>0×3+3×0=0</code>이다. 이는 사람이 정한 특징 예시이며 실제 의미 임베딩의 측정값이 아니다. ‘내적이 크다’는 길이도 크다는 뜻일 수 있으므로 의미 유사성만의 증거로 쓰면 안 된다.</p>
+<p>코사인 유사도 <code>cos(a,b)=(a·b)/(||a||||b||)</code>는 길이를 나누어 방향만 남긴다. 같은 세 쌍을 길이로 나누면 무엇이 달라지는지 보자.</p>
+<p><img alt="같은 물체쌍을 각도로 비교한 그림: 체리-오렌지 약 0.97, 체리-전화 약 0.24, 오렌지-전화 0" decoding="async" id="figure-3" loading="lazy" src="../resources/f552509739d09639f948-p035_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/f552509739d09639f948-p035_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>체리 길이는 <code>√17</code>, 오렌지는 3, 전화는 3이다. 따라서 <code>12/(3√17)=0.9701</code>, <code>3/(3√17)=0.2425</code>, 마지막은 0이다. 그림의 14°, 76°는 반올림한 각도다. 출처 표시는 원문 그림의 Serrano.Academy를 보존했다. 연결 영상의 발언은 재구성하지 않았다.</p>
+<p><strong>보충 예제:</strong> <code>a=(1,2), b=(2,0)</code>이면 내적 2, 코사인 <code>1/√5≈0.4472</code>다. <code>b</code>를 <code>(6,0)</code>으로 바꾸면 내적 6, 코사인은 같다. 각 벡터를 자기 길이로 나눈 단위 벡터끼리는 길이가 모두 1이라 내적과 코사인이 같다. 영벡터는 분모가 0이므로 코사인이 정의되지 않는다. 정규화하지 않은 벡터에서 두 값을 같다고 둘 수 없다.</p>
+<p><a id="matrix"></a></p>
+<h2 id="sec-3-행렬은-어떤-연산을-하느냐에-따라-결과가-달라진다">3. 행렬은 어떤 연산을 하느냐에 따라 결과가 달라진다</h2>
+<p><code>A=[[1,2],[3,4]]</code>, 단위행렬 <code>I=[[1,0],[0,1]]</code>로 시작한다. <strong>원문</strong>의 요소별 곱 <code>A*I</code>는 같은 위치끼리 곱하여 <code>[[1,0],[0,4]]</code>다. 행렬 곱 <code>A@I</code>는 앞의 행과 뒤의 열을 내적하므로 <code>A</code> 그대로다. <code>@</code>와 <code>*</code>는 이 문서의 구분 표기이며 다른 수학 문헌에서는 기호 관례가 다를 수 있다.</p>
+<p>행렬 곱의 크기 규칙은 <code>[m,n]@[n,p]→[m,p]</code>다. 가운데 차원은 내적으로 더하는 성분 수라서 같아야 한다. <strong>보충</strong>으로 <code>B=[[2,0],[1,3]]</code>를 사용하면:</p>
+<pre><code class="language-text">AB[1,1]=1×2+2×1=4     AB[1,2]=1×0+2×3=6
+AB[2,1]=3×2+4×1=10    AB[2,2]=3×0+4×3=12
+AB=[[4,6],[10,12]]
+A*B=[[2,0],[3,12]]
+BA=[[2,4],[10,14]]  (일반적으로 AB≠BA)
+</code></pre>
+<p>덧셈도 같은 위치끼리 하므로 원문의 <code>A+[[10,20],[30,40]]=[[11,22],[33,44]]</code>이다. 전치 <code>Aᵀ</code>는 행과 열을 맞바꾸어 <code>[[1,3],[2,4]]</code>가 된다. 일반적으로 2×3 표는 전치하면 3×2다. 여기서는 자동 크기 확장(broadcasting)을 사용하지 않는다.</p>
+<p>회전 행렬은 행렬이 숫자 표 이상의 <strong>변환</strong>이라는 것을 보여준다. 열벡터에 왼쪽에서 곱할 때 반시계 회전은 <code>R(θ)=[[cosθ,-sinθ],[sinθ,cosθ]]</code>다.</p>
+<pre><code class="language-text">[x',y']ᵀ = R(θ)[x,y]ᵀ
+x'=x cosθ-y sinθ
+y'=x sinθ+y cosθ
+θ=90°, (x,y)=(1,0) → (0,1)
+</code></pre>
+<p>원문의 회전 그림에서 실제로 보이는 각도와 범례를 확인하자.</p>
+<p><img alt="Angle 0도, XY 1.00과 0.00을 표시한 회전 예시의 정지 화면; 파랑 Original Point와 빨강 Rotated Point 범례 및 x,y축" decoding="async" id="figure-4" loading="lazy" src="../resources/060af1d32f9cfb8b273a-p038_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/060af1d32f9cfb8b273a-p038_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>현재 프레임은 0°라 두 점이 겹친다. 원문 캡션은 10°씩 증가한다고 안내하지만 PDF 안에서 모든 프레임을 확인한 것은 아니다. 직접 90°를 대입하면 회전을 확인할 수 있다. 회전은 길이를 보존한다. 이후 행벡터 <code>xW</code>를 사용할 때 같은 변환을 나타내려면 행렬을 전치해야 한다. 원문 그림의 출처 표기는 xoft.tistory.com/109이며 이 교재의 유도는 위 식으로 완결된다.</p>
+<p><a id="affine"></a></p>
+<h2 id="sec-4-가중합은-예측을-만들고-손실은-예측의-오차를-잰다">4. 가중합은 예측을 만들고, 손실은 예측의 오차를 잰다</h2>
+<p>한 뉴런은 입력 성분 <code>xᵢ</code>를 가중치 <code>wᵢ</code>와 곱해 <code>z=Σᵢwᵢxᵢ+b</code>를 만든다. 가중치는 각 입력이 출력에 기여하는 정도, 편향 <code>b</code>는 입력과 별도로 더하는 값이다. <code>x=(1,2), w=(2,-1), b=0.5</code>라면 <code>z=0.5</code>다. 원문 39쪽의 <code>Wᵀx+b</code>는 열벡터 관례이며, 표기보다 각 항의 크기를 먼저 맞추어야 한다. 편향이 있으면 엄밀히 아핀 함수이지만 신경망에서는 관례상 선형층이라고 부른다.</p>
+<p>원문의 <code>y</code>는 실제값, <code>ŷ</code>는 예측값, <code>ȳ</code>는 평균값이다. 세 값은 다른 역할이다. 평균제곱오차 <code>MSE=(1/N)Σᵢ(yᵢ-ŷᵢ)²</code>는 N개 표본의 오차 제곱 평균이다. <code>y=(2,4), ŷ=(1,6)</code>이면 <code>(1+4)/2=2.5</code>다.</p>
+<p>아래 두 그래프의 가로축이 서로 다르다는 점을 먼저 보자.</p>
+<p><img alt="왼쪽 집 크기와 가격의 회귀선 및 잔차, 오른쪽 파라미터 a와 비용 J의 곡선, 아래 MSE 식" decoding="async" id="figure-5" loading="lazy" src="../resources/ed358a9c264eb064ae3a-p040_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-5" type="button">그림 확대</button><a href="../resources/ed358a9c264eb064ae3a-p040_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽은 입력 크기와 실제 가격을 비교하고, 점에서 선까지의 세로 차이가 예측 오차다. 오른쪽은 데이터를 그리는 대신 파라미터 <code>a</code>를 바꿀 때 손실 <code>J</code>가 어떻게 변하는지 그린다. 경사하강법은 이 손실을 낮추는 방향으로 파라미터를 움직인다. 입력 축을 따라 움직이는 일이 아니다. 실제 갱신 계산은 <a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html#scalar">다음 장</a>에서 한다.</p>
+<p><a id="activation"></a></p>
+<h2 id="sec-5-활성화는-선형층-사이에-비선형성을-넣는다">5. 활성화는 선형층 사이에 비선형성을 넣는다</h2>
+<p>아핀층만 여러 번 연결하면 <code>W₂(W₁x+b₁)+b₂=(W₂W₁)x+(W₂b₁+b₂)</code>처럼 하나의 아핀층으로 합쳐진다. 층 수만 늘려서는 이 형태를 벗어나지 못한다. 활성화함수는 가중합 <code>z</code>를 다른 값 <code>h=f(z)</code>로 바꾸어 비선형 패턴을 표현하게 한다.</p>
+<p>원문 그림에서는 직선 경계와 휘어진 경계가 어떤 점들을 분리하는지 비교한다.</p>
+<p><img alt="활성화 없는 위쪽 신경망의 직선 분류 경계와 비선형 활성화가 있는 아래쪽 신경망의 휘어진 분류 경계" decoding="async" id="figure-6" loading="lazy" src="../resources/50cd008e0299807676a8-p041_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-6" type="button">그림 확대</button><a href="../resources/50cd008e0299807676a8-p041_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽 입력은 고양이, 출력은 Dog와 Cat으로 표시되어 있다. 오른쪽 산점도는 개념 그림이며 실제 정확도 수치는 없다. 아래쪽 곡선은 더 복잡한 구분을 표현할 수 있다는 뜻이지 비선형 함수를 넣으면 반드시 정확해진다는 보장은 아니다.</p>
+<p>다음 네 그래프는 가로축 입력과 세로축 출력을 비교한다. 음수 입력의 출력부터 보자.</p>
+<p><img alt="Sigmoid, Tanh, ReLU, LeakyReLU α=0.2의 수식과 입력-출력 그래프 네 개" decoding="async" id="figure-7" loading="lazy" src="../resources/ce175046a5724b7c6b31-p042_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-7" type="button">그림 확대</button><a href="../resources/ce175046a5724b7c6b31-p042_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>함수</th>
+<th>정의와 범위</th>
+<th>z=0일 때</th>
+<th>역할과 한계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sigmoid</td>
+<td><code>1/(1+e^(-z))</code>, 0과 1 사이</td>
+<td>0.5</td>
+<td>한 점수를 부드럽게 제한한다. 양끝에서 기울기가 작다.</td>
+</tr>
+<tr>
+<td>tanh</td>
+<td><code>(e^z-e^(-z))/(e^z+e^(-z))</code>, -1과 1 사이</td>
+<td>0</td>
+<td>부호를 유지하며 제한한다. 양끝에서 포화한다.</td>
+</tr>
+<tr>
+<td>ReLU</td>
+<td><code>max(0,z)</code></td>
+<td>0</td>
+<td>양수는 통과시키고 음수는 0으로 만든다. 음수 구간의 기울기는 0이다.</td>
+</tr>
+<tr>
+<td>LeakyReLU</td>
+<td>양수는 z, 음수는 αz; 원문 α=0.2</td>
+<td>0</td>
+<td>음수에도 작은 기울기를 둔다. α는 설정값이다.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>보충 활동:</strong> 입력 -2, 2에서 ReLU는 0, 2이고 LeakyReLU(0.2)는 -0.4, 2다. sigmoid(-2)≈0.1192, sigmoid(2)≈0.8808이다. sigmoid 미분은 <code>σ(z)(1-σ(z))</code>이며 0에서 0.25다. ReLU의 0 지점은 수학적으로 미분 불가능하므로 구현은 그 지점의 규칙을 정한다. 모든 활성화 출력을 자동으로 ‘정답일 확률’이라고 해석하지 않는다. 확률 해석에는 학습 목표와 출력 구성도 필요하다.</p>
+<p><a id="probability"></a></p>
+<h2 id="sec-6-지수로그를-거쳐-점수를-확률로-바꾼다">6. 지수·로그를 거쳐 점수를 확률로 바꾼다</h2>
+<p>지수함수 <code>e^z</code>는 실수 점수를 양수로 만든다. 원문 점수 10, 8, 1은 각각 약 22026.47, 2980.96, 2.718이 된다. 점수 차이 2가 지수값의 비 <code>e²≈7.39</code>로 바뀐다. 큰 지수는 수치 범위를 넘을 수 있다. 자연로그 <code>ln</code>은 지수함수의 역함수로, 양수 a,b에서 <code>ln(ab)=ln a+ln b</code>, <code>ln(a/b)=ln a-ln b</code>다. <code>d(e^z)/dz=e^z</code>, <code>d(ln z)/dz=1/z</code>이며 로그 미분은 z&gt;0에서 쓴다.</p>
+<p><strong>정정·조건:</strong> 로그를 취했다고 모든 계산이 무조건 빨라지는 것은 아니다. 긴 확률 곱을 로그의 합으로 다루면 매우 작은 수가 0으로 떨어지는 언더플로 문제를 줄이는 것이 핵심이다. ‘틀릴 때 강한 피드백’은 로그 자체보다 정답 확률에 대한 손실 <code>-ln p</code>의 성질이다. 이 손실은 <a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html#ce">4장</a>에서 계산한다.</p>
+<p>logit은 정규화 전의 점수다. Softmax는 K개 점수를 <strong>함께</strong> 바꾼다.</p>
+<pre><code class="language-text">pᵢ = exp(zᵢ) / Σⱼ exp(zⱼ)
+z=(ln2,0) → exp(z)=(2,1) → p=(2/3,1/3)
+</code></pre>
+<p>모든 확률이 양수이고 합이 1이 된다. 하나의 점수를 바꾸면 공통 분모를 통해 다른 후보의 확률도 달라진다. 같은 상수 c를 모든 점수에서 빼면 분자·분모의 <code>e^(-c)</code>가 약분된다. 계산할 때 c를 최댓값으로 잡으면 큰 지수 계산을 피할 수 있다. 유한한 실수 logits를 전제하며 결측값·무한대 입력은 별도 처리가 필요하다.</p>
+<p>원문 45쪽에서 값과 후보의 대응을 읽자.</p>
+<p><img alt="고양이 72.2%, 강아지 16.1%, 새 3.6%, 물고기 5.9%, 토끼 2.2%의 softmax 막대와 각각의 logit 2.5, 1.0, -0.5, 0, -1.0" decoding="async" id="figure-8" loading="lazy" src="../resources/4c1eb7c9fb02e532c189-p045_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-8" type="button">그림 확대</button><a href="../resources/4c1eb7c9fb02e532c189-p045_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>다섯 지수값의 합으로 나누면 고양이 약 0.7219, 강아지 0.1611, 새 0.0359, 물고기 0.0593, 토끼 0.0218이다. 그림의 ‘선택됨’은 최대 확률을 선택하는 예시이며 softmax 자체는 확률까지만 계산한다.</p>
+<p>sigmoid를 각각 적용하면 약 <code>(0.9241,0.7311,0.3775,0.5000,0.2689)</code>로 합이 1이 아니다. 여러 라벨의 각 확률을 따로 표현할 때 이 차이가 중요하다. <strong>정정:</strong> 45쪽 하단 sigmoid 화면은 페이지 밖으로 잘렸으며 보이는 고양이 72.2%는 <code>σ(2.5)=92.4%</code>와 일치하지 않는다. 누락된 화면을 추정 복원하지 않고 이 계산으로 대체한다.</p>
+<p>두 클래스 softmax에서는 <code>p₁=e^z₁/(e^z₁+e^z₂)=1/(1+e^(-(z₁-z₂)))=σ(z₁-z₂)</code>다. sigmoid 입력은 첫 점수 하나가 아니라 <strong>두 점수의 차이</strong>다. 예를 들어 <code>(2,2)</code>의 softmax는 <code>(0.5,0.5)</code>이지만 각 점수의 sigmoid는 모두 약 0.8808이다.</p>
+<p><a id="check"></a></p>
+<h2 id="sec-7-확인-질문과-해설">7. 확인 질문과 해설</h2>
+<p>먼저 계산하고 아래 해설과 비교하자. 틀리면 괄호 안 절로 돌아간다.</p>
+<ol>
+<li><code>(1,2)</code>와 <code>(6,0)</code>의 내적과 코사인은? (2절)</li>
+<li><code>[2,3]@[3,4]</code>와 <code>[2,3]@[2,4]</code> 중 가능한 것은? 출력 크기는? (3절)</li>
+<li>활성화 없이 아핀층 두 개를 쌓으면 왜 한 아핀층으로 쓸 수 있는가? (5절)</li>
+<li>logits <code>(0,0,0)</code>의 softmax와 각각의 sigmoid는? (6절)</li>
+<li><code>(ln2,0)</code>에 같은 상수 100을 더하면 softmax는 어떻게 되는가? (6절)</li>
+</ol>
+<p><strong>해설:</strong> 1은 내적 6, 코사인 <code>1/√5≈0.4472</code>다. 2는 첫 곱만 가능하고 <code>[2,4]</code>가 된다. 3은 행렬 곱의 결합법칙과 분배법칙으로 가중치와 편향을 합칠 수 있기 때문이다. 4는 softmax 각각 1/3, sigmoid 각각 1/2이다. 5는 공통 지수 인자가 약분되어 <code>(2/3,1/3)</code> 그대로다. 수학적 동일성과 부동소수점 계산의 안정성은 별개라 실제로는 최댓값을 빼는 방법을 쓴다.</p>
+<h2 id="sec-페이지별-상세-읽기">페이지별 상세 읽기</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p031.html">31 도입</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p032.html">32 덧셈</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p033.html">33 내적 부호</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p034.html">34 내적 예시</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p035.html">35 코사인</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p036.html">36 단위벡터</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p037.html">37 행렬</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p038.html">38 회전</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p039.html">39 선형층</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p040.html">40 MSE</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p041.html">41 비선형성</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p042.html">42 활성화 비교</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p043.html">43 지수·로그</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p044.html">44 softmax 유도</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p045.html">45 확률 비교</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.md">02. 벡터·행렬과 확률 변환 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html"><small>이전 장</small>01. AI의 발전과 사회적 맥락</a><a rel="next" href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html"><small>다음 장</small>03. 신경망과 역전파</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

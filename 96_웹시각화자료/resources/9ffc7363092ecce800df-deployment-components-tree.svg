@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1750" height="1190" viewBox="0 0 1750 1190">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#375c85"/></marker></defs>
+<rect width="100%" height="100%" fill="#f6f8fc"/><text x="35" y="50" font-family="Malgun Gothic,sans-serif" font-size="28" fill="#10243e">온디바이스 실행 구성 — 구성요소의 역할을 구분하는 지도</text>
+<path d="M870.0,250 L290.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M870.0,250 L870.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M870.0,250 L1450.0,370" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M290.0,520 L290.0,650" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M870.0,520 L870.0,650" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<path d="M1450.0,520 L1450.0,650" stroke="#375c85" stroke-width="3" marker-end="url(#arr)"/>
+<rect x="620" y="100" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="636" y="140" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">온디바이스 AI 실행 구성</text>
+<text x="636" y="175" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">모델 + 실행 소프트웨어 + 하드웨어</text>
+<text x="636" y="210" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">각 가지를 함께 맞춰야 실행 가능</text>
+<rect x="40" y="370" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">1. 모델 — 무엇을 계산하는가?</text>
+<text x="56" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">과제 품질과 자원 요구를 결정</text>
+<text x="56" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 2.2–2.3절</text>
+<rect x="620" y="370" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="636" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">2. 실행 소프트웨어 — 어떻게 실행하는가?</text>
+<text x="636" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">모델 준비·변환·연산 호출을 담당</text>
+<text x="636" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 2.4–2.6, 2.8절</text>
+<rect x="1200" y="370" width="500" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1216" y="410" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">3. 하드웨어 — 어디에서 실행하는가?</text>
+<text x="1216" y="445" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">연산·메모리·전력 제약을 제공</text>
+<text x="1216" y="480" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">관련: 2.7–2.8절</text>
+<rect x="40" y="650" width="500" height="240" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="690" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">소형 모델: 과제에 맞는 크기 선택</text>
+<text x="56" y="725" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">모델 압축 수단의 예</text>
+<text x="56" y="760" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">양자화 / pruning / 저랭크 분해</text>
+<text x="56" y="795" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">지식 증류 / 파라미터 공유</text>
+<text x="56" y="830" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">여러 압축 수단을 함께 적용 가능</text>
+<rect x="620" y="650" width="500" height="240" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="636" y="690" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">실행 체계 예: llama.cpp / ExecuTorch</text>
+<text x="636" y="725" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">개발 측: export·compiler·SDK</text>
+<text x="636" y="760" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">장치 측: runtime·backend·driver</text>
+<text x="636" y="795" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">GGUF: 파일 형식 / GGML: 연산 라이브러리</text>
+<text x="636" y="830" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">Hailo 스택: 개발·실행 환경 사례</text>
+<rect x="1200" y="650" width="500" height="240" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="1216" y="690" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">연산 장치 예: CPU / GPU / NPU</text>
+<text x="1216" y="725" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">내부 메모리와 외부 메모리의 협력</text>
+<text x="1216" y="760" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">커널·자료형·대역폭·전력 지원 확인</text>
+<text x="1216" y="795" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">PIM: 메모리 내부·근처 연산 접근</text>
+<text x="1216" y="830" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">PIM은 CPU/GPU/NPU와 다른 설계 관점</text>
+<rect x="40" y="990" width="1660" height="150" rx="15" fill="white" stroke="#557aa4" stroke-width="2"/>
+<text x="56" y="1030" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">읽는 법: 화살표는 구성·예시 관계이며 실행 순서가 아니다. 각 목록은 대표 예이며 서로 배타적인 선택지가 아니다.</text>
+<text x="56" y="1065" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">모델 파일이 작아도 backend가 연산·shape·양자화 형식을 지원하지 않으면 원하는 가속기를 쓰지 못할 수 있다.</text>
+<text x="56" y="1100" font-family="Malgun Gothic,sans-serif" font-size="22" fill="#10243e">실제 준비·실행 순서는 본문의 export·compile·runtime 설명과 기존 흐름도를 함께 읽는다.</text>
+</svg>

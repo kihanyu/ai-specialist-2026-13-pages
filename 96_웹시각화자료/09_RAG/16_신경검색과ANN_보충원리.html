@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/rag-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html" aria-current="page">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>BERT의 MLM·NSP와 검색 정답, ColBERT centroid 후보 축소와 최종 MaxSim을 구분한다.</li><li>metric 전제·(1+ε)-ANN·엄격 α-shortcut witness·수축 상한 φ·충분조건과 구현별 beam 한계를 계산한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="rag-ann-shortcut" id="lab-rag-ann-shortcut"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-bert-사전학습과-검색-정답은-다르다">1. BERT 사전학습과 검색 정답은 다르다</a></li><li><a href="#sec-2-colbert-후보-줄이기와-최종-maxsim">2. ColBERT 후보 줄이기와 최종 MaxSim</a></li><li><a href="#sec-3-ann의-오차-비율은-recall과-다른-정의다">3. ANN의 오차 비율은 recall과 다른 정의다</a></li><li><a href="#sec-4-α-shortcut-간선-선택과-witness">4. α-shortcut 간선 선택과 witness</a></li><li><a href="#sec-5-가까운-방향으로-이동한다는-결론의-유도">5. 가까운 방향으로 이동한다는 결론의 유도</a></li><li><a href="#sec-6-beam-구현의-상태를-따로-확인하기">6. Beam 구현의 상태를 따로 확인하기</a></li><li><a href="#sec-7-확인-질문과-해설">7. 확인 질문과 해설</a></li><li><a href="#sec-출처">출처</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-16-신경검색과-ann-보충-사전학습-목표와-근사-보장의-전제">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</h1>
+<p>원본 전체 대조에서 04·05장보다 상세히 다루는 <strong>BERT의 두 사전학습 목표, centroid 후보 검색, ANN의 α-shortcut 수축 증명</strong>을 이 장에 보완한다. 기존 장의 계산·그림·해설을 그대로 두고 연결하며 실제 신경망·DiskANN을 실행하지 않는다.</p>
+<h2 id="sec-1-bert-사전학습과-검색-정답은-다르다">1. BERT 사전학습과 검색 정답은 다르다</h2>
+<p><code>RAG (Samsung, final).pdf</code> 51~117쪽은 Attention→encoder→decoder→BERT를 단계로 설명한다. Encoder는 입력의 앞뒤 위치를 참조하고, 생성 decoder의 self-attention은 미래 정답을 가린다. Encoder–decoder cross-attention은 decoder 상태에서 query를, encoder 출력에서 key/value를 얻는다. 여러 head는 독립 투영 결과를 연결하고 출력 투영을 거친다. 위치 정보·FFN·잔차·정규화가 더해지며 원본 Post-LN 그림은 정규화 위치가 지정된 한 구조이지 모든 모델의 동일 배치가 아니다.</p>
+<p>원래 BERT의 입력은 token·position·segment embedding 합이다. 쌍 입력의 [CLS], [SEP]와 attention mask의 역할을 구별한다. WordPiece는 부분단어 어휘를 써 희귀 단어를 나누며 단어 수·토큰 수가 항상 같지는 않다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>사전학습/검색 목표</th>
+<th>입력</th>
+<th>정답·손실 위치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MLM</td>
+<td>일부 토큰을 변형한 문장</td>
+<td>선택한 위치의 원래 token ID, 어휘 분포 CE</td>
+</tr>
+<tr>
+<td>NSP</td>
+<td>두 문장과 segment 정보</td>
+<td>두 번째 문장이 이어지는지의 이진 라벨, [CLS] 분류</td>
+</tr>
+<tr>
+<td>검색 contrastive</td>
+<td>질문과 후보 문서들</td>
+<td>후보 중 관련 문서 위치, 행별 softmax CE</td>
+</tr>
+</tbody>
+</table></div>
+<p>원래 BERT의 MLM은 입력 토큰의 일부(논문의15%)를 예측 대상으로 선택하고 그중80%는 [MASK],10%는 다른 임의 토큰,10%는 그대로 둔다. <strong>선택하지 않은 모든 위치를 같은 MLM 정답으로 학습하는 것은 아니다.</strong> NSP는 실제 다음 문장/무작위 문장 사례를 만들어 학습하는 당시 목표이며 모든 후속 encoder가 NSP를 쓴다는 뜻은 아니다. 검색 미세튜닝은 [CLS] 문맥 표현에 관련성 head를 두거나 query/document 벡터 내적에 손실을 연결한다. MLM·NSP 정확도가 높다고 검색 relevance가 자동 보장되지 않는다. <a href="https://arxiv.org/html/1810.04805v2#S3.SS1">BERT 원논문 §3.1</a></p>
+<p>분류는 [CLS]→class logits, 토큰 태깅은 각 위치→label logits, 추출 QA는 시작/끝 위치 점수 같은 출력 head를 연결할 수 있다. 검색은 문서 후보 라벨이라는 별도 과제다. 파라미터를 고정하고 표현만 추출하는 것과 encoder까지 미세튜닝하는 것도 구별한다.</p>
+<h2 id="sec-2-colbert-후보-줄이기와-최종-maxsim">2. ColBERT 후보 줄이기와 최종 MaxSim</h2>
+<p>원본118~131쪽은 CE/DPR/ColBERT와 학습형 sparse를 비교한다. ColBERT의 토큰 MaxSim은 각 질문 토큰마다 문서 토큰의 최대 유사도를 골라 더한다. 문서별 단일 평균 벡터 내적과 다른 연산이며 문서 토큰을 한 번씩 소진하는 matching도 아니다.</p>
+<p>대규모 다중 벡터 검색에서는 문서 토큰들을 centroid 주변으로 묶어, 질문 토큰에 유망한 centroid와 연결 후보부터 볼 수 있다. 이는 <strong>후보 확보의 근사</strong>다. 마지막에 평가한 MaxSim이 정확해도 앞 단계에서 빠진 문서까지 복구하지는 않는다. 다중 토큰 벡터는 저장량·메모리 접근·후보 재점수 비용을 늘린다. 학습형 sparse는 어휘별 가중치의 변환·pooling·sparsity 제약을 사용한다. MLM softmax는 대부분 양수여서 그 자체로 sparse가 되는 것은 아니다. 문서 expansion만 할지 질문도 확장할지도 별도 선택이다.</p>
+<h2 id="sec-3-ann의-오차-비율은-recall과-다른-정의다">3. ANN의 오차 비율은 recall과 다른 정의다</h2>
+<p>원본 DOCX가 나열한 B-tree는 정렬된 키·범위 접근, R-tree는 객체를 감싸는 영역의 계층, kd-tree는 축별 공간 분할, octree는 3차원 공간의 반복8분할이라는 다른 구조다. 고차원 벡터에 기존 구조를 그대로 쓰면 많은 영역을 검사할 수 있다. 단위 초입방체에서 한 변 길이 s인 부분의 부피는 s^D이므로 D=100, s=0.1이면 10^-100이다. 동일한 공간 분할 직관이 차원을 올려도 같은 선택성을 유지하지 않는 예다. LSH·IVF·그래프는 각각 확률적 버킷·중심 목록·연결 경로로 후보를 줄이는 다른 전략이며 05장 전체 설명과 연결한다.</p>
+<p><code>_Data_Analytics__DiskANN.pdf</code> 2~3쪽에서 metric space의 최근접 p*와 query q에 대해</p>
+<div class="math-raw math-display">$$D(p,q)\le (1+\epsilon)D(p^*,q),\quad \epsilon&gt;0$$</div><p>이면 p는 (1+ε)-ANN이다. exact Top-K ID의 재현율인 ANN Recall@K와 다른 조건이다. 최근접 거리1·반환거리1.5·ε0.5이면 비율 조건을 만족하지만 exact ID는 다를 수 있다. 최근접 거리가0이면 비율 조건의 우변도0이므로 정확히 거리0인 결과가 필요하다. 이때 단순 거리비 나눗셈을 계산하지 않는다.</p>
+<p>거리 D는 삼각부등식을 만족하는 metric이라는 전제다. L2 제곱은 L2와 이웃 순위가 같아도 일반적으로 삼각부등식을 만족하지 않으므로 아래 증명에 D=L2²를 그대로 대입하지 않는다.</p>
+<h2 id="sec-4-α-shortcut-간선-선택과-witness">4. α-shortcut 간선 선택과 witness</h2>
+<p>원본6~7쪽의 <strong>설명용 완전 후보 구축</strong>은 노드 p에서 다른 모든 점을 D(p,·) 오름차순으로 정렬한다. 가장 가까운 u를 간선으로 남기고</p>
+<div class="math-raw math-display">$$D(u,v)&lt;D(p,v)/\alpha,\quad\alpha&gt;1$$</div><p>인 미처리 v를 제거한다. 제거된 v에는 자신을 대신하는 선택 이웃 u라는 witness가 남는다. 끝나면 모든 v는 직접 이웃이거나 그런 witness가 있다. 동률 정렬·엄격 부등호의 일관성이 필요하다.</p>
+<p>예를 들어 p=(0,0), A=(1,0), B=(2,0), C=(0,2), D=(3,0), α=2라 하자. A 선택 후 B는 <code>1&lt;2/2</code>가 거짓이라 유지된다. B를 선택하면 D는 <code>1&lt;3/2</code>가 참이라 B를 witness로 제거할 수 있다. C는 다른 방향이라 남는다. 최종 이웃은 A,B,C다. <strong>동일 경계값을 ≤로 바꾸면 다른 그래프</strong>가 될 수 있다. α가 커지면 제거 조건이 엄격해져 더 많은 간선이 남을 수 있다.</p>
+<p>원본의 이 구축은 전체 후보와 보존되는 witness를 가정한다. 실용 Vamana/DiskANN은 후보 제한·degree cap·여러 pass·저장장치 접근 등을 추가하므로 이 간단한 증명을 임의 파라미터의 실용 인덱스 보장으로 확대하지 않는다.</p>
+<h2 id="sec-5-가까운-방향으로-이동한다는-결론의-유도">5. 가까운 방향으로 이동한다는 결론의 유도</h2>
+<p>r=D(p,q), r*=D(p*,q)라 두고 현재 p가 허용 근사 답이 아니라고 하자. 그러면 r*&lt;r/(1+ε)이고 삼각부등식으로</p>
+<div class="math-raw math-display">$$\frac{\epsilon}{1+\epsilon}r&lt;D(p,p^*)&lt;\frac{2+\epsilon}{1+\epsilon}r$$</div><p>이다. p*가 직접 이웃이면 바로 더 가까운 후보가 있다. 아니라면 shortcut witness u에 대해</p>
+<div class="math-raw math-display">$$D(u,q)\le D(u,p^*)+D(p^*,q)
+\le \frac{1}{\alpha}D(p,p^*)+D(p^*,q)
+\le \phi(\alpha,\epsilon)r,$$</div><div class="math-raw math-display">$$\phi(\alpha,\epsilon)=\frac1\alpha+\frac{1+1/\alpha}{1+\epsilon}.$$</div><p>φ&lt;1이 되는 충분한 조건을 풀면 <span class="math-raw math-inline">$\alpha&gt;1+2/\epsilon$</span>이다. α2·ε3이면 φ=1/2+(3/2)/4=0.875다. α2·ε1이면 φ=1.25라 이 상한으로는 수축을 보장하지 못한다. φ≥1이라는 것만으로 실제 경로가 반드시 실패한다고 말할 수는 없다. <strong>충분조건 불충족과 실패 증명은 다르다.</strong></p>
+<p>유한한 점 집합에서 더 가까운 이웃으로 엄격히 이동하면 무한히 반복할 수 없다. 근사 답이 아닌 모든 p에 더 가까운 이웃이 존재한다는 조건이 유지되면, 멈춘 점이 근사 답이 아니라는 가정은 종료 조건과 모순된다. 이것이 원본8~13쪽의 순수 greedy 보장 논리다.</p>
+<h2 id="sec-6-beam-구현의-상태를-따로-확인하기">6. Beam 구현의 상태를 따로 확인하기</h2>
+<p>원본4~5쪽은 일반 beam 개요와 k-NN용 frontier·visited·결과 heap을 제시한다. 폭 B는 탐색 frontier, k는 최종 결과 heap 크기다. 더 가까운 미방문 후보를 확장하고 결과 k개를 갱신하되 frontier가 넘으면 먼 후보를 버린다. 05장의 C(유지 후보)/seen(거리 계산)/expanded(이웃 확장) 변형과 상태·반환 시점이 완전히 같은 코드는 아니다.</p>
+<p>구현별로 후보를 버리는 시점, 이미 확장한 후보의 보관, 중복 삽입, 최대 단계·방문 예산, 종료 판단이 다르다. 따라서 “beam이므로 위 greedy 증명 경로를 항상 그대로 포함한다”는 말만으로 모든 구현의 보장을 확정하지 않는다. 명시된 shortcut 성질·후보 보존·종료 조건을 만족하는지 확인해야 한다. 실제 속도는 거리 비교 차원·간선 수·메모리와 저장장치 접근·병렬화에 영향받는다.</p>
+<h2 id="sec-7-확인-질문과-해설">7. 확인 질문과 해설</h2>
+<ol>
+<li>MLM의 정답과 검색 contrastive loss의 정답은 무엇인가?</li>
+<li>centroid 단계에서 문서를 놓쳤는데 최종 MaxSim만 정확하면 복구되는가?</li>
+<li>p에서 B의 거리2, A에서 B의 거리1, α2이면 엄격한 shortcut 규칙으로 B를 제거하는가?</li>
+<li>φ≥1이면 실제 ANN이 반드시 실패한 것인가?</li>
+<li>L2²가 순위를 보존하니 삼각부등식 증명에도 그대로 쓸 수 있는가?</li>
+</ol>
+<details><summary>해설</summary>
+<ol>
+<li>MLM은 선택 위치의 token ID, 검색은 후보 집합의 관련 문서 라벨이다. 출력 축과 학습 목적이 다르다.</li>
+<li>아니다. 후보 밖 문서는 그 최종 계산의 대상이 아니다.</li>
+<li>아니다. 1&lt;1은 거짓이다. ≤로 바꾸면 원본의 엄격 조건과 다른 그래프다.</li>
+<li>아니다. 주어진 상한에 의한 수축 충분조건을 충족하지 못한 것이다.</li>
+<li>안 된다. 순위 동일성과 metric의 삼각부등식은 다른 성질이다.</li>
+</ol>
+</details>
+<h2 id="sec-출처">출처</h2>
+<ul>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EA%B5%90%EC%95%88/1%EC%9D%BC%EC%B0%A8/RAG%20%28Samsung%2C%20final%29.pdf">RAG (Samsung, final).pdf</a> 51~117쪽 encoder/decoder·BERT·학습 head, 118~131쪽 검색 표현·centroid·학습형 sparse, 194~234쪽 LSH, 235~385쪽 그래프 ANN. LSH·그래프 계열의 전체 기본 설명은 기존05장에 보존되어 있다.</li>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EA%B5%90%EC%95%88/2%EC%9D%BC%EC%B0%A8/_Data_Analytics__DiskANN.pdf">_Data_Analytics__DiskANN.pdf</a> 2~3쪽 근사 정의, 4~5쪽 beam 상태, 6~7쪽 shortcut 구축, 8~9쪽 부등식·φ, 10~13쪽 수축·유한 종료·보장의 전제. 원본 페이지의 부등호·후보 조건을 확인해 집필했다.</li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/96_%EC%9B%B9%EC%8B%9C%EA%B0%81%ED%99%94%EC%9E%90%EB%A3%8C/%EA%B8%B0%EC%A4%80%EB%B3%B8%EB%AC%B8/09_RAG/16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.md">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="15_Text2SQL%EA%B3%BCMCP.html"><small>이전 장</small>15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a><a rel="next" href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html"><small>다음 장</small>17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

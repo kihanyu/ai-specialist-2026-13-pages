@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">같은 문서 집합이어도 순서에 따라 AP가 달라진다</title><desc id="desc">전체 관련 문서 B,D,E · 두 목록 모두 P@5=0.6, Recall@5=1</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526175"/></marker></defs>
+<style>text{font-family:"Malgun Gothic","Noto Sans KR",sans-serif;fill:#172B4D} .note{fill:#526175}</style>
+<rect width="1200" height="720" fill="white"/>
+<text x="30" y="48.0" font-size="32" text-anchor="start" style="fill:#172B4D;font-weight:700">같은 문서 집합이어도 순서에 따라 AP가 달라진다</text>
+<text x="30" y="92.0" font-size="24" text-anchor="start" style="fill:#526175;font-weight:400">전체 관련 문서 B,D,E · 두 목록 모두 P@5=0.6, Recall@5=1</text>
+<text x="30" y="150.0" font-size="26" text-anchor="start" style="fill:#D55E00;font-weight:700">뒤에 모인 관련 문서</text>
+<rect x="330" y="120" width="130" height="65" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="395" y="163.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">1위 A</text>
+<rect x="490" y="120" width="130" height="65" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="555" y="163.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">2위 C</text>
+<rect x="650" y="120" width="130" height="65" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="715" y="163.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">3위 B</text>
+<rect x="810" y="120" width="130" height="65" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="875" y="163.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">4위 D</text>
+<rect x="970" y="120" width="130" height="65" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="1035" y="163.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">5위 E</text>
+<text x="330" y="242.0" font-size="26" text-anchor="start" style="fill:#D55E00;font-weight:700">AP = (1/3 + 2/4 + 3/5) / 3 = 0.477778</text>
+<text x="330" y="285.0" font-size="23" text-anchor="start" style="fill:#172B4D;font-weight:400">관련 문서가 등장하는 순위에서만 Precision을 더한다.</text>
+<text x="30" y="360.0" font-size="26" text-anchor="start" style="fill:#00856A;font-weight:700">앞에 모인 관련 문서</text>
+<rect x="330" y="330" width="130" height="65" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="395" y="373.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">1위 B</text>
+<rect x="490" y="330" width="130" height="65" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="555" y="373.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">2위 D</text>
+<rect x="650" y="330" width="130" height="65" rx="12" fill="#D9EFE5" stroke="#00856A" stroke-width="2"/>
+<text x="715" y="373.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:700">3위 E</text>
+<rect x="810" y="330" width="130" height="65" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="875" y="373.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">4위 A</text>
+<rect x="970" y="330" width="130" height="65" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="1035" y="373.0" font-size="24" text-anchor="middle" style="fill:#172B4D;font-weight:400">5위 C</text>
+<text x="330" y="452.0" font-size="26" text-anchor="start" style="fill:#00856A;font-weight:700">AP = (1 + 1 + 1) / 3 = 1.000000</text>
+<text x="330" y="495.0" font-size="23" text-anchor="start" style="fill:#172B4D;font-weight:400">관련 문서가 등장하는 순위에서만 Precision을 더한다.</text>
+<rect x="30" y="590" width="1140" height="100" rx="12" fill="#F2F6FA" stroke="#CFD8E3" stroke-width="2"/>
+<text x="48" y="625.0" font-size="25" text-anchor="start" style="fill:#7956A5;font-weight:700">AP의 분모는 전체 관련 문서 수 3개다.</text>
+<text x="48" y="660.0" font-size="24" text-anchor="start" style="fill:#172B4D;font-weight:400">찾은 관련 문서 수로 나누면 누락한 정답의 영향을 지워 버린다.</text>
+</svg>

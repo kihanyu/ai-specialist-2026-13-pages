@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>6. 고급 LLM 양자화와 적용 판단 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/ondevice-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">On-Device AI 전체 흐름</a></li><li><a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">1장. AI 연산과 성능·메모리 병목</a></li><li><a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">2장. 온디바이스 AI 실행 환경</a></li><li><a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">3장. 수 표현과 선형 양자화의 원리</a></li><li><a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">4장. 비균일 양자화와 PTQ 오차 제어</a></li><li><a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html">5. QAT와 정수 추론</a></li><li><a href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html" aria-current="page">6. 고급 LLM 양자화와 적용 판단</a></li><li><a href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html">부록 — 개념 사이의 연결과 종합 복습</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</a></li><li><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></li><li><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a></li><li><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></li><li><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></li><li><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</a></li><li><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></li><li><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a></li><li><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html">8. 종합 복습: 조건에 맞는 수단을 선택하기</a></li><li><a href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html">LLM 양자화 실무 의사결정 가이드</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">On-Device AI</p><h1>6. 고급 LLM 양자화와 적용 판단</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>W/A/KV의 병목과 LLM.int8·SmoothQuant·QuaRot·SpinQuant의 outlier 처리를 설명한다.</li><li>GPTQ의 국소 Hessian·damping·오차 보상과 AWQ의 활성 통계 기반 scaling을 구분한다.</li><li>QLoRA의 frozen NF4 base·계산 dtype·adapter·double quant를 구분한다.</li><li>llama.cpp 계열의 payload·scale·imatrix·packing과 실제 배포 품질을 따로 평가한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="od-outlier" id="lab-od-outlier"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="od-granularity" id="lab-od-granularity"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="od-kv" id="lab-od-kv"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-고급-llm-기법-가지치기-지도">고급 LLM 기법 가지치기 지도</a></li><li><a href="#sec-61-학습-목표선수-개념표기">6.1 학습 목표·선수 개념·표기</a></li><li><a href="#sec-62-무엇을-양자화할-것인가-p6364">6.2 무엇을 양자화할 것인가 — p.63–64</a></li><li><a href="#sec-63-llmint8-중요한-outlier는-고정밀로-분리-p65">6.3 LLM.int8: 중요한 outlier는 고정밀로 분리 — p.65</a></li><li><a href="#sec-64-smoothquant-activation의-어려움을-weight로-옮긴다-p6669">6.4 SmoothQuant: activation의 어려움을 weight로 옮긴다 — p.66–69</a></li><li><a href="#sec-65-quarot과-spinquant-좌표계를-바꿔-outlier를-분산-p7071">6.5 QuaRot과 SpinQuant: 좌표계를 바꿔 outlier를 분산 — p.70–71</a></li><li><a href="#sec-66-weight-only와-gptq-p7274">6.6 Weight-only와 GPTQ — p.72–74</a></li><li><a href="#sec-67-awq-activation으로-중요한-weight-channel을-찾는다-p7577">6.7 AWQ: activation으로 중요한 weight channel을 찾는다 — p.75–77</a></li><li><a href="#sec-68-qlora-양자화한-기저-모델-위에-작은-어댑터를-학습-p7879">6.8 QLoRA: 양자화한 기저 모델 위에 작은 어댑터를 학습 — p.78–79</a></li><li><a href="#sec-69-llamacpp-형식-비트-수와-파일-크기를-구분-p80">6.9 llama.cpp 형식: 비트 수와 파일 크기를 구분 — p.80</a></li><li><a href="#sec-610-종합-적용-시나리오와-배포-검증">6.10 종합 적용 시나리오와 배포 검증</a></li><li><a href="#sec-611-용어-찾아보기">6.11 용어 찾아보기</a></li><li><a href="#sec-612-요약흔한-오해최종-복습">6.12 요약·흔한 오해·최종 복습</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-6-고급-llm-양자화와-적용-판단">6. 고급 LLM 양자화와 적용 판단</h1>
+<p>앞 장의 대표값·보정·스케일 개념을 대규모 언어 모델(LLM, Large Language Model)에 적용한다. 활성값의 큰 값을 보호하는 방법에서 시작해, 가중치 저장량을 줄이는 방법과 작은 어댑터만 학습하는 방법으로 이어진다.</p>
+<h2 id="sec-고급-llm-기법-가지치기-지도">고급 LLM 기법 가지치기 지도</h2>
+<p><img alt="고급 LLM 기법 가지치기 지도" decoding="async" id="figure-1" loading="lazy" src="../resources/b229d3853b89a0196ee0-llm-methods-tree.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/b229d3853b89a0196ee0-llm-methods-tree.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/assets/ODAI-1/llm-methods-tree.canvas">편집 가능한 Canvas</a> · <a href="../resources/9cb71b6fedfa00956281-llm-methods-tree.svg">확대용 SVG</a></p>
+<p>여러 기법의 이름을 외우기 전에 주된 수단과 목적을 구분한다. 추론 양자화의 오차 제어 수단과 QLoRA의 업무 미세조정 목적을 나누었다. 기법 간 조합이 가능하므로 이 그림을 배타적인 분류나 성능 순위로 읽지 않는다. W/A/KV 대상과 llama.cpp 저장 형식은 별도 설계축이다.
+<strong>원본 범위: p.63–80.</strong> 이 장은 Part 1의 마지막 장이다. p.63의 학습 비용과 p.69·77의 정확도·속도 비교는 원본의 시점과 실험 조건에 따른 설명이며, 최신 모델의 가격·지원·성능으로 단정하지 않는다. 그림은 원본 강의자료의 본문 Crop이다.</p>
+<h2 id="sec-61-학습-목표선수-개념표기">6.1 학습 목표·선수 개념·표기</h2>
+<p>학습 목표는 병목에 맞춰 양자화 대상을 정하고, outlier 대응 방법의 차이를 설명하며, 저장 dtype·계산 dtype·학습 대상을 구별하는 것이다. 1장의 prefill/decode와 KV cache, 3장의 선형 양자화, 4장의 calibration·granularity, 5장의 QAT·gradient를 먼저 알아야 한다.</p>
+<p><strong>W4A16</strong>은 보통 가중치 4비트 저장과 activation 16비트를 뜻한다. 이 표기만으로 곱셈 커널·누산 dtype·KV cache 정밀도를 알 수는 없다. **Outlier(이상값)**는 다른 값에 비해 절댓값이 큰 값이나 feature를 말한다. 오류 데이터라는 뜻은 아니며 중요한 정보를 담을 수 있다. **Perplexity(PPL, 혼란도)**는 언어모델이 정답 토큰을 얼마나 잘 예측하는지 나타내는 지표로, 같은 데이터·토큰화·평가 조건에서는 낮을수록 좋다. 서로 다른 조건의 PPL은 직접 비교하지 않는다.</p>
+<p>이 장의 기본 행렬 표기는 입력 <span class="math-raw math-inline">$X\in\mathbb R^{T\times d}$</span>, 가중치 <span class="math-raw math-inline">$W\in\mathbb R^{d\times m}$</span>, 출력 <span class="math-raw math-inline">$Y=XW\in\mathbb R^{T\times m}$</span>다. <span class="math-raw math-inline">$T$</span>는 처리 token 수, <span class="math-raw math-inline">$d$</span>는 입력 feature 수, <span class="math-raw math-inline">$m$</span>은 출력 feature 수이며 모두 개수다. GPTQ 절만 원본에 맞춰 전치된 column-sample 표기를 명시한다.</p>
+<h2 id="sec-62-무엇을-양자화할-것인가-p6364">6.2 무엇을 양자화할 것인가 — p.63–64</h2>
+<p><img alt="p.63 CNN과 LLM 양자화의 맥락" decoding="async" id="figure-2" loading="lazy" src="../resources/6fecb1a38732a1960b7f-p063-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/6fecb1a38732a1960b7f-p063-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/6fecb1a38732a1960b7f-p063-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.63 읽는 포인트:</strong> CNN에서 익힌 원리를 LLM으로 옮기되, 모델 규모와 비용 때문에 PTQ가 실용적인 선택이 되는 맥락을 읽는다. 원본의 달러·원화 학습비는 모델 학습 전체에 대한 시점 의존 사례이며, QAT나 개인 미세조정의 비용 견적이 아니다. BitNet 같은 저비트 학습 모델과 기존 FP 모델을 사후 변환한 결과도 구별해야 한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>대상</th>
+<th>줄이려는 비용</th>
+<th>주로 유의할 점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Weight-only, 예: W4A16</td>
+<td>가중치 저장량과 메모리 전송량</td>
+<td>복원·packing·지원 커널 overhead, activation·KV 메모리는 별도</td>
+</tr>
+<tr>
+<td>Weight + activation, 예: W8A8</td>
+<td>가중치·activation 이동과 저정밀 행렬곱</td>
+<td>activation outlier, token별 분포, Q/DQ 비용</td>
+</tr>
+<tr>
+<td>KV cache</td>
+<td>긴 context·여러 요청에서 증가하는 cache 메모리</td>
+<td>K/V 분포 차이, attention 품질, cache 갱신·복원 비용</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>교육용 용량 예제:</strong> 7×10⁹개의 가중치를 16비트에서 4비트로 저장하면 값 본체는 14 GB에서 3.5 GB로 줄어든다. 여기서 GB는 10⁹ byte다. scale·zero point·비양자화 tensor·정렬 공간은 제외했다. 총 실행 메모리는 여기에 KV cache, activation, workspace와 runtime 비용을 더해야 하므로 3.5 GB 장치에서 실행된다는 뜻은 아니다.</p>
+<p><img alt="p.64 가중치와 activation 분포의 차이" decoding="async" id="figure-3" loading="lazy" src="../resources/e360b1ed87dc23f3d41c-p064-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/e360b1ed87dc23f3d41c-p064-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/e360b1ed87dc23f3d41c-p064-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.64 읽는 포인트:</strong> 분포가 layer·token·channel에 따라 바뀌는 모습을 본다. <strong>Token-wise dynamic quantization</strong>은 token별 activation 통계로 scale을 실행 중 정하는 방식이다. <strong>Group-wise weight quantization</strong>은 한 가중치 행·열의 연속된 일부 값을 묶어 scale을 공유한다. 작은 group은 분포에 잘 맞지만 scale metadata가 늘어난다. 원본의 “각 head는 독립 학습된다”는 문장은 head별 분포가 다를 수 있다는 직관으로 읽는다. Transformer는 보통 하나의 목적함수로 공동 학습하며, head마다 완전히 독립된 학습 작업을 수행한다는 뜻은 아니다.</p>
+<h2 id="sec-63-llmint8-중요한-outlier는-고정밀로-분리-p65">6.3 LLM.int8: 중요한 outlier는 고정밀로 분리 — p.65</h2>
+<p><strong>W8A8부터 읽기:</strong> W는 가중치(Weight), A는 활성값(Activation)을 뜻하므로 W8A8은 해당 경로에서 둘을 8비트로 표현한다는 표기다. 누산기나 KV 캐시까지 모두 8비트라는 뜻은 아니다. LLM.int8은 일반 값에는 이 경로를 쓰고, 양자화에 민감한 큰 값은 별도의 고정밀 경로로 보호한다. 여기서 이상치(Outlier)는 반드시 잘못된 데이터가 아니라 모델 출력에 중요한 큰 활성값일 수 있다.</p>
+<p><img alt="p.65 LLM.int8의 mixed-precision 분해" decoding="async" id="figure-4" loading="lazy" src="../resources/e6a1b24662fd060f69c9-p065-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/e6a1b24662fd060f69c9-p065-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/e6a1b24662fd060f69c9-p065-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.65 읽는 포인트:</strong> 일반 feature 경로와 outlier feature 경로를 나눈 뒤 출력을 합치는 구조를 본다. 단순히 tensor 전체를 INT8로 반올림하는 것과 다르다. 예를 들어 입력 feature가 4개이고 그중 세 번째가 이상치 경로라면, 일반 입력의 1·2·4번째 열과 대응 가중치의 1·2·4번째 행을 함께 고른다. 세 번째 입력 열과 세 번째 가중치 행은 고정밀 경로로 계산한다. 두 결과는 출력 크기가 같으므로 더할 수 있다. “이상치와 일반 값을 두 행렬로 분리한다(Separate Outlier and Normal Values into Two Matrices)”는 설명을 이처럼 <strong>서로 대응하는 입력·가중치 축의 분할</strong>로 읽는다.</p>
+<p>**LLM.int8()**은 vector-wise scale과 mixed-precision decomposition을 결합한다. **벡터별(Vector-wise)**은 <code>Y=XW</code>에서 입력의 각 행 벡터와 가중치의 각 열 벡터에 별도 스케일을 두는 것이다. 토큰마다 활성값 크기가 다르고 출력 채널마다 가중치 범위가 다를 수 있으므로, 행렬 전체에 눈금 하나를 쓰는 것보다 각 벡터의 범위를 잘 활용할 수 있다. feature 집합을 일반 부분 <span class="math-raw math-inline">$N$</span>과 outlier 부분 <span class="math-raw math-inline">$O$</span>로 나누면 개념적으로 다음과 같다.</p>
+<div class="math-raw math-display">$$
+Y=X_NW_N+X_OW_O
+\approx\operatorname{Dequant}(Q_8(X_N)Q_8(W_N))+X_OW_O.
+$$</div><p><span class="math-raw math-inline">$Q_8$</span>은 8비트 양자화, Dequant는 해당 scale로 복원하는 연산이다. <span class="math-raw math-inline">$N,O$</span>는 입력 feature 축의 서로 겹치지 않는 분할이며, 두 항의 출력 모양은 <span class="math-raw math-inline">$T\times m$</span>으로 같다. outlier 항은 16비트 경로로 처리해 정보 손실을 줄인다. 어느 feature를 outlier로 정하는지와 threshold는 구현 조건을 확인해야 한다. 원본의 6.7B 전후 관찰은 당시 분석 대상 모델에서 나타난 현상이지 모든 모델 크기에 적용되는 경계가 아니다. <a href="https://arxiv.org/abs/2208.07339">LLM.int8 원 논문</a>은 이러한 분해를 제시한다.</p>
+<h2 id="sec-64-smoothquant-activation의-어려움을-weight로-옮긴다-p6669">6.4 SmoothQuant: activation의 어려움을 weight로 옮긴다 — p.66–69</h2>
+<p><img alt="p.66 activation outlier와 채널별 scaling" decoding="async" id="figure-5" loading="lazy" src="../resources/cadc0f5556504074a2dd-p066-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-5" type="button">그림 확대</button><a href="../resources/cadc0f5556504074a2dd-p066-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/c95504515cc22947922d-p066-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.66 읽는 포인트:</strong> activation의 특정 channel에 세로로 반복되는 큰 값을 찾는다. SmoothQuant는 값을 단순 삭제하는 대신 activation과 weight를 반대 방향으로 rescale한다.</p>
+<p><img alt="p.67 smoothing 전후 양자화 난이도" decoding="async" id="figure-6" loading="lazy" src="../resources/a61b250261ff6ac21d84-p067-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-6" type="button">그림 확대</button><a href="../resources/a61b250261ff6ac21d84-p067-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/e6e6dc3687c01ec3e1e8-p067-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.67 읽는 포인트:</strong> 원래 activation 분포는 넓고 weight 분포는 상대적으로 다루기 쉬운 상황을 가정한다. smoothing 뒤 activation은 양자화하기 쉬워지는 대신 weight 쪽 난이도가 증가한다. 두 tensor를 모두 같은 방향으로 줄이는 그림으로 읽지 않는다.</p>
+<p>양의 channel scale <span class="math-raw math-inline">$s_j&gt;0$</span>를 대각원소로 갖는 <span class="math-raw math-inline">$D=\operatorname{diag}(s_1,\ldots,s_d)$</span>를 사용하면</p>
+<div class="math-raw math-display">$$
+XW=(XD^{-1})(DW).
+$$</div><p>이는 양자화 전 실수 연산에서 정확한 등가 변환이다. <span class="math-raw math-inline">$D$</span>는 <span class="math-raw math-inline">$d\times d$</span>, <span class="math-raw math-inline">$XD^{-1}$</span>은 입력 channel을 줄이고 <span class="math-raw math-inline">$DW$</span>는 대응 weight 행을 키운다. <span class="math-raw math-inline">$s_j$</span>는 calibration activation과 weight의 channel 통계로 offline 결정한다. 그 뒤 두 tensor를 저정밀화하면 서로 다른 오차가 생기므로 <strong>변환의 등가성</strong>과 <strong>양자화의 무손실성</strong>을 구별한다.</p>
+<p><img alt="p.68 SmoothQuant의 행렬 등가식" decoding="async" id="figure-7" loading="lazy" src="../resources/2877eaf4aabecab9fbbb-p068-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-7" type="button">그림 확대</button><a href="../resources/2877eaf4aabecab9fbbb-p068-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/5ceb1ae3f78e3610f8b1-p068-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.68 읽는 포인트와 검산 예시:</strong> <span class="math-raw math-inline">$X=[10,1]$</span>, <span class="math-raw math-inline">$W=[1,2]^\top$</span>, <span class="math-raw math-inline">$D=\operatorname{diag}(10,1)$</span>이면 원래 출력은 12다. 변환 후 입력은 <span class="math-raw math-inline">$[1,1]$</span>, 가중치는 <span class="math-raw math-inline">$[10,2]^\top$</span>이므로 출력은 여전히 12다. 이 예제는 상쇄를 보이는 것이며 최적 scale이나 실제 INT8 오차 개선을 보장하는 수치는 아니다.</p>
+<p><img alt="p.69 SmoothQuant의 정확도와 성능 실험" decoding="async" id="figure-8" loading="lazy" src="../resources/df2968c1c58dc5353139-p069-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-8" type="button">그림 확대</button><a href="../resources/df2968c1c58dc5353139-p069-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/df2968c1c58dc5353139-p069-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.69 읽는 포인트:</strong> 정확도 표와 속도·메모리 그래프는 서로 다른 평가축이다. 원본의 “losslessly”는 해당 평가 지표에서 손실이 거의 없다는 결과 표현이지 모든 입력에서 원래 출력과 bitwise 동일하다는 뜻이 아니다. <a href="https://arxiv.org/abs/2211.10438">SmoothQuant 원 논문</a>의 주요 목표는 W8A8 추론이다. 해당 실험의 메모리 절감이나 가속을 W4A4, 모든 장치, 전체 프로세스 peak memory로 그대로 확대하지 않는다.</p>
+<h2 id="sec-65-quarot과-spinquant-좌표계를-바꿔-outlier를-분산-p7071">6.5 QuaRot과 SpinQuant: 좌표계를 바꿔 outlier를 분산 — p.70–71</h2>
+<p><img alt="p.70 QuaRot과 회전 변환" decoding="async" id="figure-9" loading="lazy" src="../resources/651dfc3ce4a1e79351a6-p070-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-9" type="button">그림 확대</button><a href="../resources/651dfc3ce4a1e79351a6-p070-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/21cebb787d5c392e2de3-p070-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.70 읽는 포인트:</strong> 회전 전 일부 feature에 집중된 큰 값이 회전 후 여러 축으로 분산되는 모습을 본다. 값의 정보 자체를 지우는 것이 아니라 표현 좌표계를 바꾼다.</p>
+<p><strong>Orthogonal matrix(직교 행렬)</strong> <span class="math-raw math-inline">$R\in\mathbb R^{d\times d}$</span>는 <span class="math-raw math-inline">$RR^\top=R^\top R=I$</span>를 만족한다. 따라서 <span class="math-raw math-inline">$R^{-1}=R^\top$</span>이다. <span class="math-raw math-inline">$I$</span>는 항등행렬이다. **Hadamard transform(하다마드 변환)**은 ±1 패턴으로 구성한 직교 변환을 정규화해 사용하는 방법이며, randomized 변형은 부호 등을 무작위화한다.</p>
+<p><strong>원문 수식 정정:</strong> p.70의 <span class="math-raw math-inline">$(XR)(R^{-1}W^{-1})=XW^\top$</span> 표기는 일반적인 선형 layer 등가식으로 성립하지 않는다. 이 문서의 <span class="math-raw math-inline">$Y=XW$</span> 표기에서 올바른 기본식은</p>
+<div class="math-raw math-display">$$
+Y=(XR)(R^\top W)=XW.
+$$</div><p>가중치를 <span class="math-raw math-inline">$W\in\mathbb R^{m\times d}$</span>로 저장해 <span class="math-raw math-inline">$Y=XW^\top$</span>라 쓰는 관례라면 <span class="math-raw math-inline">$W'=WR$</span>, <span class="math-raw math-inline">$X'=XR$</span>로 두어 <span class="math-raw math-inline">$X'W'^\top=XW^\top$</span>가 된다. 원문의 <span class="math-raw math-inline">$|R|=1$</span>은 행렬식 표기다. 일반 직교 행렬은 determinant가 ±1이고, 방향을 보존하는 회전은 +1이다. 따라서 이를 “R 자체가 1”로 읽으면 안 된다.</p>
+<p><strong>QuaRot</strong>은 이러한 불변성을 Transformer 구조에 맞게 적용하고 outlier를 분산해 weight·activation·KV cache의 4비트화를 추구한다. 임의의 비선형 함수 앞뒤에 R과 Rᵀ를 삽입하면 항상 상쇄되는 것은 아니다. residual·정규화·attention·실행 중 변환의 위치를 함께 설계해야 한다. <a href="https://arxiv.org/abs/2404.00456">QuaRot 원 논문</a>은 이 구조를 제시한다. 원본에 병기된 RRS와 OstQuant는 관련 후속 변환 연구의 예시이며, 같은 알고리즘의 다른 이름은 아니다. 그림의 QSUR은 해당 그림에서 사용하는 양자화 공간 활용 지표로 읽고 보편적인 정확도 지표와 동일시하지 않는다.</p>
+<p><img alt="p.71 SpinQuant의 학습된 회전" decoding="async" id="figure-10" loading="lazy" src="../resources/43f95456460f35ec25f2-p071-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-10" type="button">그림 확대</button><a href="../resources/43f95456460f35ec25f2-p071-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/613c00b42d2dc119021b-p071-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.71 읽는 포인트:</strong> 회전을 고정하는 것과, 양자화 후 손실이 작아지도록 회전을 최적화하는 것을 비교한다. <strong>SpinQuant</strong>은 회전 행렬을 학습하는 방법이다. <strong>Cayley SGD</strong>는 직교성 제약을 유지하는 갱신을 구성하기 위해 Cayley transform을 활용하는 최적화 방식이다. 여기서 SGD는 stochastic gradient descent(확률적 경사하강법)를 뜻한다. <a href="https://arxiv.org/abs/2405.16406">SpinQuant 원 논문</a>은 무작위 회전 선택에 따른 성능 편차를 줄이려는 학습 접근을 설명한다. 회전 파라미터 최적화와 모델 전체의 일반적인 QAT는 학습 대상과 비용이 같지 않다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>비교축</th>
+<th>SmoothQuant</th>
+<th>QuaRot</th>
+<th>SpinQuant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>기본 변환</td>
+<td>channel별 대각 scaling</td>
+<td>직교·Hadamard 계열 회전</td>
+<td>학습한 직교 회전</td>
+</tr>
+<tr>
+<td>outlier 대응</td>
+<td>activation 난이도를 weight 쪽으로 이전</td>
+<td>큰 값을 좌표축 사이로 분산</td>
+<td>양자화 손실을 고려해 분산 방향 선택</td>
+</tr>
+<tr>
+<td>대표 목표</td>
+<td>W8A8</td>
+<td>W4A4·KV4 경로</td>
+<td>W4A4·KV4의 품질 개선</td>
+</tr>
+<tr>
+<td>추가 작업</td>
+<td>대표 입력 통계 calibration</td>
+<td>구조 변환과 필요 online 회전</td>
+<td>회전 최적화용 데이터·계산</td>
+</tr>
+<tr>
+<td>확인할 비용</td>
+<td>scale fusion, Q/DQ</td>
+<td>online transform·packing·커널</td>
+<td>최적화 비용과 최종 runtime</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-66-weight-only와-gptq-p7274">6.6 Weight-only와 GPTQ — p.72–74</h2>
+<p><strong>저장량 감소에서 출력 오차 제어로:</strong> W4A16은 가중치 4비트 저장과 활성값 16비트 사용을 나타낸다. 혼합 정밀도 연산(Mixed-precision Interactions)에서는 압축 가중치를 읽어 계산 가능한 형식으로 복원하는 과정이 포함될 수 있다. 핵심 이득인 메모리 전송량 감소(Reduced Memory Traffic)는 가중치 읽기가 병목일 때 특히 유리하다. 이어지는 GPTQ는 그렇게 가중치를 낮은 비트로 바꾸면서 레이어 출력을 최대한 유지하려는 방법이다.</p>
+<p><img alt="p.72 저비트 weight-only의 목적" decoding="async" id="figure-11" loading="lazy" src="../resources/53ca3d9d3c186fa5f67a-p072-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-11" type="button">그림 확대</button><a href="../resources/53ca3d9d3c186fa5f67a-p072-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/53ca3d9d3c186fa5f67a-p072-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.72 읽는 포인트:</strong> W4A16의 장점은 우선 weight 전송량 감소다. weight를 4비트로 저장하더라도 multiplication을 native INT4로 수행한다는 뜻은 아니다. fused dequantization과 행렬곱 구현에 따라 실제 속도가 달라진다. 원본의 “W8A8도 memory-bound”는 특정 decode·batch·장치 조건에서의 설명으로 읽어야 한다. 큰 prefill이나 batch에서는 병목이 바뀔 수 있다.</p>
+<p><img alt="p.73 GPTQ의 layer 재구성 목표와 Hessian" decoding="async" id="figure-12" loading="lazy" src="../resources/75e42c517e21f5355f9d-p073-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-12" type="button">그림 확대</button><a href="../resources/75e42c517e21f5355f9d-p073-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/75e42c517e21f5355f9d-p073-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.73 읽는 포인트:</strong> 가장 가까운 정수로만 반올림하지 않고, 한 weight를 양자화한 오차를 아직 양자화하지 않은 weight로 보상한다. OBQ에서 출발하되 대형 행렬에 적용하도록 계산을 조직한다.</p>
+<p><strong>GPTQ</strong>는 calibration 입력에 대한 layer 출력의 차이를 줄이는 weight PTQ다. **Reconstruction(재구성)**은 원본 layer 출력을 양자화 layer 출력으로 가깝게 재현하는 목적을 뜻한다. **Hessian(헤시안)**은 손실의 2차 미분 행렬이며 오차 방향에 따른 곡률을 나타낸다. 여기서는 원본 GPTQ 슬라이드와 맞추기 위해 <span class="math-raw math-inline">$X_c\in\mathbb R^{d\times n}$</span>에 calibration sample을 열로, <span class="math-raw math-inline">$W_c\in\mathbb R^{m\times d}$</span>에 출력 channel을 행으로 놓는다.</p>
+<div class="math-raw math-display">$$
+\mathcal L_{\rm rec}=\|W_cX_c-\widehat W_cX_c\|_F^2,
+\quad H=2X_cX_c^\top.
+$$</div><p><span class="math-raw math-inline">$n$</span>은 calibration 위치 수, <span class="math-raw math-inline">$\widehat W_c$</span>는 양자화·복원한 가중치, <span class="math-raw math-inline">$\|\cdot\|_F$</span>는 모든 원소 제곱합의 제곱근인 Frobenius norm이다. row별 동일한 입력을 사용하므로 이 국소 목적의 Hessian을 행 사이에 공유할 수 있다. 실제 안정화에는 damping 등 수치 처리가 필요하며, 이것을 모델 전체 task loss의 정확한 Hessian이라고 부르면 안 된다.</p>
+<p>**레이어별(Layer-wise) 국소 출력 재구성(Local Layer-output Reconstruction)**은 “모델의 최종 정답을 다시 학습”하기보다 각 레이어에서 원본 출력과 양자화 출력의 차이를 줄이는 것이다. 보정 입력을 모으고 → 입력 통계를 계산하고 → 가중치를 양자화하며 남은 가중치로 오차를 보상하고 → 다음 레이어로 진행한다. 교안의 활성값 공분산(Activation Covariance)은 입력 feature가 함께 나타나는 관계를 설명하는 표현이다. 다만 위 식의 <code>X_c X_cᵀ</code>는 평균을 빼지 않은 2차 모멘트이며, 일반적인 중심화 공분산과 정확히 같은 것은 아니다.</p>
+<p>**고정 순서(Fixed Order)**는 기본 GPTQ에서 모든 출력 행에 같은 입력 열 순서를 적용해 계산을 공유하는 아이디어다. 매 가중치마다 최선의 순서를 새로 탐색하는 비용을 줄이고, 여러 열의 보정을 묶어 처리할 수 있다. 이는 모든 구현이 원래 열 순서만 사용한다는 뜻은 아니다. 입력 중요도로 열을 미리 재정렬하는 활성값 순서(Activation Order) 옵션도 있으므로 구현 조건과 구분한다.</p>
+<p><strong>Damping(감쇠·대각 안정화) 보충:</strong> 입력 feature가 선형 종속이면 <span class="math-raw math-inline">$H=2X_cX_c^\top$</span>가 특이행렬이 되어 역행렬을 구할 수 없을 수 있다. <span class="math-raw math-inline">$H_\lambda=2X_cX_c^\top+\lambda I$</span>, <span class="math-raw math-inline">$\lambda&gt;0$</span>처럼 양의 대각 보정값을 더하면 수치 안정성과 Cholesky 분해를 확보하는 데 도움이 된다. <span class="math-raw math-inline">$\lambda$</span>는 안정화 강도이며 실제 구현의 선택·크기를 확인해야 한다.</p>
+<p>**Cholesky decomposition(콜레스키 분해)**은 양의 정부호 행렬을 삼각행렬의 곱으로 나타내는 것이다. GPTQ는 이러한 수치 구조와 **lazy batch update(지연 블록 갱신)**를 활용해 weight 양자화와 오차 보정을 효율적으로 조직한다. <a href="https://arxiv.org/abs/2210.17323">GPTQ 원 논문</a>은 근사 2차 정보를 이용한 one-shot weight quantization을 제시한다.</p>
+<p><img alt="p.74 GPTQ의 순차 양자화와 오차 보상 예제" decoding="async" id="figure-13" loading="lazy" src="../resources/7e6c8ee697842157e454-p074-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-13" type="button">그림 확대</button><a href="../resources/7e6c8ee697842157e454-p074-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/80e064c9f3362309e054-p074-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.74 읽는 포인트와 검산:</strong> 이 그림은 0.5 간격으로 양자화하는 개념 예제다. 첫 열의 첫 값 0.80을 1.00으로 양자화하면 오차 <span class="math-raw math-inline">$e=0.80-1.00=-0.20$</span>이다. 그림의 첫 inverse-Hessian 행에서 첫 대각값이 1, 다음 값이 −0.30이면, 다음 weight −0.24에 대한 보정은 <span class="math-raw math-inline">$-0.24-(-0.20)(-0.30)/1=-0.30$</span>이다. 이후 −0.30을 양자화하면 −0.50이 되어, 보정 없이 −0.24를 0.0으로 반올림한 결과와 달라진다. 그림의 단계별 Schur-complement 표는 보상 직관을 설명한다. 실제 GPTQ의 Cholesky 기반 구현에서 이 작은 표들을 매번 그대로 만드는 것으로 읽지 않는다. 모든 후속 숫자는 구현의 반올림 규칙·damping·블록 처리에 따라 달라질 수 있다.</p>
+<h2 id="sec-67-awq-activation으로-중요한-weight-channel을-찾는다-p7577">6.7 AWQ: activation으로 중요한 weight channel을 찾는다 — p.75–77</h2>
+<p><strong>GPTQ 다음에 AWQ를 읽는 이유:</strong> GPTQ가 입력에 대한 레이어 출력 재구성 오차를 직접 줄인다면, AWQ는 활성값을 보고 어떤 가중치 채널을 더 잘 보호해야 하는지 판단한다. 절댓값이 큰 가중치만 고르는 방식과 다르다. 아래 “중요한 채널 약 1%(Only 1% of Salient Weight Channels)” 실험은 소수 채널의 영향이 크다는 근거이며, 모든 모델에서 정확히 1%를 고정밀로 남겨야 한다는 규칙은 아니다.</p>
+<p><img alt="p.75 AWQ의 salient channel 관찰 실험" decoding="async" id="figure-14" loading="lazy" src="../resources/bbf49c097cc8c4b04606-p075-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-14" type="button">그림 확대</button><a href="../resources/bbf49c097cc8c4b04606-p075-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/bbf49c097cc8c4b04606-p075-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.75 읽는 포인트:</strong> 중요한 1% channel을 FP16으로 남겼을 때 PPL이 크게 개선되는 실험은 <strong>중요도 가설을 확인하는 관찰</strong>이다. 최종 AWQ를 “항상 weight 1%를 FP16으로 저장하는 알고리즘”이라고 정의하면 안 된다. 원본의 43.2→13.0은 그림의 해당 실험 설정에 한정한다.</p>
+<p>**Activation-aware Weight Quantization(AWQ, 활성값을 고려한 가중치 양자화)**는 입력 activation 통계로 중요한 weight channel을 찾아 scaling으로 보호한다. weight 크기만 보는 대신 실제 입력에 의해 출력에 얼마나 영향을 주는지 고려한다. 최종 설계는 하드웨어에 불리한 mixed-precision 보존을 피하려는 방향이다. <a href="https://arxiv.org/abs/2306.00978">AWQ 원 논문</a>은 이러한 등가 scaling 기반 접근을 제시한다.</p>
+<p><img alt="p.76 AWQ의 channel scaling과 group quantization" decoding="async" id="figure-15" loading="lazy" src="../resources/b57b4b1d08582e0614f1-p076-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-15" type="button">그림 확대</button><a href="../resources/b57b4b1d08582e0614f1-p076-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/9c37a6dfbafbd7eb618e-p076-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.76 읽는 포인트:</strong> scale <span class="math-raw math-inline">$s&gt;1$</span>로 중요한 channel을 키우고, 대응 입력을 역으로 나누어 실수 연산의 등가성을 유지한다. 기본 상쇄 식은 SmoothQuant와 같은 <span class="math-raw math-inline">$(XD^{-1})(DW)$</span>이지만, <strong>어느 오차를 줄이려는가</strong>가 다르다. AWQ는 low-bit weight-only의 출력 오차를 줄이기 위한 channel 보호가 중심이다.</p>
+<p><strong>교육용 보충:</strong> activation 절댓값 평균 <span class="math-raw math-inline">$a_j=\frac1N\sum_{i=1}^N|x_{ij}|$</span> 등을 구해 <span class="math-raw math-inline">$s_j\propto a_j^\alpha$</span>, <span class="math-raw math-inline">$0\le\alpha\le1$</span> 같은 후보를 탐색할 수 있다. <span class="math-raw math-inline">$N$</span>은 통계를 수집한 입력 위치 수, <span class="math-raw math-inline">$j$</span>는 feature channel, <span class="math-raw math-inline">$\alpha$</span>는 탐색 지수다. 이는 원리를 설명하는 단순화이며, 실제 정규화·clipping·검색 방식은 구현을 확인해야 한다. 한 channel을 키우면 group 전체 scale도 바뀔 수 있으므로 모든 channel의 오차가 동시에 감소한다는 보장은 없다.</p>
+<p><img alt="p.77 AWQ와 GPTQ의 원본 PPL 비교" decoding="async" id="figure-16" loading="lazy" src="../resources/5e062cd00571d9fe7486-p077-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-16" type="button">그림 확대</button><a href="../resources/5e062cd00571d9fe7486-p077-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/5e062cd00571d9fe7486-p077-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.77 읽는 포인트:</strong> 모델과 bit 수가 고정된 열 안에서 비교한다. calibration 재구성에 과도하게 맞추는 문제는 검토할 가치가 있지만, 표 한 장으로 “AWQ가 항상 GPTQ보다 좋다”거나 “GPTQ는 반드시 과적합한다”고 결론내리지 않는다. 목표 도메인과 별도 평가 입력에서 검증해야 한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>비교축</th>
+<th>GPTQ</th>
+<th>AWQ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>핵심 판단</td>
+<td>layer 출력 재구성 오차의 곡률과 보상</td>
+<td>activation 통계에 기반한 channel 중요도</td>
+</tr>
+<tr>
+<td>주요 처리</td>
+<td>weight 순차 양자화와 남은 weight의 오차 보정</td>
+<td>중요 channel scaling과 weight quantization</td>
+</tr>
+<tr>
+<td>대표 대상</td>
+<td>low-bit weight-only</td>
+<td>low-bit weight-only</td>
+</tr>
+<tr>
+<td>calibration의 역할</td>
+<td>재구성 목적과 근사 2차 정보 추정</td>
+<td>activation 통계와 scale 후보 평가</td>
+</tr>
+<tr>
+<td>검증할 위험</td>
+<td>calibration 대표성, 수치 안정성, 과도한 국소 적합</td>
+<td>통계 대표성, group scale 상호작용</td>
+</tr>
+<tr>
+<td>배포 시 공통 확인</td>
+<td>저장 형식·group·커널·성능·품질</td>
+<td>저장 형식·group·커널·성능·품질</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-68-qlora-양자화한-기저-모델-위에-작은-어댑터를-학습-p7879">6.8 QLoRA: 양자화한 기저 모델 위에 작은 어댑터를 학습 — p.78–79</h2>
+<p><strong>추론용 압축에서 적응 학습으로:</strong> 앞의 GPTQ·AWQ는 주로 학습된 가중치를 저비트로 바꾸는 문제를 다뤘다. QLoRA(Quantized Low-Rank Adaptation, 양자화 저랭크 적응)는 양자화한 기저 모델 가중치(Quantized Base Model Weights)를 고정해 두고, 작은 어댑터를 학습하여 새로운 작업에 적응하는 방법이다. 먼저 아래 그림에서 고정된 기저 모델과 학습되는 어댑터를 나누고, 다음 그림에서 가중치뿐 아니라 스케일의 저장량까지 줄이는 이중 양자화(Double Quantization)를 확인한다.</p>
+<p><img alt="p.78 QLoRA의 frozen base와 LoRA adapter" decoding="async" id="figure-17" loading="lazy" src="../resources/6a66651caff321bd8cd3-p078-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-17" type="button">그림 확대</button><a href="../resources/6a66651caff321bd8cd3-p078-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/ee5e7e52cb867b357348-p078-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.78 읽는 포인트:</strong> 기저 모델의 4비트 저장과 학습 가능한 어댑터를 구분한다. gradient가 기저 모델의 계산을 통과할 수 있다는 것과 기저 weight가 업데이트된다는 것은 다르다.</p>
+<p>**Low-Rank Adaptation(LoRA, 저랭크 적응)**은 큰 weight 갱신을 작은 두 행렬의 곱으로 표현해 학습 파라미터 수를 줄이는 기법이다. 이 장의 <span class="math-raw math-inline">$W\in\mathbb R^{d\times m}$</span> 표기에서</p>
+<div class="math-raw math-display">$$
+Y=X\bigl(\widehat W+cAB\bigr),\qquad
+A\in\mathbb R^{d\times r},\;B\in\mathbb R^{r\times m},\;r\ll\min(d,m).
+$$</div><p><span class="math-raw math-inline">$\widehat W$</span>는 양자화 저장 후 계산용으로 복원한 고정 기저 weight, <span class="math-raw math-inline">$A,B$</span>는 학습하는 adapter 행렬, <span class="math-raw math-inline">$r$</span>은 rank, <span class="math-raw math-inline">$c$</span>는 adapter 배율이다. 가중치 본체의 학습 파라미터 <span class="math-raw math-inline">$dm$</span>개 대신 <span class="math-raw math-inline">$r(d+m)$</span>개를 학습한다. 예를 들어 <span class="math-raw math-inline">$d=m=4096,r=8$</span>이면 본체 16,777,216개와 비교해 adapter는 65,536개로 약 0.39%다. optimizer 상태 감소에 유리하지만 activation 메모리가 없어지는 것은 아니다.</p>
+<p><strong>QLoRA</strong>는 frozen quantized base와 LoRA를 결합한다. **NF4(NormalFloat 4-bit)**는 정규분포를 가정한 비균일 codebook 기반 표현으로, 보편적인 IEEE FP4나 INT4와 다르다. <strong>Paged optimizer</strong>는 unified-memory paging 등을 활용해 optimizer 관련 메모리 급증을 관리한다. CPU 이동이 생기면 전송 비용이 발생할 수 있으며, 모든 optimizer가 항상 CPU에 있다는 뜻은 아니다. <a href="https://arxiv.org/abs/2305.14314">QLoRA 원 논문</a>은 NF4, double quantization, paged optimizer를 결합한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구분</th>
+<th>QLoRA의 대표 구성</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>기저 모델 저장</td>
+<td>NF4 코드와 block scale</td>
+<td>저장 비용 절감</td>
+</tr>
+<tr>
+<td>행렬곱 계산</td>
+<td>복원 후 BF16 등</td>
+<td>4비트 code를 모든 연산에서 직접 곱한다는 뜻이 아님</td>
+</tr>
+<tr>
+<td>학습 대상</td>
+<td>LoRA adapter</td>
+<td>frozen base의 모든 weight를 업데이트하지 않음</td>
+</tr>
+<tr>
+<td>gradient 경로</td>
+<td>모델 계산을 거쳐 adapter까지 전파</td>
+<td>base weight 업데이트 여부와 별개</td>
+</tr>
+<tr>
+<td>배포 형태</td>
+<td>base+adapter 또는 병합·재변환</td>
+<td>target runtime 지원과 품질을 다시 검증</td>
+</tr>
+</tbody>
+</table></div>
+<p><img alt="p.79 double quantization과 scale 저장 비용" decoding="async" id="figure-18" loading="lazy" src="../resources/5b6bd6ec64390ed53a21-p079-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-18" type="button">그림 확대</button><a href="../resources/5b6bd6ec64390ed53a21-p079-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/5b6bd6ec64390ed53a21-p079-figure.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.79 읽는 포인트:</strong> double quantization의 두 번째 대상은 weight 값 자체가 아니라 첫 번째 양자화의 <strong>scale 상수</strong>다. BF16 계산과 NF4 저장이 함께 보이는 이유도 확인한다.</p>
+<p><strong>검산:</strong> 64개 weight마다 FP32 scale 하나를 저장하면 scale 비용은 <span class="math-raw math-inline">$32/64=0.5$</span> bit/weight다. 이를 8비트로 양자화하고, 256개 scale마다 FP32 상위 scale 하나를 공유하는 단순 모델에서는</p>
+<div class="math-raw math-display">$$
+\frac8{64}+\frac{32}{64\times256}
+=0.125+0.001953125
+=0.126953125\text{ bit/weight}.
+$$</div><p>절감량은 약 0.37305 bit/weight다. 따라서 4비트 코드에 이 scale만 더한 유효 저장량은 약 4.12695 bit/weight가 된다. 기타 상수, tensor별 예외, padding, 비양자화 layer, adapter와 optimizer는 제외한 계산이다. 전체 학습 메모리가 FP16 대비 정확히 4배 줄어든다고 해석하지 않는다.</p>
+<h2 id="sec-69-llamacpp-형식-비트-수와-파일-크기를-구분-p80">6.9 llama.cpp 형식: 비트 수와 파일 크기를 구분 — p.80</h2>
+<p><img alt="p.80 llama.cpp 양자화 형식 분류" decoding="async" id="figure-19" loading="lazy" src="../resources/c3f7a760b8c0e07d6614-p080-figure.png"/></p><div class="image-actions"><button data-image-zoom="figure-19" type="button">그림 확대</button><a href="../resources/c3f7a760b8c0e07d6614-p080-figure.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><a href="../resources/0e63c751978ea8300668-p080-crop.png">원본 전체 내용 Crop</a></p>
+<p><strong>p.80 읽는 포인트:</strong> 표의 행은 모두 동일한 구현이 아니다. 값 본체의 bit 수, block scale, 중요도 정보, codebook, packing을 나누어 본다. 아래 형식명은 <strong>강의 원문 목록의 분류 예시</strong>다. 실제 사용 가능 형식·모델·backend는 설치한 llama.cpp 버전에서 확인해야 하며, 원본만으로 최신 지원을 단정하지 않는다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>계열</th>
+<th>강의의 예시</th>
+<th>이해해야 할 구조·주의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Legacy block</td>
+<td>Q4_0, Q4_1, Q5_0, Q5_1, Q8_0</td>
+<td>block 단위 scale, 형식에 따라 min 등을 추가. 같은 Q4라도 metadata·복원식이 다름</td>
+</tr>
+<tr>
+<td>K-quant</td>
+<td>Q2_K, Q3_K_<em>, Q4_K_</em>, Q5_K_*, Q6_K</td>
+<td>superblock과 하위 scale·min 표현. 모든 K 형식이 똑같은 6비트 metadata 구조는 아님</td>
+</tr>
+<tr>
+<td>IQ/I-quant</td>
+<td>IQ1_<em>, IQ2_</em>, IQ3_*, IQ4_XS, IQ4_NL</td>
+<td>중요도·격자·codebook·비균일 표현 등을 활용하는 여러 형식. 모든 형식이 같은 VQ나 GPTQ 구현은 아님</td>
+</tr>
+<tr>
+<td>Ternary</td>
+<td>TQ1_0, TQ2_0</td>
+<td>값 집합을 −1,0,+1로 제한하고 base-3 또는 scalar packing 등으로 저장</td>
+</tr>
+<tr>
+<td>FP4</td>
+<td>MXFP4, NVFP4</td>
+<td>FP4 값과 공유 scale. native 커널·장치 지원 별도 확인</td>
+</tr>
+<tr>
+<td>극저비트 예시</td>
+<td>Q1_0, Q2_0</td>
+<td>강의 목록에 있는 명칭. 해당 버전의 실제 정의·지원 여부 확인 필요</td>
+</tr>
+</tbody>
+</table></div>
+<p>**Importance matrix(imatrix, 중요도 통계)**는 calibration activation의 제곱 평균 등으로 weight 오차가 출력에 미치는 영향을 가중하는 정보다. 원본의 <span class="math-raw math-inline">$I_i\approx E[x_i^2]$</span>에서 <span class="math-raw math-inline">$x_i$</span>는 i번째 입력 feature, <span class="math-raw math-inline">$E$</span>는 calibration 입력에 대한 평균이다. GPTQ도 입력 통계를 활용하지만, imatrix 사용을 곧 GPTQ의 Hessian 기반 순차 보정과 동일시해서는 안 된다.</p>
+<p><strong>Packing(비트 묶음 저장) 검산:</strong> 원본의 삼진 예제는 <span class="math-raw math-inline">$[-1,+1,0,-1,+1]$</span>을 <span class="math-raw math-inline">$[0,2,1,0,2]$</span>로 매핑한다. 이를 <span class="math-raw math-inline">$0\times3^4+2\times3^3+1\times3^2+0\times3+2=65$</span>로 저장한다. 5개의 삼진 값은 <span class="math-raw math-inline">$3^5=243$</span>가지이므로 8비트에 넣을 수 있어 1.6 bit/value다. 이 값은 해당 toy packing의 값 본체만 계산한 것이며 전체 모델의 scale·정렬 비용은 제외했다.</p>
+<p><strong>교육용 보충:</strong> Q4의 “4”는 보통 값 코드 폭을 가리키며 파일 전체의 정확한 평균 4 bit/weight를 뜻하지 않는다. 같은 계열의 S/M/L 접미사도 모든 모델·형식에 공통인 품질 서열로 해석하지 않는다. 실제 파일 크기와 정확도는 tensor별 정밀도 배치·형식 정의·모델 구조에 달려 있다.</p>
+<h2 id="sec-610-종합-적용-시나리오와-배포-검증">6.10 종합 적용 시나리오와 배포 검증</h2>
+<p>양자화 기법은 단일 순위가 아니라 <strong>병목·정확도·지원 커널</strong>의 조합으로 선택한다. 아래는 교육용 판단 예시이며 특정 제품 구매나 최신 backend 지원을 추천하는 목록이 아니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>관측 상황</th>
+<th>검토할 방향</th>
+<th>결론 전에 측정할 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>batch=1 decode에서 weight 읽기가 지배적</td>
+<td>지원되는 low-bit weight-only</td>
+<td>token/s, dequant 비용, PPL·업무 품질</td>
+</tr>
+<tr>
+<td>prefill 행렬곱 비중이 크고 INT8 커널이 잘 지원됨</td>
+<td>W8A8과 outlier 대응</td>
+<td>TTFT, 입력 길이별 품질, Q/DQ·fusion</td>
+</tr>
+<tr>
+<td>INT4 activation에서 일부 feature 때문에 품질이 악화</td>
+<td>scaling·회전 계열</td>
+<td>변환 비용과 정확도, 모델 구조 호환성</td>
+</tr>
+<tr>
+<td>긴 대화에서 KV cache가 메모리를 지배</td>
+<td>KV 양자화 또는 Part 2의 cache 최적화</td>
+<td>긴 context 품질, cache 비용, decode 지연</td>
+</tr>
+<tr>
+<td>메모리가 부족하지만 업무 맞춤 미세조정이 필요</td>
+<td>QLoRA 같은 adapter 학습</td>
+<td>학습 peak memory, adapter 품질, 배포 경로</td>
+</tr>
+<tr>
+<td>저비트 PTQ 품질이 목표 미달이고 학습 자원이 있음</td>
+<td>QAT 또는 학습 기반 보정</td>
+<td>학습 비용, 분포 변화, 최종 device 성능</td>
+</tr>
+</tbody>
+</table></div>
+<p>**TTFT(Time To First Token, 첫 토큰 시간)**는 요청에서 첫 출력 토큰까지 걸리는 시간이다. **TPOT(Time Per Output Token, 출력 토큰당 시간)**는 이후 token 생성 간격을 나타낸다. token/s와 함께 측정하되 측정 구간·batch·동시 요청 수를 명시해야 한다.</p>
+<p>배포 전에는 같은 prompt·tokenizer·출력 길이로 FP 기준과 비교한다. 품질 평가에는 calibration에서 보지 않은 업무 데이터와 긴 context를 포함한다. 파일 크기, peak RAM/VRAM, TTFT·TPOT, 전력·열 제약, 실패·fallback 여부를 기록한다. **VRAM(Video RAM)**은 GPU의 전용 메모리를 가리키며, 통합·공유 메모리 구조에서는 시스템 RAM과 중복 합산하지 않는다. 멀티모달 모델은 언어 측면 PPL뿐 아니라 실제 이미지 이해 과제를 확인한다. 이러한 흐름은 <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/assets/ODAI-1/quantization-flow.canvas">양자화 적용 Canvas</a>와 <a href="../resources/498e022acacf1b076141-quantization-flow.svg">미리보기</a>를 함께 읽는다.</p>
+<h2 id="sec-611-용어-찾아보기">6.11 용어 찾아보기</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>용어</th>
+<th>짧은 정의</th>
+<th>다시 볼 절</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>W4A16 / W8A8</td>
+<td>가중치·activation 정밀도 조합 표기</td>
+<td>6.1–6.2</td>
+</tr>
+<tr>
+<td>Outlier</td>
+<td>분포의 다른 값보다 절댓값이 큰 값·feature</td>
+<td>6.1, 6.3–6.5</td>
+</tr>
+<tr>
+<td>Mixed precision</td>
+<td>일부 계산·tensor를 다른 정밀도로 처리</td>
+<td>6.3</td>
+</tr>
+<tr>
+<td>Offline calibration</td>
+<td>배포 전 대표 입력으로 통계·scale 추정</td>
+<td>6.4, 6.7</td>
+</tr>
+<tr>
+<td>Orthogonal / Hadamard</td>
+<td>길이를 보존하는 직교 변환 / ±1 기반 변환</td>
+<td>6.5</td>
+</tr>
+<tr>
+<td>Reconstruction / Hessian</td>
+<td>출력 재현 목적 / 손실의 2차 곡률 행렬</td>
+<td>6.6</td>
+</tr>
+<tr>
+<td>Salient channel</td>
+<td>출력에 중요하여 오차 보호가 필요한 channel</td>
+<td>6.7</td>
+</tr>
+<tr>
+<td>LoRA / QLoRA</td>
+<td>저랭크 adapter 학습 / 양자화 frozen base 위 adapter 학습</td>
+<td>6.8</td>
+</tr>
+<tr>
+<td>NF4 / double quant</td>
+<td>정규분포 기반 4비트 codebook / scale 상수의 추가 양자화</td>
+<td>6.8</td>
+</tr>
+<tr>
+<td>Imatrix / packing</td>
+<td>입력 통계 기반 중요도 / 여러 코드를 비트에 묶어 저장</td>
+<td>6.9</td>
+</tr>
+<tr>
+<td>TTFT / TPOT</td>
+<td>첫 출력까지의 시간 / 이후 토큰당 생성 시간</td>
+<td>6.10</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-612-요약흔한-오해최종-복습">6.12 요약·흔한 오해·최종 복습</h2>
+<p>LLM.int8은 outlier를 고정밀 경로로 분리하고, SmoothQuant는 channel scaling으로 activation 난이도를 이전한다. QuaRot·SpinQuant는 좌표계를 바꾸고, GPTQ는 출력 재구성의 곡률을 활용하며, AWQ는 activation으로 중요한 weight channel을 보호한다. QLoRA는 이들과 목적이 다른 <strong>메모리 효율적인 adapter 미세조정</strong> 접근이다. 형식의 이름과 실제 계산 경로는 별도로 검증해야 한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>흔한 오해</th>
+<th>바로잡기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>변환이 수학적으로 등가면 양자화도 무손실이다</td>
+<td>등가성은 양자화 전 실수 계산의 성질이다</td>
+</tr>
+<tr>
+<td>AWQ는 weight 1%를 항상 FP16으로 남긴다</td>
+<td>FP16 실험은 중요도 관찰이며 최종은 scaling 기반 보호다</td>
+</tr>
+<tr>
+<td>QLoRA는 모든 weight를 NF4로 업데이트한다</td>
+<td>frozen base를 통해 gradient를 전달하며 adapter를 학습한다</td>
+</tr>
+<tr>
+<td>4비트 저장이면 4비트 곱셈이다</td>
+<td>복원 후 FP16/BF16 계산하는 경로도 있다</td>
+</tr>
+<tr>
+<td>IQ는 GPTQ의 다른 이름이다</td>
+<td>중요도 정보와 양자화 보정 알고리즘을 구분해야 한다</td>
+</tr>
+<tr>
+<td>가장 작은 파일이 가장 빠르다</td>
+<td>unpacking·커널·cache·batch에 따라 달라진다</td>
+</tr>
+</tbody>
+</table></div>
+<ol>
+<li><strong>왜 weight-only는 decode에서 유리할 수 있는가?</strong> 작은 batch에서 weight 재사용이 작으면 weight 전송량 감소가 병목을 줄일 수 있다. 실제 효과는 커널 overhead와 장치에 달려 있다.</li>
+<li><strong>SmoothQuant와 AWQ가 같은 scaling 식을 쓰는데 왜 다른가?</strong> 전자는 activation·weight 동시 저정밀화를 위해 activation 난이도를 이전하고, 후자는 low-bit weight-only에서 activation 기반 중요 channel의 weight 오차를 보호한다.</li>
+<li><strong>회전의 상쇄 조건은?</strong> 호환되는 위치에 R과 Rᵀ를 짝지어 삽입해야 한다. 비선형 연산을 임의로 가로질러 이동할 수 없다.</li>
+<li><strong>GPTQ의 Hessian은 무엇의 Hessian인가?</strong> calibration 입력에 대한 국소 layer 출력 재구성 손실의 곡률이다. 전체 task loss의 정확한 Hessian으로 해석하지 않는다.</li>
+<li><strong>QLoRA에서 NF4·BF16·adapter는 각각 무엇인가?</strong> 기저 모델의 대표 저장 표현, 복원 후 대표 계산 표현, 실제 학습하는 작은 파라미터다.</li>
+<li><strong>7B 모델을 4비트로 저장하면 3.5 GB 장치에서 실행 가능한가?</strong> 가중치 본체만 3.5 GB이므로 판단할 수 없다. metadata·KV·activation·workspace와 장치 가용 메모리를 더해야 한다.</li>
+<li><strong>양자화 후 PPL은 비슷하지만 업무 답변이 나빠지면?</strong> 업무 평가를 독립 기준으로 삼고 calibration 대표성·긴 문맥·특정 연산 민감도를 재검토한다.</li>
+</ol>
+<p><strong>Part 2로 이어지는 질문:</strong> weight를 줄인 뒤 KV cache나 attention 메모리가 새 병목이 될 수 있다. 원본 p.2의 pruning·knowledge distillation·KV 최적화·speculative decoding·FlashAttention은 후속 과정이며 이 Part 1에서 상세 학습한 것으로 간주하지 않는다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-1/ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.md">6. 고급 LLM 양자화와 적용 판단 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html"><small>이전 장</small>5. QAT와 정수 추론</a><a rel="next" href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html"><small>다음 장</small>부록 — 개념 사이의 연결과 종합 복습</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

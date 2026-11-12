@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="382" viewBox="0 0 720 382" role="img" aria-labelledby="t d">
+<title id="t">판매 기록에서 월요일과 화요일 예측까지</title>
+<desc id="d">금요일에서 일요일까지의 판매 기록을 읽어 시간 패턴을 찾은 뒤 월요일과 화요일의 판매량을 예측한다. 미래 실제 판매량은 모델에 넣지 않는다.</desc>
+<rect x="1" y="1" width="718" height="380" rx="15" fill="#f8fafc" stroke="#cbd5e1"/>
+<g font-family="Malgun Gothic, Noto Sans CJK KR, sans-serif" fill="#142943">
+<text x="24" y="41" font-size="24" font-weight="700">일요일 밤에는 어디까지 읽을 수 있을까?</text>
+<rect x="24" y="61" width="672" height="88" rx="10" fill="#e7f0ff" stroke="#b7c7da"/>
+<text x="42" y="85" font-size="17" font-weight="700">1. 기준 시점까지의 입력</text>
+<text x="42" y="109" font-size="16">금요일 20개 · 토요일 32개 · 일요일 24개</text>
+<text x="42" y="132" font-size="16">이미 알려진 월요일 행사 일정은 함께 쓸 수 있다.</text>
+<text x="360" y="164" text-anchor="middle" font-size="17" font-weight="700">↓</text>
+<rect x="24" y="167" width="672" height="88" rx="10" fill="#e8f7ef" stroke="#b7c7da"/>
+<text x="42" y="191" font-size="17" font-weight="700">2. 시간축에서 단서 찾기</text>
+<text x="42" y="215" font-size="16">합성곱: 가까운 며칠의 급등과 하락을 찾는다.</text>
+<text x="42" y="238" font-size="16">어텐션: 목표 날짜에 유용한 과거 기록을 모은다.</text>
+<text x="360" y="270" text-anchor="middle" font-size="17" font-weight="700">↓</text>
+<rect x="24" y="273" width="672" height="88" rx="10" fill="#fff0df" stroke="#b7c7da"/>
+<text x="42" y="297" font-size="17" font-weight="700">3. 출력값에 날짜를 붙이기</text>
+<text x="42" y="321" font-size="16">첫 값: 월요일 판매량 · 둘째 값: 화요일 판매량</text>
+<text x="42" y="344" font-size="16">두 날짜의 실제 판매량은 나중에 오차를 계산할 때 쓴다.</text>
+
+</g></svg>

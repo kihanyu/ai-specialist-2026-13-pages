@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>03. 검색 평가지표 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/rag-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html" aria-current="page">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>03. 검색 평가지표</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>같은 순위 목록에서 Success·P·R·RR·AP·nDCG를 cutoff와 명시된 분모로 계산한다.</li><li>전체 관련 수 r를 쓰는 AP@K와 다른 분모 변형, 질의별 MRR·MAP 평균을 구분한다.</li><li>반환 부족·관련 문서 0개·미판정·중복·동점·평가 누출과 벤치마크 조건을 해석한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="rag-metrics" id="lab-rag-metrics"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-평가의-입력출력">1. 평가의 입력·출력</a></li><li><a href="#sec-2-하나의-결과를-여러-관점으로-읽기">2. 하나의 결과를 여러 관점으로 읽기</a></li><li><a href="#sec-3-successk와-rrmrr-첫-관련-문서">3. Success@K와 RR·MRR: 첫 관련 문서</a></li><li><a href="#sec-4-precision과-recall-노이즈와-누락">4. Precision과 Recall: 노이즈와 누락</a></li><li><a href="#sec-5-ap와-map-모든-관련-문서의-순위를-반영하기">5. AP와 MAP: 모든 관련 문서의 순위를 반영하기</a></li><li><a href="#sec-6-순서만-바꾸면-무엇이-달라지는가">6. 순서만 바꾸면 무엇이 달라지는가?</a></li><li><a href="#sec-7-평가가-틀어지는-경계-조건">7. 평가가 틀어지는 경계 조건</a></li><li><a href="#sec-8-벤치마크와-운영-성능을-함께-읽기">8. 벤치마크와 운영 성능을 함께 읽기</a></li><li><a href="#sec-9-확인-질문과-해설">9. 확인 질문과 해설</a></li><li><a href="#sec-그림으로-복습하기">그림으로 복습하기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-03-검색-평가지표">03. 검색 평가지표</h1>
+<p><a href="02_TF_IDF%EC%99%80_BM25.html">이전: TF-IDF와 BM25</a> · <a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">다음: 신경검색과 검색기 학습</a></p>
+<p>검색 점수가 높다는 이유만으로 검색기가 좋은지 알 수는 없다. <strong>사람이 관련 있다고 판단한 문서를 어느 순위에서 얼마나 찾았는지</strong>를 평가해야 한다. 첫 정답을 빨리 찾는 목표, 노이즈를 적게 반환하는 목표, 필요한 문서를 빠짐없이 찾는 목표는 다르다.</p>
+<h2 id="sec-1-평가의-입력출력">1. 평가의 입력·출력</h2>
+<p>입력은 질의별 순위 목록과 관련성 라벨이다. 출력은 질의별 지표 및 여러 질의의 평균이다. BM25 점수, cosine 점수, 모델의 확신도는 관련성 라벨을 대신하지 않는다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기호</th>
+<th>정의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$q$</span></td>
+<td>하나의 질의</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$d_i$</span></td>
+<td>검색 결과의 <span class="math-raw math-inline">$i$</span>위 문서, 순위는 1부터 시작</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$rel_i$</span></td>
+<td><span class="math-raw math-inline">$d_i$</span>가 관련 문서이면 1, 아니면 0</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$R_q$</span></td>
+<td>corpus 전체에서 <span class="math-raw math-inline">$q$</span>와 관련 있다고 정의된 문서 집합</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$r=\lvert R_q\rvert$</span></td>
+<td>전체 관련 문서 수</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$K$</span></td>
+<td>평가할 상위 결과 수</td>
+</tr>
+<tr>
+<td><span class="math-raw math-inline">$h_K=\sum_{i=1}^{K}rel_i$</span></td>
+<td>상위 <span class="math-raw math-inline">$K$</span>개 안에서 찾은 관련 문서 수</td>
+</tr>
+</tbody>
+</table></div>
+<p>먼저 문서 ID를 중복 없이 반환한다고 가정한다. 같은 문서·같은 근거를 반복 반환해 hit 수를 부풀리면 안 된다. RAG에서는 평가 단위가 문서인지 청크인지, 같은 사실을 담은 다른 청크도 정답인지 정해야 한다.</p>
+<h2 id="sec-2-하나의-결과를-여러-관점으로-읽기">2. 하나의 결과를 여러 관점으로 읽기</h2>
+<p>문서 A~F가 다음 순서로 반환되었다고 하자. 전체 관련 문서는 B·D·E의 3개다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align:right">순위 <span class="math-raw math-inline">$i$</span></th>
+<th>반환 문서</th>
+<th style="text-align:right"><span class="math-raw math-inline">$rel_i$</span></th>
+<th style="text-align:right">누적 관련 수</th>
+<th style="text-align:right">Precision@<span class="math-raw math-inline">$i$</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">1</td>
+<td>A</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:right">2</td>
+<td>B</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><span class="math-raw math-inline">$1/2$</span></td>
+</tr>
+<tr>
+<td style="text-align:right">3</td>
+<td>C</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><span class="math-raw math-inline">$1/3$</span></td>
+</tr>
+<tr>
+<td style="text-align:right">4</td>
+<td>D</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"><span class="math-raw math-inline">$2/4$</span></td>
+</tr>
+<tr>
+<td style="text-align:right">5</td>
+<td>E</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right"><span class="math-raw math-inline">$3/5$</span></td>
+</tr>
+<tr>
+<td style="text-align:right">6</td>
+<td>F</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right"><span class="math-raw math-inline">$3/6$</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>상위 3개에 첫 관련 문서는 있지만 나머지 관련 문서는 아직 없다. 그래서 ‘관련 문서가 하나라도 있는가’에는 성공해도 ‘모두 찾았는가’에는 부족하다.</p>
+<p><img alt="상위 세 문서 A·B·C에서 첫 관련 문서 위치와 Success·RR·Precision·Recall을 계산한 그림" decoding="async" id="figure-1" loading="lazy" src="../resources/20e18b3e30428a533429-03_rank_metrics.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/20e18b3e30428a533429-03_rank_metrics.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> 파란 테두리 안은 평가 깊이 K=3이며 관련 문서는 B 하나다. RR의 분모는 B의 순위 2, Precision의 분모는 반환 슬롯 3, Recall의 분모는 전체 관련 문서 B·D·E의 수 3이다. 이 예제에서 Precision과 Recall의 값이 우연히 같아도 분모가 뜻하는 대상은 다르다.</p>
+<h2 id="sec-3-successk와-rrmrr-첫-관련-문서">3. Success@K와 RR·MRR: 첫 관련 문서</h2>
+<p>첫 관련 문서의 순위를 <span class="math-raw math-inline">$r_{first}$</span>라고 하자. 없으면 무한대로 생각한다.</p>
+<div class="math-raw math-display">$$Success@K(q)=\mathbf1[r_{first}\le K].$$</div><div class="math-raw math-display">$$RR@K(q)=\begin{cases}1/r_{first},&amp;r_{first}\le K\\0,&amp;\text{그 외}\end{cases}$$</div><p>위 예제에서 <span class="math-raw math-inline">$r_{first}=2$</span>이므로 <span class="math-raw math-inline">$Success@3=1$</span>, <span class="math-raw math-inline">$RR@3=0.5$</span>다. <span class="math-raw math-inline">$K=1$</span>이면 둘 다 0이다. <span class="math-raw math-inline">$K=3$</span> 바깥의 관련 문서는 RR@3에 기여하지 않는다.</p>
+<p>질의 집합 <span class="math-raw math-inline">$Q$</span>에서 평균하면 다음과 같다.</p>
+<div class="math-raw math-display">$$MRR@K=\frac1{|Q|}\sum_{q\in Q}RR@K(q).$$</div><p>세 질의의 첫 관련 순위가 1·2·검색 실패이고 <span class="math-raw math-inline">$K=3$</span>이면 <span class="math-raw math-inline">$MRR@3=(1+1/2+0)/3=0.5$</span>다. 질의마다 문서 수를 가중해 평균하는 것이 아니라, 여기서는 <strong>질의 하나를 같은 무게로</strong> 평균한다.</p>
+<p>Success는 ‘K 안에 존재하는가’, RR은 ‘그중 첫 문서를 얼마나 앞에 놓았는가’를 측정한다. RR=1이어도 첫 문서만 맞고 나머지가 모두 쓸모없을 수 있다. 또 multi-hop 질문처럼 둘 이상의 근거가 필요한 경우 첫 근거 하나만 찾아서는 답변에 충분하지 않을 수 있다.</p>
+<h2 id="sec-4-precision과-recall-노이즈와-누락">4. Precision과 Recall: 노이즈와 누락</h2>
+<div class="math-raw math-display">$$Precision@K=\frac{h_K}{K},\qquad Recall@K=\frac{h_K}{r}.$$</div><p>기본 예제의 상위 3개는 <code>[A,B,C]</code>이므로 <span class="math-raw math-inline">$h_3=1$</span>이다.</p>
+<div class="math-raw math-display">$$Precision@3=1/3,\qquad Recall@3=1/3.$$</div><p><span class="math-raw math-inline">$K=5$</span>이면 <span class="math-raw math-inline">$Precision@5=3/5=0.6$</span>, <span class="math-raw math-inline">$Recall@5=3/3=1$</span>이다. 관련 문서를 모두 찾았어도 노이즈 A·C가 섞여 precision은 1이 아니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>보고 싶은 문제</th>
+<th>먼저 볼 지표</th>
+<th>해석의 한계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>처음부터 유용한 결과가 나오는가?</td>
+<td>RR·MRR</td>
+<td>뒤의 노이즈·추가 근거 누락을 모름</td>
+</tr>
+<tr>
+<td>제한된 컨텍스트를 노이즈가 차지하는가?</td>
+<td>Precision@K</td>
+<td>필요한 다른 근거가 corpus에 얼마나 더 있는지 모름</td>
+</tr>
+<tr>
+<td>필요한 근거를 빠뜨리는가?</td>
+<td>Recall@K</td>
+<td>관련 문서의 순서와 노이즈 양을 충분히 반영하지 못함</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>K를 늘리는 효과:</strong> 중복 없는 동일한 순위 목록에서 Recall@K는 줄어들지 않는다. Precision@K는 새 문서가 관련 있는지에 따라 오르거나 내린다. ‘더 많이 반환하면 검색이 무조건 좋아진다’고 결론내리지 않는다. RAG에서는 컨텍스트 길이·비용·생성기의 정보 활용 능력도 함께 바뀐다.</p>
+<p>원하면 조화평균 <span class="math-raw math-inline">$F1@K=2PR/(P+R)$</span>을 사용할 수 있다. <span class="math-raw math-inline">$P=R=0$</span>이면 F1을 0으로 정의한다. F1은 precision·recall의 균형을 보여주지만 상위 K 안에서 관련 문서의 순서가 달라도 동일하다.</p>
+<h2 id="sec-5-ap와-map-모든-관련-문서의-순위를-반영하기">5. AP와 MAP: 모든 관련 문서의 순위를 반영하기</h2>
+<p>Average Precision(AP)은 <strong>관련 문서를 만나는 순위에서의 precision</strong>을 더한 뒤, 전체 관련 문서 수로 나눈다.</p>
+<div class="math-raw math-display">$$AP(q)=\frac1r\sum_{i=1}^{|D|}Precision@i(q)\,rel_i.$$</div><p>반환 목록 밖에 있는 관련 문서의 기여는 0이다. 기본 예제에서는 B·D·E가 2·4·5위에 있으므로 다음과 같다.</p>
+<div class="math-raw math-display">$$AP=\frac{1/2+2/4+3/5}{3}=\frac{1.6}{3}\approx0.533333.$$</div><p>AP는 모든 순위의 precision을 무조건 평균하는 값이 아니다. 또 찾은 관련 문서 수만으로 나누면 못 찾은 관련 문서에 대한 누락 효과가 사라진다. 검색 결과가 <code>[B]</code> 한 개뿐이고 관련 문서가 3개라면, 이 정의의 AP는 <span class="math-raw math-inline">$1/3$</span>이지 1이 아니다.</p>
+<p>여러 질의에 대해 <span class="math-raw math-inline">$MAP=\frac1{|Q|}\sum_q AP(q)$</span>를 계산한다. 모든 문서를 합쳐 하나의 precision을 계산하는 것과 다르다. 정의와 예제의 기준은 <a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">Introduction to Information Retrieval의 ranked evaluation 설명</a>에서도 확인할 수 있다.</p>
+<h3 id="sec-apk는-분모-규약을-반드시-쓴다">AP@K는 분모 규약을 반드시 쓴다</h3>
+<p>잘린 목록에서 이 교재는 다음 규약을 사용한다.</p>
+<div class="math-raw math-display">$$AP@K=\frac1r\sum_{i=1}^{K}Precision@i\,rel_i.$$</div><p>기본 예제의 AP@3은 <span class="math-raw math-inline">$(1/2)/3=1/6$</span>이다. 일부 평가 도구는 분모를 <span class="math-raw math-inline">$\min(r,K)$</span>로 둔다. <span class="math-raw math-inline">$r=3,K=2$</span>인 기본 예제에서는 교재 규약이 <span class="math-raw math-inline">$1/6$</span>이고, 이 변형은 <span class="math-raw math-inline">$1/4$</span>다. 같은 <code>AP@K</code>라는 이름만 보고 수치를 직접 비교하지 않는다. 평가 보고서에 수식·도구 설정을 함께 남긴다.</p>
+<h2 id="sec-6-순서만-바꾸면-무엇이-달라지는가">6. 순서만 바꾸면 무엇이 달라지는가?</h2>
+<p>관련 문서 B·D·E는 같고 상위 5개의 구성도 같다고 하자.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>순위 목록</th>
+<th style="text-align:right">RR@5</th>
+<th style="text-align:right">P@5</th>
+<th style="text-align:right">R@5</th>
+<th style="text-align:right">AP@5: 분모 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[A,C,B,D,E]</code></td>
+<td style="text-align:right"><span class="math-raw math-inline">$1/3$</span></td>
+<td style="text-align:right">0.6</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><span class="math-raw math-inline">$(1/3+2/4+3/5)/3\approx0.477778$</span></td>
+</tr>
+<tr>
+<td><code>[B,D,E,A,C]</code></td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">0.6</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><span class="math-raw math-inline">$(1+1+1)/3=1$</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>precision·recall은 상위 K의 집합만 보므로 같다. RR·AP는 순서를 반영하므로 다르다. 이 예제는 ‘첫 문서 위치’와 ‘관련 문서 수’ 두 관점을 같은 조건에서 분리해 보여준다.</p>
+<p><img alt="같은 다섯 문서에서 관련 문서를 뒤에 놓거나 앞에 놓아 AP가 0.477778과 1로 달라지는 비교 그림" decoding="async" id="figure-2" loading="lazy" src="../resources/3c3f554d190f9dc98535-03_ap_order.svg"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/3c3f554d190f9dc98535-03_ap_order.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> 위·아래 목록은 관련 문서의 수가 같고 순서만 다르다. 녹색 칸에 도달하는 순위의 Precision만 더해 전체 관련 문서 수 3으로 나눈다. 무관 문서의 순위까지 모두 평균하거나, 찾은 문서 수만을 분모로 삼으면 다른 계산이 된다. 그림의 두 목록은 K=5 안에 관련 문서 세 개를 모두 포함한다.</p>
+<h3 id="sec-등급-관련성과-ndcg">등급 관련성과 nDCG</h3>
+<p>관련성 라벨이 0·1이 아니라 ‘매우 관련=2, 부분 관련=1, 무관=0’이라면 높은 등급을 앞에 두는 정도를 별도로 볼 수 있다. 한 가지 규약은 다음과 같다.</p>
+<div class="math-raw math-display">$$DCG@K=\sum_{i=1}^{K}\frac{2^{g_i}-1}{\log_2(i+1)},\qquad nDCG@K=DCG@K/IDCG@K.$$</div><p><span class="math-raw math-inline">$g_i$</span>는 관련성 등급이고 IDCG는 그 질의의 정답 등급을 이상적인 순서로 놓았을 때의 DCG다. gain을 <span class="math-raw math-inline">$g_i$</span> 그대로 쓰는 정의도 있으므로 gain·discount·평가 깊이를 함께 명시한다. 이 지표는 모델 순위표의 숫자를 읽기 위한 보충이며, 이진 라벨의 Precision과 같은 값이 아니다.</p>
+<p>모든 정답 gain이 0이어서 <span class="math-raw math-inline">$IDCG@K=0$</span>이면 비율이 정의되지 않는다. 평균에서 제외할지 0으로 포함할지 평가 규약을 정하고 해당 질의 수를 함께 보고한다.</p>
+<h2 id="sec-7-평가가-틀어지는-경계-조건">7. 평가가 틀어지는 경계 조건</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>상황</th>
+<th>이 교재의 처리 또는 확인할 규칙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math-raw math-inline">$K$</span>보다 적게 반환</td>
+<td>고정 깊이 P@K는 반환하지 못한 슬롯을 0으로 보아 <span class="math-raw math-inline">$K$</span>로 나눈다. 반환 개수로 나눈 precision과 구별한다.</td>
+</tr>
+<tr>
+<td>관련 문서가 0개</td>
+<td>Recall·AP의 분모가 0이므로 수학적으로 정의되지 않는다. 이 교재의 평균에서는 제외하고 해당 질의 수를 별도 보고한다. 모든 질의가 제외되면 평균도 계산하지 않는다.</td>
+</tr>
+<tr>
+<td>관련 문서가 없는 질문</td>
+<td>검색 지표만으로 성공을 정하기 어렵다. 답변 거절·무근거 답변 비율을 별도로 평가한다.</td>
+</tr>
+<tr>
+<td>relevance 미판정 문서</td>
+<td>‘미판정=무관’이라는 평가 관행과 실제 무관을 구별한다. 라벨이 희소한 데이터는 정답 문서를 negative로 잘못 볼 수 있다.</td>
+</tr>
+<tr>
+<td>점수 동점</td>
+<td>문서 ID 등 결정적 tie-break를 고정하거나, 평가 도구의 동점 처리 규칙을 명시한다.</td>
+</tr>
+<tr>
+<td>중복 청크·문서</td>
+<td>반환 문서 중복 제거와 근거 중복 처리 규약을 정한다.</td>
+</tr>
+<tr>
+<td>데이터 누출</td>
+<td>평가 질문·문서를 학습·튜닝에 반복 사용한 성능과 독립 평가 성능을 구별한다.</td>
+</tr>
+</tbody>
+</table></div>
+<p>0개 관련 질의를 제외하는 것은 유일한 표준이라는 뜻이 아니다. 0으로 포함하는 도구도 있다. 어느 쪽이든 개수와 규약을 공개해야 비교가 가능하다. Success@K·RR@K는 hit가 없으면 이 장의 정의상 0이지만, 평균을 낼 때는 평가 목적에 맞는 질의 모집단을 고정한다.</p>
+<h2 id="sec-8-벤치마크와-운영-성능을-함께-읽기">8. 벤치마크와 운영 성능을 함께 읽기</h2>
+<p>대표적인 검색 평가 자원에는 TREC·MS MARCO·BEIR가 있다. TREC는 평가 과제와 판정 체계의 맥락, MS MARCO는 질의·문서 관련성 데이터로 학습·평가하는 맥락, BEIR는 여러 검색 도메인에서 일반화를 살피는 맥락으로 읽으면 된다. 특정 판본의 문서 수나 최고 점수를 암기하는 것이 핵심은 아니다.</p>
+<p>보고할 최소 정보는 <strong>데이터셋·판본, 질의 수, 관련성 정의, 전처리·검색 단위, K, 평균 규칙, 모델·인덱스 설정</strong>이다. 품질이 같을 때 지연·처리량·메모리·비용도 비교한다. 문서 길이·하드웨어·배치 크기가 다른 환경의 속도 수치는 그대로 옮기지 않는다.</p>
+<p>RAG 답변이 틀렸을 때는 먼저 필요한 근거가 검색됐는지 확인한다. Recall이 낮으면 검색·청킹 문제일 수 있고, 근거가 있는데도 답이 틀리면 컨텍스트 구성·생성 문제일 수 있다. 단, 검색 점수가 좋다는 것만으로 올바른 답변이 보장되지는 않는다. 생성 평가와의 연결은 12장에서 다룬다.</p>
+<h2 id="sec-9-확인-질문과-해설">9. 확인 질문과 해설</h2>
+<ol>
+<li>첫 문서가 관련 있고 이후 9개가 무관할 때 RR@10=1이면 검색이 충분히 좋은가?</li>
+<li>기본 예제에서 K를 3에서 5로 늘리면 recall·precision은 각각 얼마인가?</li>
+<li>관련 문서가 3개인데 <code>[B]</code>만 반환했을 때 AP를 1로 계산하면 무엇을 놓치는가?</li>
+<li>전체 관련 문서 수가 0인 질의를 Recall·AP 평균에서 제외했는데 개수를 보고하지 않으면 어떤 문제가 생기는가?</li>
+</ol>
+<details>
+<summary>학습용 해설</summary>
+<ol>
+<li>목표에 따라 다르다. 첫 관련 문서를 찾는 목적에는 좋지만 P@10=0.1이고, 나머지 관련 문서나 여러 근거의 누락을 RR은 알려주지 않는다.</li>
+<li>recall은 <span class="math-raw math-inline">$1/3\to1$</span>, precision은 <span class="math-raw math-inline">$1/3\to3/5$</span>다. 이 예제에서는 둘 다 오르지만 precision이 항상 오르는 것은 아니다.</li>
+<li>찾지 못한 관련 문서 2개의 누락을 지워버린다. 본문의 AP 정의는 <span class="math-raw math-inline">$1/3$</span>이다.</li>
+<li>평가가 쉬운 일부 질의만 남았는지, 시스템 간 평균의 모집단이 같은지 판단할 수 없다. 제외 원인·개수를 함께 보고한다.</li>
+</ol>
+</details>
+<h2 id="sec-그림으로-복습하기">그림으로 복습하기</h2>
+<ul>
+<li><a href="../resources/20e18b3e30428a533429-03_rank_metrics.svg">순위와 네 지표 그림</a>에서 첫 hit·반환 슬롯·전체 정답 수를 구별한다.</li>
+<li><a href="../resources/3c3f554d190f9dc98535-03_ap_order.svg">AP 순서 비교 그림</a>에서 문서 수를 그대로 둔 채 순서만 바꾼 효과를 계산한다.</li>
+<li>평가에는 라벨·깊이 K·분모·질의 평균·예외 처리 규약이 필요하다. 점수 함수가 다른 검색기를 비교하더라도 이 평가 조건은 같게 유지해야 한다.</li>
+</ul>
+<p><a href="02_TF_IDF%EC%99%80_BM25.html">이전: TF-IDF와 BM25</a> · <a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">다음: 신경검색과 검색기 학습</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.md">03. 검색 평가지표 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="02_TF_IDF%EC%99%80_BM25.html"><small>이전 장</small>02. TF-IDF와 BM25</a><a rel="next" href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html"><small>다음 장</small>04. 신경검색과 검색기 학습</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>04. 교차엔트로피·KL과 PPL | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html" aria-current="page">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>04. 교차엔트로피·KL과 PPL</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>고정된 목표 분포에 대해 CE·엔트로피·KL을 구별한다.</li><li>정답 확률의 기하평균과 PPL을 연결한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-temperature" id="lab-llm-temperature"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-고정할-것은-관측-데이터다">1. 고정할 것은 관측 데이터다</a></li><li><a href="#sec-2-확률의-곱에서-교차엔트로피로">2. 확률의 곱에서 교차엔트로피로</a></li><li><a href="#sec-3-엔트로피를-빼면-kl-발산이-남는다">3. 엔트로피를 빼면 KL 발산이 남는다</a></li><li><a href="#sec-4-ppl은-평균-손실을-지수로-바꾼-척도다">4. PPL은 평균 손실을 지수로 바꾼 척도다</a></li><li><a href="#sec-5-확인-질문과-해설">5. 확인 질문과 해설</a></li><li><a href="#sec-페이지별-상세-읽기">페이지별 상세 읽기</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-04-교차엔트로피kl과-ppl">04. 교차엔트로피·KL과 PPL</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">이전: 신경망과 역전파</a> · <a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">다음: 조건부확률과 베이즈</a></p>
+<p>같은 관측 데이터를 여러 확률분포가 설명할 때 어느 분포가 더 잘 맞는지 비교해야 한다. <strong>관측열의 확률을 높이는 일 → 평균 음의 로그확률을 낮추는 일 → 목표 분포와의 차이를 줄이는 일</strong>을 연결하는 도구가 교차엔트로피와 KL 발산이다. PPL은 같은 평균 손실을 지수 척도로 바꾼 값이다.</p>
+<p>원문 54~61쪽을 다룬다. 확률의 합이 1이라는 점과 <a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html#probability">지수·로그</a>를 알면 시작할 수 있다. 이 장의 목표는 10개 결과열로 세 후보를 비교하고, CE와 KL의 차이를 설명하고, 정답 확률에서 PPL을 구하는 것이다. 특별히 밝히지 않으면 로그는 자연로그 ln이며 단위는 nat이다.</p>
+<p><a id="distribution"></a></p>
+<h2 id="sec-1-고정할-것은-관측-데이터다">1. 고정할 것은 관측 데이터다</h2>
+<p>원문에서 다섯 결과 A~E가 가능한 주사위 모형을 관측했다. 아래에서는 막대의 높이와 실제 결과열을 대응시켜 보자.</p>
+<p><img alt="A,B,C,D,E 확률 0.4,0.2,0.1,0.1,0.2를 나타내는 오각형 모형과 막대그래프; 아래 결과열 A,A,A,A,B,B,C,D,E,E" decoding="async" id="figure-1" loading="lazy" src="../resources/148f8d74440828406d7c-p054_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/148f8d74440828406d7c-p054_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>결과열은 <code>A,A,A,A,B,B,C,D,E,E</code>이다. A 4번, B 2번, C 1번, D 1번, E 2번으로 10개다. 각 횟수를 10으로 나눈 경험 분포를 <code>p=(0.4,0.2,0.1,0.1,0.2)</code>라 쓰자. 색과 오각형은 결과 범주를 구별한다. 실제 확률은 막대 높이와 옆의 수치에서 읽으며, 오각형 면적을 재서 구하는 것이 아니다.</p>
+<p>이제 같은 결과열에 아래 세 후보를 적용한다. 어디에 높은 확률을 주는지가 어떻게 다른가?</p>
+<p><img alt="같은 10개 관측열 아래 Die1, Die2, Die3의 A~E 분포를 나란히 비교한 그림" decoding="async" id="figure-2" loading="lazy" src="../resources/5d6a04ebb41e750db2c6-p055_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/5d6a04ebb41e750db2c6-p055_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>후보</th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+<th>E</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Die1</td>
+<td>0.4</td>
+<td>0.2</td>
+<td>0.1</td>
+<td>0.1</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>Die2</td>
+<td>0.4</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>Die3</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.4</td>
+<td>0.2</td>
+<td>0.1</td>
+</tr>
+</tbody>
+</table></div>
+<p>Die2는 A 확률은 맞지만 B와 E를 낮추고 C와 D를 높인다. Die3는 가장 자주 나온 A보다 C에 큰 확률을 준다. 후보가 바뀌어도 <strong>경험 분포 p와 관측 횟수는 바꾸지 않는다</strong>. 같은 데이터로 비교해야 한다.</p>
+<p><a id="ce"></a></p>
+<h2 id="sec-2-확률의-곱에서-교차엔트로피로">2. 확률의 곱에서 교차엔트로피로</h2>
+<p>이 주사위 모형은 각 시행이 독립이고 같은 분포 q에서 나온다고 가정한다. 따라서 특정 순서의 결과열 확률은 각 결과의 확률을 곱한 값이다. 예를 들어 Die2는 <code>0.4⁴×0.1²×0.2×0.2×0.1²=0.0000001024</code>다. <strong>이 순서의 열</strong>을 계산하므로 순열 개수 계수를 곱하지 않는다. 단순히 같은 횟수가 나올 확률을 묻는 다른 질문에서는 경우의 수가 필요하다.</p>
+<p>곱에 로그를 취하면 합이 되고, 음수를 붙인 뒤 10으로 나누면 비교하기 쉬운 평균 손실이 된다.</p>
+<pre><code class="language-text">H(p,q) = -Σᵢ pᵢ ln qᵢ
+        = -(1/N) Σₜ ln q(관측 결과ₜ)
+Die2: -[4ln0.4 + 2ln0.1 + ln0.2 + ln0.2 + 2ln0.1]/10
+      ≈1.609438
+</code></pre>
+<p><code>H(p,q)</code>가 **교차엔트로피(Cross Entropy, CE)**다. p는 각 결과를 얼마나 자주 고려할지 정하는 가중치이고 q는 모델이 그 결과에 부여한 확률이다. 부호를 반대로 했으므로 확률이 높은 관측열일수록 CE가 낮다. q를 바꾸면서 비교할 때는 p를 고정한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>후보</th>
+<th>특정 결과열 확률</th>
+<th>평균 CE</th>
+<th>해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Die1</td>
+<td>0.0000004096</td>
+<td>1.470808</td>
+<td>관측 빈도와 일치하며 세 후보 중 최소</td>
+</tr>
+<tr>
+<td>Die2</td>
+<td>0.0000001024</td>
+<td>1.609438</td>
+<td>Die1보다 열의 확률이 1/4</td>
+</tr>
+<tr>
+<td>Die3</td>
+<td>0.0000000032</td>
+<td>1.956012</td>
+<td>흔한 A에 낮은 확률을 부여</td>
+</tr>
+</tbody>
+</table></div>
+<p>Die1은 <code>-[4ln0.4+2ln0.2+ln0.1+ln0.1+2ln0.2]/10</code>으로 계산한다. Die3는 로그 안을 세 번째 후보로 바꾼다. 결과열의 로그확률은 각각 약 -14.70808, -16.09438, -19.56012다. 평균을 내지 않은 합과 평균 CE를 혼동하지 말자.</p>
+<p><strong>보충: 한 정답만 있는 경우.</strong> 정답이 A라면 목표 one-hot 분포는 <code>(1,0,0,0,0)</code>이고 CE는 <code>-ln q(A)</code> 하나로 줄어든다. q(A)=0.8이면 0.2231, q(A)=0.1이면 2.3026이다. 확신하며 틀리는 예측이 큰 벌점을 받는다. pᵢ&gt;0인데 qᵢ=0이면 손실은 무한대다. pᵢ=0인 항은 극한 관례로 0으로 처리한다. 소프트웨어에서는 안정적인 로그 계산을 사용하지만 여기서는 수학적 식을 계산한다.</p>
+<p><a id="kl"></a></p>
+<h2 id="sec-3-엔트로피를-빼면-kl-발산이-남는다">3. 엔트로피를 빼면 KL 발산이 남는다</h2>
+<p><strong>엔트로피</strong> <code>H(p)=-Σpᵢln pᵢ</code>는 목표 분포 자체의 불확실성이다. q=p일 때 교차엔트로피가 이 값과 같다. <strong>KL 발산</strong>은 목표 p를 모델 q로 설명할 때 추가되는 양이다.</p>
+<pre><code class="language-text">KL(p||q) = Σᵢ pᵢ ln(pᵢ/qᵢ)
+         = H(p,q)-H(p)
+H(p)=1.470808
+Die1: 0
+Die2: 1.609438-1.470808=0.138629
+Die3: 1.956012-1.470808=0.485203
+</code></pre>
+<p>KL은 음수가 아니며 같은 분포일 때 0이다. 다만 일반적인 거리와 달리 <code>KL(p||q)</code>와 <code>KL(q||p)</code>는 같지 않다. 방향을 바꾸면 가중치와 로그의 비가 모두 바뀐다. 따라서 ‘두 분포 사이 거리’라는 직관은 대칭 거리라는 뜻으로 받아들이지 않는다. p가 고정이면 H(p)도 상수라 CE 최소화와 KL 최소화는 같은 최적화 목표를 갖는다.</p>
+<p>아래 원문 표는 비교의 흐름을 보존하기 위한 자료다. <strong>수정해야 할 표기 두 곳</strong>을 먼저 기억하자. 이 교재의 계산 기준은 위 식과 표다.</p>
+<p><img alt="원문 세 주사위의 확률·교차엔트로피·KL 비교표; Die1 1.471과 0, Die2 1.609와 0.138, Die3 1.956과 0.485를 표시하며 아래 본문에서 KL 방향과 확률식 오기를 정정함" decoding="async" id="figure-3" loading="lazy" src="../resources/bbc2ef8d44c6e02c991e-p059_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/bbc2ef8d44c6e02c991e-p059_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽에서 오른쪽으로 후보 → 결과열 확률 → CE → KL을 읽는다. 메달은 이 세 후보의 순위를 표현하며 모델 일반 성능을 측정한 자료는 아니다. 원문은 Die2·Die3 행의 KL을 <code>D(Q||P)</code>, <code>D(R||P)</code>로 적었지만 그 옆 뺄셈은 **<code>KL(P||Q)</code>, <code>KL(P||R)</code>**에 해당한다. 표에 사용된 <code>H(P|Q)</code>는 여기서는 교차엔트로피를 나타내지만 조건부 엔트로피와 혼동되므로 본문은 <code>H(p,q)</code>로 쓴다.</p>
+<p>또 원문 Probability 열의 거듭제곱 인자에는 세 행 모두 오류가 있다. Die1 식 <code>0.4⁴·0.1²·0.2¹·0.2¹·0.1²</code>는 Die2의 확률을 만든다. Die2 식은 <code>0.4⁴·0.1¹·0.2²·0.2¹·0.1¹</code>, Die3 식은 <code>0.4¹·0.1²·0.2⁴·0.2²·0.1¹</code>로 표시되어 각각 관측 빈도와 확률의 배치가 맞지 않는다. A,B,C,D,E 순서로 올바르게 쓰면 다음과 같다.</p>
+<pre><code class="language-text">Die1: 0.4⁴ × 0.2² × 0.1¹ × 0.1¹ × 0.2² = 0.0000004096
+Die2: 0.4⁴ × 0.1² × 0.2¹ × 0.2¹ × 0.1² = 0.0000001024
+Die3: 0.1⁴ × 0.2² × 0.4¹ × 0.2¹ × 0.1² = 0.0000000032
+</code></pre>
+<p>표에 표시된 세 최종 확률은 올바르지만 그 위 곱식과 일치하지 않는다. 수치 1.471 등을 먼저 반올림한 뒤 빼면 작은 차이가 생기므로 검산에서는 마지막에 반올림한다. 원문 그림 하단의 Serrano.Academy 출처 표시는 유지했다.</p>
+<p><a id="ppl"></a></p>
+<h2 id="sec-4-ppl은-평균-손실을-지수로-바꾼-척도다">4. PPL은 평균 손실을 지수로 바꾼 척도다</h2>
+<p>언어모델에서는 각 위치의 정답 토큰 확률이 앞 문맥에 조건을 둔다. <code>qₜ=P(정답 토큰ₜ|앞 토큰들)</code>이라 하면:</p>
+<pre><code class="language-text">평균 CE = -(1/N)Σₜ ln qₜ
+PPL = exp(평균 CE) = (∏ₜ 1/qₜ)^(1/N)
+</code></pre>
+<p>이 곱은 언어 토큰이 무조건 독립이라는 가정이 아니다. 앞 문맥이 다른 조건부확률들을 연결한 것이다. 문맥 조건은 <a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html#llm">5장</a>에서 설명한다. PPL은 정답 확률의 <strong>기하평균의 역수</strong>, 또는 정답 확률 역수들의 <strong>기하평균</strong>이다. 산술평균과 다르다.</p>
+<p>원문 예시를 따라 <code>q=(0.5,0.25,0.125)</code>를 넣자. 역수는 2,4,8이고 곱은 64다. 세제곱근을 취하면 PPL=4다. 평균 CE는 <code>(ln2+ln4+ln8)/3=ln4≈1.386294</code>다. 이때 매 단계 실제 후보가 4개였다는 뜻은 아니다. 균등한 K개 후보에 확률 1/K를 부여하면 PPL이 정확히 K가 된다는 점에서 가져온 ‘유효 후보 수’ 비유다.</p>
+<p><strong>보충 활동:</strong> 두 정답 확률이 0.5, 0.25면 CE≈1.039721, PPL=√8≈2.828427이다. 역수의 산술평균 <code>(2+4)/2=3</code>과 다름을 확인하자. 정답 확률이 모두 1이면 PPL=1이고, 하나라도 0이면 유한한 평균 손실을 얻을 수 없다.</p>
+<p><strong>비교 조건:</strong> 같은 평가 데이터, 토크나이저, 평가 토큰의 포함·제외 기준, 제공하는 앞 문맥과 평균 방식을 맞춰야 PPL을 비교할 수 있다. 토큰화와 문맥 길이가 평가에 영향을 준다는 내용은 <a href="https://huggingface.co/docs/transformers/en/perplexity">Hugging Face 공식 PPL 문서</a>에서 확인했다(2026-11-09). 낮은 PPL은 그 조건에서 정답열에 더 높은 기하평균 확률을 주었다는 뜻이며 사실성·유용성 전체를 보증하지 않는다.</p>
+<p><strong>원문 표현의 조건 보완:</strong> 60쪽은 ‘아주 작은 CE 개선도 큰 PPL 변화’라고 설명한다. 정확한 관계는 <code>PPL_new/PPL_old=exp(CE_new-CE_old)</code>다. CE가 0.01 감소하면 PPL의 상대 감소는 약 0.995%로, 항상 극적인 변화는 아니다. 또 PPL=1은 평가된 정답을 확률 1로 준 극한 상태이지 모델의 모든 능력이 완벽하다는 뜻이 아니다. 61쪽의 균등분포는 고정된 후보 수에서 자기 엔트로피가 최대인 경우다. 잘못된 모델이 정답에 0에 가까운 확률을 주면 CE와 PPL은 그 균등 예측보다 더 나쁠 수 있다.</p>
+<h2 id="sec-5-확인-질문과-해설">5. 확인 질문과 해설</h2>
+<ol>
+<li>Die2를 평가할 때 A의 가중치를 0.4, B의 가중치를 0.1로 바꾸어도 되는가? (2절)</li>
+<li>p=q=(0.5,0.5)일 때 CE와 KL은 각각 얼마인가? (3절)</li>
+<li>정답 확률 1/2,1/4,1/8에서 PPL은 왜 14/3이 아닌가? (4절)</li>
+<li>정답에 0.001을 주는 이진 분류의 한 토큰 PPL은 2 이하인가? (4절)</li>
+<li>두 모델의 토크나이저가 다르면 PPL 숫자만 보고 우열을 정할 수 있는가? (4절)</li>
+</ol>
+<p><strong>해설:</strong> 1은 안 된다. 목표 빈도는 <code>(0.4,0.2,0.1,0.1,0.2)</code>로 고정하고 로그 안 후보만 바꾼다. 2는 CE=ln2≈0.6931, KL=0이다. 목표 엔트로피를 빼기 전후의 차이다. 3은 기하평균이므로 <code>(2×4×8)^(1/3)=4</code>다. 4는 PPL=1000이다. 모델이 정답에 거의 확률을 주지 않으면 후보 수보다 클 수 있다. 5는 평가 단위가 달라지므로 단순 비교할 수 없다.</p>
+<h2 id="sec-페이지별-상세-읽기">페이지별 상세 읽기</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p054.html">54 분포와 관측</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p055.html">55 세 후보</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p056.html">56 Die1</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p057.html">57 Die2</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p058.html">58 Die3</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p059.html">59 KL 정정</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p060.html">60 PPL 정의</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p061.html">61 기하평균</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.md">04. 교차엔트로피·KL과 PPL 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html"><small>이전 장</small>03. 신경망과 역전파</a><a rel="next" href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html"><small>다음 장</small>05. 조건부확률과 베이즈</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

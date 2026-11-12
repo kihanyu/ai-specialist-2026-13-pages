@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>16. 지시학습과 손실 마스킹 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html" aria-current="page">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>16. 지시학습과 손실 마스킹</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>입력 문맥과 loss 감독 위치를 구분한다.</li><li>shift 후 유효 정답 수를 평균 손실의 분모로 사용한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-loss-mask" id="lab-llm-loss-mask"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-템플릿은-입력-구조를-일정하게-만든다">1. 템플릿은 입력 구조를 일정하게 만든다</a></li><li><a href="#sec-2-입력에는-남겨도-loss에서는-뺄-수-있다">2. 입력에는 남겨도 loss에서는 뺄 수 있다</a></li><li><a href="#sec-3-마스크-세-종류의-질문은-다르다">3. 마스크 세 종류의 질문은 다르다</a></li><li><a href="#sec-4-전처리-계약과-평균의-분모">4. 전처리 계약과 평균의 분모</a></li><li><a href="#sec-5-확인-질문과-해설">5. 확인 질문과 해설</a></li><li><a href="#sec-원문-페이지별-상세-해설">원문 페이지별 상세 해설</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-16-지시학습과-손실-마스킹">16. 지시학습과 손실 마스킹</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15장</a> · <a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17장</a></p>
+<p><a id="intro"></a></p>
+<p>SFT는 지시와 응답 예시로 이미 학습된 모델을 추가 학습하는 감독 미세튜닝이다. 이 장의 목적은 <strong>무엇을 입력으로 보여 주고 어떤 정답 위치만 손실에 넣는지</strong> 직접 결정하는 것이다. 지시는 입력 문맥으로 남겨도 지시 자체의 예측 오차는 제외할 수 있다.</p>
+<p>선행 배경은 토큰 ID, next-token 예측, CE다. 토큰 ID는 어휘 항목 번호이고 next-token 예측은 앞 토큰으로 다음 토큰을 맞히는 일이다. CE는 정답 확률 p의 -ln(p)로, 정답을 낮게 예측할수록 커진다. 모두 자연로그를 쓴다. 이 장을 마치면 직렬화→토큰화→padding→shift→loss mask를 수행하고 유효 토큰 수로 평균을 계산할 수 있어야 한다.</p>
+<p>기본 경로는 1~3절의 위치 표와 계산이다. 4절에서 배치 가중 방식과 빈 마스크 예외를 확인하고 5절 문제를 푼다. 원문195~204쪽의 각 페이지 해설은 마지막 대응 목록에 있다.</p>
+<p><a id="template"></a></p>
+<h2 id="sec-1-템플릿은-입력-구조를-일정하게-만든다">1. 템플릿은 입력 구조를 일정하게 만든다</h2>
+<p>데이터의 instruction, 선택적 input, response를 일관된 텍스트나 역할 구분 토큰으로 직렬화한다. 토큰 경계를 알려주는 템플릿은 모델이 어디서 답해야 하는지 배우도록 돕는다. 템플릿을 바꿀 수는 있지만 학습 때와 생성 때의 구조가 크게 다르면 동작이 달라질 수 있다. 원문 197~199쪽의 예는 한 가지 형식이며 모든 모델의 고정 규격이 아니다.</p>
+<p>자동 생성한 예시도 정답성·중복·개인정보·실제 작업 적합성을 검토해야 한다. 응답이 길다고 무조건 좋은 학습 예시는 아니다. train/validation 분리 역시 필요하다.</p>
+<p><a id="mask"></a></p>
+<h2 id="sec-2-입력에는-남겨도-loss에서는-뺄-수-있다">2. 입력에는 남겨도 loss에서는 뺄 수 있다</h2>
+<p>설명용 ID에서 P0=10,P1=11은 prompt, R0=20,R1=21은 response, EOS=2는 종료, PAD=0은 채움이다. 어휘의 실제 표준 번호가 아니다. next-token 정답은 입력을 한 칸 이동시켜 만든다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>위치</th>
+<th>모델 입력 X</th>
+<th>다음 토큰 정답 Y</th>
+<th>응답만 학습하는 labels</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>P0=10</td>
+<td>P1=11</td>
+<td>-100</td>
+</tr>
+<tr>
+<td>1</td>
+<td>P1=11</td>
+<td>R0=20</td>
+<td>20</td>
+</tr>
+<tr>
+<td>2</td>
+<td>R0=20</td>
+<td>R1=21</td>
+<td>21</td>
+</tr>
+<tr>
+<td>3</td>
+<td>R1=21</td>
+<td>EOS=2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>EOS=2</td>
+<td>PAD=0</td>
+<td>-100</td>
+</tr>
+</tbody>
+</table></div>
+<p>-100은 이 예에서 loss가 무시하도록 정한 sentinel이며 토큰 ID가 아니다. <strong>응답 첫 토큰 R0의 손실은 마지막 prompt 입력 위치의 출력에서 계산</strong>한다. 토큰 위치와 정답 위치를 섞지 않아야 한다. prompt는 모델 입력에 남아 문맥을 제공한다. prompt loss를 제외하는 것은 prompt를 Attention에서 가린다는 뜻이 아니다.</p>
+<p>실제 EOS는 예측할 대상이고, 배치 길이를 맞추기 위해 덧붙인 PAD는 보통 loss에서 제외한다. EOS와 PAD가 같은 ID를 공유하는 구현은 값만으로 구별하지 말고 유효 길이나 위치 mask를 이용한다. 전 위치 labels가 무시되면 평균낼 유효 토큰이 없으므로 해당 샘플·배치를 처리하는 규칙이 필요하다. 내부 shift를 하는 API에는 위 X/Y를 중복 shift해 전달하지 않는다.</p>
+<h2 id="sec-3-마스크-세-종류의-질문은-다르다">3. 마스크 세 종류의 질문은 다르다</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>마스크</th>
+<th>묻는 질문</th>
+<th>적용 대상</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>causal mask</td>
+<td>미래 위치를 볼 수 있는가?</td>
+<td>Attention 점수</td>
+</tr>
+<tr>
+<td>padding attention mask</td>
+<td>채움 위치를 읽을 수 있는가?</td>
+<td>Attention 참조</td>
+</tr>
+<tr>
+<td>loss mask</td>
+<td>이 정답 위치를 평균 손실에 포함하는가?</td>
+<td>labels·손실 집계</td>
+</tr>
+</tbody>
+</table></div>
+<p>응답만 학습하는 SFT에서 위 표의 유효 정답 확률을 (0.5,0.25,0.8)이라고 놓으면 음의 로그값은 (0.693147,1.386294,0.223144), 평균은 약 0.767528이다. 분모는 입력 길이 5가 아니라 <strong>유효 응답·종료 정답 3개</strong>다. prompt를 포함해 loss를 계산하는 학습 설계도 가능하므로 응답만 학습하는 것이 정의상 필수는 아니다.</p>
+<p><a id="pipeline"></a></p>
+<h2 id="sec-4-전처리-계약과-평균의-분모">4. 전처리 계약과 평균의 분모</h2>
+<p>원문198쪽의 ‘데이터 생성’은 새로운 지시의 합성이 아니라 이미 있는 instruction/input/output을 학습 텐서로 바꾸는 과정이다. 예를 들어 instruction=단위를 바꿔라, input=45km, output=45000m라는 필드를 정해진 경계 문자열로 연결하고 토큰화한다. 같은 지시를 추론할 때는 output 정답을 붙이지 않는다. 원문197쪽의 Alpaca와 Phi-3 형식은 서로 다른 예시이며 실제 모델의 대화 템플릿에 맞춰야 한다.</p>
+<p>어떤 50256은 남고 어떤 것은 -100이 되는지 살펴보자.</p>
+<p><img alt="첫 종료 50256은 남기고 그 뒤의 배치 채움 50256은 -100으로 바꾸는 세 target 행" decoding="async" id="figure-1" loading="lazy" src="../resources/81e85f65c10eff2a7dc0-p202_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/81e85f65c10eff2a7dc0-p202_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽의 주황 점선은 실제 종료 예측이고 파란 테두리는 채움이다. 오른쪽에서 후자만 -100이 된다. 원문 세 행의 유효 정답 수는 5,2,3개로 총10개다. ID값이 같다는 이유만으로 실제 종료까지 전부 지우면 모델이 종료를 배울 신호가 사라진다. 이 규칙은 실제 종료 뒤 같은 ID를 반복해 채운 예시에 적용한다.</p>
+<p>instruction masking은 입력 삭제와 다르다. 양쪽의 회색 부분과 남아 있는 응답을 비교하자.</p>
+<p><img alt="입력에는 instruction과 응답을 두고 target의 instruction 위치만 무시하여 응답과 종료를 학습하는 그림" decoding="async" id="figure-2" loading="lazy" src="../resources/dbdf2b7a34d9ac1786eb-p203_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/dbdf2b7a34d9ac1786eb-p203_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽 instruction은 모델이 읽을 문맥이다. 오른쪽 회색 영역은 손실에 포함하지 않는 정답이다. 표2절처럼 labels의 첫 응답 토큰은 마지막 prompt 입력의 출력에 대응한다. 문자 경계가 tokenizer의 토큰 경계와 다를 수 있으므로 실제 직렬화된 토큰열에서 응답 시작을 확인한다. truncation으로 응답이 모두 사라지면 유효 loss token도0이 될 수 있다.</p>
+<p>응답 전용 CE의 식은 <code>L=Σ_(b,t) m_bt[-ln p_bt(y_bt)] / Σ_(b,t) m_bt</code>다. m은 포함1/제외0, b는 배치 사례, t는 <strong>shift 후 정답 위치</strong>다. ignore sentinel을 확률배열 index로 먼저 조회하지 말고 유효 위치만 선택한다. 유효 토큰 수가0이면 이 평균은 정의되지 않으므로 샘플 제외·오류 처리 등 명시 규칙을 둔다.</p>
+<p><strong>교육용 비교:</strong> A의 유효 토큰2개·각 손실1, B의 유효 토큰4개·각 손실2라면 토큰 평균은(2+8)/6=1.666667이다. 샘플별 평균을 먼저 낸 뒤 평균하면(1+2)/2=1.5다. 긴 응답을 더 많이 반영할지 문장마다 같은 비중을 줄지에 따라 목적이 달라진다. ‘평균’만 적지 말고 분모를 밝혀야 한다. 가중 CE나 분산학습의 집계 방식은 추가 설계 사항이며 이 식은 비가중 유효 토큰 평균이다.</p>
+<p><strong>공식 근거:</strong> PyTorch CrossEntropyLoss의 ignore_index는 지정 target을 무시하고 비가중 mean에서 무시하지 않은 target을 기준으로 평균낸다. 실제 실행 API의 shift 위치와 mask 규약은 그 구현 문서를 확인한다. <a href="https://docs.pytorch.org/docs/2.15/generated/torch.nn.CrossEntropyLoss.html">CrossEntropyLoss 공식 문서</a></p>
+<h2 id="sec-5-확인-질문과-해설">5. 확인 질문과 해설</h2>
+<ol>
+<li>P0,P1,R0,R1,EOS,PAD에서 응답만 학습하면 정답 labels는 무엇인가?</li>
+<li>확률0.5,0.25,0.8의 응답·종료 손실을 padding 포함5로 나누면 왜 틀리는가?</li>
+<li>모든 labels가 -100인 배치의 평균을0이라고 정해도 되는가?</li>
+<li>prompt를 loss에서 가리면 attention에서도 가려야 하는가?</li>
+</ol>
+<details><summary>해설</summary>
+<ol>
+<li>입력을 앞5개로 잡는 외부 shift 예에서는 [-100,R0,R1,EOS,-100]이다. R0는 마지막 prompt 위치의 출력이 맞힐 정답이다.</li>
+<li>제외 위치는 합과 분모 양쪽에서 빠져야 한다. 올바른 평균은2.302585/3=0.767528이다. 5로 나누면0.460517로 잘못 작아진다.</li>
+<li>수학적으로0/0이라 정의되지 않는다. 학습 파이프라인에서 사전에 제외하거나 명시적으로 처리해야 하며 조용히 정상 데이터로 간주하지 않는다.</li>
+<li>아니다. 지시는 응답에 필요한 문맥이다. causal·padding attention mask와 loss mask는 다른 질문에 답한다.</li>
+</ol>
+</details>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p204.html">204쪽 내부 활동</a>에는 padding 길이를 바꾸는 추가 실험이 있다. 예상 손실은 변하지 않는다. 원 노트북 전체 실행이나 새 독자의 수행을 확인했다는 뜻은 아니다. 다음 <a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17장</a>은 한 정답 응답의 모방에서 두 응답의 상대 선호로 넘어간다.</p>
+<h2 id="sec-원문-페이지별-상세-해설">원문 페이지별 상세 해설</h2>
+<ul>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p195.html">195쪽: 지시 미세튜닝의 시작</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p196.html">196쪽: 지시와 기대 응답의 쌍</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p197.html">197쪽: Alpaca와 Phi-3 형식 비교</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p198.html">198쪽: 데이터 생성은 학습 텐서 준비 과정</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p199.html">199쪽: 필드에서 텍스트를 거쳐 토큰 ID로</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p200.html">200쪽: 배치별 가장 긴 길이에 맞추기</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p201.html">201쪽: 다음 토큰 target의 한 칸 이동</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p202.html">202쪽: 실제 종료 한 개와 채움 제외</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p203.html">203쪽: instruction은 문맥에 남기고 손실에서 제외</a></li>
+<li><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p204.html">204쪽: 응답 마스킹 실습</a></li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.md">16. 지시학습과 손실 마스킹 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html"><small>이전 장</small>15. 미세튜닝, LoRA와 QLoRA</a><a rel="next" href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html"><small>다음 장</small>17. 선호학습, RLHF와 DPO</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

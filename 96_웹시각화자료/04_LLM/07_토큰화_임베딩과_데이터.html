@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/llm-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">LLM 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">LLM 독립형 교재 — 입력에서 학습과 효율화까지</a></li><li><a href="01_AI%EC%9D%98_%EB%B0%9C%EC%A0%84%EA%B3%BC_%EC%82%AC%ED%9A%8C%EC%A0%81_%EB%A7%A5%EB%9D%BD.html">01. AI의 발전과 사회적 맥락</a></li><li><a href="02_%EB%B2%A1%ED%84%B0_%ED%96%89%EB%A0%AC%EA%B3%BC_%ED%99%95%EB%A5%A0%EB%B3%80%ED%99%98.html">02. 벡터·행렬과 확률 변환</a></li><li><a href="03_%EC%8B%A0%EA%B2%BD%EB%A7%9D%EA%B3%BC_%EC%97%AD%EC%A0%84%ED%8C%8C.html">03. 신경망과 역전파</a></li><li><a href="04_%EA%B5%90%EC%B0%A8%EC%97%94%ED%8A%B8%EB%A1%9C%ED%94%BC_KL%EA%B3%BC_PPL.html">04. 교차엔트로피·KL과 PPL</a></li><li><a href="05_%EC%A1%B0%EA%B1%B4%EB%B6%80%ED%99%95%EB%A5%A0%EA%B3%BC_%EB%B2%A0%EC%9D%B4%EC%A6%88.html">05. 조건부확률과 베이즈</a></li><li><a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a></li><li><a href="07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.html" aria-current="page">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</a></li><li><a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></li><li><a href="09_Attention%EC%9D%98_%EA%B3%84%EC%82%B0.html">09. Attention의 계산 — 누구를 참고해서 어떤 정보를 가져올까</a></li><li><a href="10_MultiHead%EC%99%80_GPT_%EC%A0%84%EC%B2%B4%EA%B5%AC%EC%A1%B0.html">10. Multi-head와 GPT 전체 구조 — Attention의 출력은 어떻게 다음 토큰 예측으로 이어질까</a></li><li><a href="11_%EC%A0%95%EA%B7%9C%ED%99%94_FFN%EA%B3%BC_%EC%9E%94%EC%B0%A8.html">11. 정규화·FFN과 잔차 — 문맥을 섞고 특징을 가공하는 블록</a></li><li><a href="12_%EC%B6%9C%EB%A0%A5%ED%99%95%EB%A5%A0%EA%B3%BC_%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%83%9D%EC%84%B1.html">12. GPT 모델 입출력 — 벡터에서 다음 토큰으로</a></li><li><a href="13_%EC%A7%80%EC%8B%9D%EA%B3%BC_%EC%9E%A0%EC%9E%AC%ED%91%9C%ED%98%84.html">13. 지식의 저장 — 가중치와 현재 표현을 구별하기</a></li><li><a href="14_%EC%82%AC%EC%A0%84%ED%95%99%EC%8A%B5%EA%B3%BC_%ED%95%99%EC%8A%B5%EA%B3%BC%EC%A0%95.html">14. 모델 학습 — 정답 확률에서 가중치 갱신까지</a></li><li><a href="15_%EB%AF%B8%EC%84%B8%ED%8A%9C%EB%8B%9D_LoRA%EC%99%80_QLoRA.html">15. 미세튜닝, LoRA와 QLoRA</a></li><li><a href="16_%EC%A7%80%EC%8B%9C%ED%95%99%EC%8A%B5%EA%B3%BC_%EC%86%90%EC%8B%A4%EB%A7%88%EC%8A%A4%ED%82%B9.html">16. 지시학습과 손실 마스킹</a></li><li><a href="17_%EC%84%A0%ED%98%B8%ED%95%99%EC%8A%B5_RLHF%EC%99%80_DPO.html">17. 선호학습, RLHF와 DPO</a></li><li><a href="18_%EC%B6%94%EB%A1%A0%EB%AA%A8%EB%8D%B8_GRPO%EC%99%80_Clip.html">18. 추론 모델 — 좋은 풀이를 더 자주 만들도록 학습하기</a></li><li><a href="19_KV%EC%BA%90%EC%8B%9C_GQA%EC%99%80_MLA.html">19. KV 캐시, GQA와 MLA: 무엇을 저장하고 다시 읽을까</a></li><li><a href="20_%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9D%B8_%EA%B5%AC%EC%A1%B0%EC%99%80_%EC%83%81%ED%83%9C%EA%B0%B1%EC%8B%A0.html">20. 효율적인 구조와 상태 갱신</a></li><li><a href="21_FlashAttention%EA%B3%BC_%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%9D%B4%EB%8F%99.html">21. FlashAttention과 메모리 이동</a></li><li><a href="22_%EC%BA%90%EC%8B%9C%EC%96%91%EC%9E%90%ED%99%94%EC%99%80_TurboQuant.html">22. 캐시 양자화와 TurboQuant</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">용어집 — 정의와 역할</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">LLM</p><h1>07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>문자열·토큰 ID·임베딩·입력과 다음 정답의 shape를 추적한다.</li><li>padding·특수 토큰·훈련과 평가 데이터의 역할을 구별한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="llm-loss-mask" id="lab-llm-loss-mask"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-전처리와-토큰화는-서로-다른-일을-한다">1. 전처리와 토큰화는 서로 다른 일을 한다</a></li><li><a href="#sec-2-next-token-입력정답은-한-토큰-어긋난다">2. next-token 입력·정답은 한 토큰 어긋난다</a></li><li><a href="#sec-3-임베딩은-id로-행을-조회하는-학습-가능한-표">3. 임베딩은 ID로 행을 조회하는 학습 가능한 표</a></li><li><a href="#sec-4-특수-토큰과-padding-값과-목적을-구별하기">4. 특수 토큰과 padding: 값과 목적을 구별하기</a></li><li><a href="#sec-5-다음-단계인-위치-정보">5. 다음 단계인 위치 정보</a></li><li><a href="#sec-6-확인-질문">6. 확인 질문</a></li><li><a href="#sec-7-세-토크나이저를-실제-숫자로-비교하기">7. 세 토크나이저를 실제 숫자로 비교하기</a></li><li><a href="#sec-8-벡터-공간을-읽고-직접-계산하기">8. 벡터 공간을 읽고 직접 계산하기</a></li><li><a href="#sec-9-자기회귀-생성에서-데이터셋까지">9. 자기회귀 생성에서 데이터셋까지</a></li><li><a href="#sec-10-자료-안에서-끝내는-데이터셋-실습">10. 자료 안에서 끝내는 데이터셋 실습</a></li><li><a href="#sec-페이지별-원문-관찰">페이지별 원문 관찰</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-07-언어-모델-입력-문자열이-학습-가능한-숫자가-되는-과정">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">전체 학습 안내</a> · <a href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html">이전</a> · <a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">다음: 위치 정보</a></p>
+<p>문자열은 <strong>전처리→토큰화→ID→입력·정답 창→임베딩과 위치 정보</strong>를 거쳐 모델로 들어갑니다. 목표는 각 단계의 값과 모양을 추적하고, 토큰 ID·벡터·정답을 서로 구별하는 것입니다. 기본 학습은 1~4절을 따르고 위치 방식 비교는 다음 장에서 읽으세요. 행렬의 모양은 <code>[행 수, 열 수]</code>로 표기합니다.</p>
+<h2 id="sec-1-전처리와-토큰화는-서로-다른-일을-한다">1. 전처리와 토큰화는 서로 다른 일을 한다</h2>
+<p>79쪽의 파운데이션 모델은 넓은 데이터에서 기본 능력을 학습한 기반 모델이고, Chat 모델은 대화 지시와 응답 형식에 맞도록 추가 학습된 모델입니다. 입력을 숫자로 바꾸는 기본 경로는 공유하지만, 대화 템플릿·역할 토큰·정답 구간이 달라질 수 있습니다. 추가 학습은 이후 지시학습 단원에서 이어집니다.</p>
+<p>전처리는 문서 정제·중복 처리·형식 통일 등 데이터 준비이고, 토큰화는 문자열을 모델이 다룰 조각(token)과 고유 ID로 바꾸는 규칙입니다. 토큰은 단어 전체일 수도, 단어 일부·공백·바이트 조각일 수도 있습니다. 81쪽의 ‘의미 단위’는 직관이며 의미 경계가 항상 보장되지는 않습니다.</p>
+<p>토큰 ID는 어휘표의 번호입니다. ID 20이 ID 10보다 의미가 두 배 크거나 가깝다는 뜻은 없습니다. 동일 문자열이라도 토크나이저·버전·특수 토큰 설정이 다르면 ID와 길이가 달라집니다. 아래 ID는 전부 교육용 가상 사전의 값이며 실제 모델의 encode 결과가 아닙니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>원문 85~88쪽</th>
+<th>어휘를 만드는 관점</th>
+<th>학습자가 구별할 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BPE</td>
+<td>자주 함께 등장하는 이웃 조각의 병합을 반복</td>
+<td>병합 학습과 이미 학습된 병합 규칙 적용은 다름</td>
+</tr>
+<tr>
+<td>WordPiece</td>
+<td>교안에서는 쌍의 빈도와 각 조각 빈도의 비율로 설명</td>
+<td>단순 빈도 병합과 점수 기준을 구별; 구현별 세부 학습법을 보편화하지 않음</td>
+</tr>
+<tr>
+<td>Unigram</td>
+<td>후보 조각과 확률 모델로 분절을 평가하고 어휘를 줄임</td>
+<td>최선 분절 선택과 확률적 분절 샘플링은 별도 옵션</td>
+</tr>
+</tbody>
+</table></div>
+<p>Unigram 토크나이저가 매번 무조건 다른 결과를 내는 것은 아닙니다. 확률적 분절은 subword regularization을 위해 선택할 수 있으며, 결정적 분절도 가능합니다. <a href="https://aclanthology.org/P18-1007/">Kudo의 원 논문</a>.</p>
+<p>병합 예시로 단어 <code>low</code>가 3회, <code>lower</code>가 1회 나오는 작은 말뭉치를 봅시다. 초기 조각을 문자와 단어 경계로 두면 <code>(l,o)</code>와 <code>(o,w)</code>는 각각 4회입니다. 동률 처리 규칙으로 <code>(l,o)</code>를 먼저 고르면 <code>lo w</code>가 되고, 다음 병합에서 <code>lo+w</code>가 후보가 됩니다. 실제 byte-level BPE의 초기 조각·공백 처리·동률 규칙은 이 단순 예시와 다를 수 있습니다.</p>
+<h2 id="sec-2-next-token-입력정답은-한-토큰-어긋난다">2. next-token 입력·정답은 한 토큰 어긋난다</h2>
+<p>가상 토큰열 <code>[11,4,8,2,9,6]</code>, 문맥 길이 <code>T=3</code>, 창 이동폭 <code>stride=2</code>를 사용합니다. 다음 토큰을 정답으로 만들려면 창 하나당 원 토큰 <code>T+1=4</code>개가 필요합니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>창 시작</th>
+<th>입력 X</th>
+<th>정답 Y</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>[11,4,8]</code></td>
+<td><code>[4,8,2]</code></td>
+<td>11 뒤 4, 11·4 뒤 8, 11·4·8 뒤 2</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>[8,2,9]</code></td>
+<td><code>[2,9,6]</code></td>
+<td>8 뒤 2, 8·2 뒤 9, 8·2·9 뒤 6</td>
+</tr>
+</tbody>
+</table></div>
+<p>여기서는 창 시작이 바뀌면 잘린 문맥으로 새 예측 사례를 만듭니다. X와 Y를 따로 섞으면 대응이 깨지므로 한 사례를 묶어서 shuffle해야 합니다. 두 창을 배치로 모으면 X·Y의 모양은 각각 <code>[B,T]=[2,3]</code>이고 값은 정수 ID입니다. stride를 1로 바꾸면 시작점은 0,1,2로 늘어나 세 창이 됩니다. 짧은 마지막 창을 버릴지 padding할지는 데이터 계약으로 정합니다.</p>
+<p>교안 99쪽의 자기지도학습(Self-Supervised Learning)은 사람이 각 위치의 라벨을 따로 쓰지 않아도 원문에서 정답을 만든다는 뜻입니다. 학습 신호가 없다는 뜻은 아닙니다. 일부 라이브러리 모델은 내부에서 shift하므로, 그 경우 바깥에서 정답을 또 이동하면 안 됩니다.</p>
+<h2 id="sec-3-임베딩은-id로-행을-조회하는-학습-가능한-표">3. 임베딩은 ID로 행을 조회하는 학습 가능한 표</h2>
+<p>어휘 크기 <code>V=20</code>, 벡터 폭 <code>C=4</code>인 임베딩 표 E의 모양은 <code>[20,4]</code>입니다. ID 11은 <code>E[11]</code>이라는 길이 4의 행을 선택합니다. X의 모양이 <code>[2,3]</code>이면 <code>E[X]</code>는 <code>[2,3,4]</code>입니다. 곱셈 대상인 실수 표현이 이 단계에서 생깁니다.</p>
+<p>가상 행 <code>E[11]=(1,0,2,-1)</code>와 첫 위치 벡터 <code>P[0]=(0.1,0.2,0,0)</code>를 더하면 첫 입력 표현은 <code>(1.1,0.2,2,-1)</code>입니다. 같은 ID가 다른 위치에 오면 토큰 임베딩은 같아도 더해지는 위치 정보는 다를 수 있습니다.</p>
+<p>82~84쪽의 단어 벡터 유사도와 유추는 <strong>특정 학습된 벡터 공간에서 나타나는 경향</strong>입니다. 벡터 산술이 언어 관계를 항상 정확히 풀거나 무작위 초기 임베딩이 의미를 담는다고 해석하지 않습니다. 뒤의 Attention을 통과하면 같은 토큰도 문맥에 따라 다른 표현을 갖게 됩니다.</p>
+<p>아래에서는 원래 ID, 학습용 창, 임베딩 모양을 위에서 아래로 따라가세요. X는 표의 ②에서는 정수 입력, 본문의 Attention 입력에서는 임베딩 이후의 실수 표현을 뜻하므로 단계와 함께 읽습니다.</p>
+<p><img alt="가상 토큰열에서 X와 한 칸 이동한 Y를 만들고 임베딩 조회와 위치 덧셈으로 실수 표현을 만드는 추적도" decoding="async" id="figure-1" loading="lazy" src="../resources/2edbeffa5cccf5e0bbf6-04_input.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/2edbeffa5cccf5e0bbf6-04_input.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p>ID 11 자체가 벡터 <code>(1.1,0.2,2,-1)</code>인 것은 아닙니다. E의 11번 행을 조회하고 위치 벡터를 더한 결과가 이 벡터입니다. T와 C를 바꾸면 어느 축이 달라지는지 6절의 질문으로 확인하세요.</p>
+<h2 id="sec-4-특수-토큰과-padding-값과-목적을-구별하기">4. 특수 토큰과 padding: 값과 목적을 구별하기</h2>
+<p>BOS는 시작, EOS는 끝, PAD는 길이를 맞추기 위한 자리라는 용도로 쓰일 수 있습니다. 대화 역할·도구 호출 표시 등도 98쪽의 구조 제어 신호입니다. 정확한 이름과 ID는 모델마다 다릅니다. BOS나 EOS가 모든 데이터 형식에 반드시 자동 삽입되는 것도 아닙니다.</p>
+<p>padding을 추가하면 두 질문이 생깁니다. <strong>Attention mask</strong>는 어떤 입력 위치를 참조할지 제어하고, <strong>loss mask</strong>는 어떤 정답 위치를 손실에 넣을지 제어합니다. 하나가 다른 하나를 자동으로 대신하지 않습니다. 실제 EOS는 ‘여기서 종료’를 학습시키는 정답이 될 수 있습니다. PAD와 EOS가 같은 ID라도 추가된 PAD 위치와 실제 EOS 위치를 길이·mask로 구분해야 합니다. prompt 구간의 loss 제외 등은 지시 미세튜닝에서 이어집니다.</p>
+<h2 id="sec-5-다음-단계인-위치-정보">5. 다음 단계인 위치 정보</h2>
+<p>같은 ID는 같은 행을 조회하므로 순서 정보를 별도로 넣어야 합니다. 위치 벡터의 덧셈과 Q·K의 회전은 <a href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html">위치 정보와 RoPE</a>에서 비교합니다.</p>
+<h2 id="sec-6-확인-질문">6. 확인 질문</h2>
+<ol>
+<li>위 토큰열에서 <code>T=3,stride=1</code>일 때 중간 창의 X와 Y를 쓰세요.</li>
+<li><code>V=20,C=4,B=2,T=3</code>일 때 입력 ID·임베딩 표·임베딩 결과의 모양을 쓰세요.</li>
+<li>PAD에 loss를 주지 않았으니 Attention mask도 필요 없다는 주장에 어떤 조건이 빠졌나요?</li>
+<li>ID 11을 두 번 조회하면 임베딩 표의 어느 행을 사용하는지 설명하세요.</li>
+</ol>
+<details><summary>해설과 돌아갈 위치</summary>
+<ol>
+<li>시작 1이므로 X=<code>[4,8,2]</code>, Y=<code>[8,2,9]</code>. 2절.</li>
+<li><code>[2,3]</code>, <code>[20,4]</code>, <code>[2,3,4]</code>. 번호를 실수 벡터와 혼동했다면 3절.</li>
+<li>PAD가 실제 토큰의 표현 계산에 참조되는지 별도 제어해야 합니다. 데이터 배치·padding 방향·mask 규약에 따라 판단합니다. 4절.</li>
+<li>두 번 모두 11번 행입니다. 이후 위치 정보나 문맥 연산이 달라질 수 있습니다. 3절.</li>
+</ol>
+</details>
+<p><strong>다음 연결:</strong> 이제 실수 입력 표현 X가 준비되었습니다. 다음 단원에서는 X에서 만든 Q·K·V를 이용해 문맥 정보를 섞습니다.</p>
+<h2 id="sec-7-세-토크나이저를-실제-숫자로-비교하기">7. 세 토크나이저를 실제 숫자로 비교하기</h2>
+<p><strong>원문 85쪽:</strong> <code>deep learning engineer</code>를 문자로 쪼개면 <code>in</code>과 <code>ee</code>가 각각 두 번 등장합니다. 동률에서 <code>in</code>을 먼저 합친 다음 <code>ee</code>를 합칩니다. 그림의 초록색 선은 새 어휘 항목이 실제 단어 안의 어느 조각을 대체했는지 보여줍니다. 같은 빈도라면 별도 동률 규칙이 필요합니다.</p>
+<p><img alt="문자에서 in을 병합하고 다음 ee를 병합하여 어휘를 늘리는 BPE 단계와 빈도 상자" decoding="async" id="figure-2" loading="lazy" src="../resources/fe11deb0e63a1ba0254b-p085_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-2" type="button">그림 확대</button><a href="../resources/fe11deb0e63a1ba0254b-p085_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>왼쪽 아래의 쌍 빈도표에서 시작해 오른쪽 위·아래로 읽습니다. 합쳐진 <code>in</code>은 다음 단계에서 한 토큰이므로 이후 후보는 <code>n+i</code> 대신 <code>n+in</code>처럼 바뀝니다. BPE는 모든 부분 문자열을 한꺼번에 고르는 방식이 아닙니다. 학습 때 정한 병합 순서를 새 문자열에 적용하는 단계와 어휘 학습을 분리하세요. 희귀 단어를 부분 단위로 나타내는 목적은 <a href="https://aclanthology.org/P16-1162/">BPE 원 논문</a>에 설명되어 있습니다.</p>
+<p><strong>WordPiece 보충 계산:</strong> 원문 86쪽은 <code>P(a,b)/(P(a)P(b))</code>로 독립적 등장 대비 결합 강도를 설명합니다. 확률을 추정하는 분모를 통일한 교육용 빈도 점수 <code>count(ab)/(count(a)count(b))</code>를 써 봅시다. A쌍의 빈도가 8이고 각 조각 빈도가 20,20이면 점수는 0.02입니다. B쌍의 빈도가 3이고 각 조각 빈도가 3,5이면 0.2입니다. 단순 빈도는 A, 이 점수는 B를 우선합니다. 따라서 자주 등장한다는 사실과 상대적으로 강하게 결합한다는 사실은 다릅니다.</p>
+<p><img alt="WordPiece의 쌍 확률을 개별 확률 곱으로 나누는 식과 ee in ng de의 표시값" decoding="async" id="figure-3" loading="lazy" src="../resources/2799387ea6c061bfa518-p086_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-3" type="button">그림 확대</button><a href="../resources/2799387ea6c061bfa518-p086_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>원문 수치의 한계:</strong> 그림은 <code>ee/in/ng: 0.117</code>, <code>de: 0.058</code>을 표시하지만 개별 토큰 확률과 정규화 기준을 주지 않습니다. 따라서 이를 위 비율식의 검산된 결과라고 단정할 수 없습니다. <a href="https://huggingface.co/learn/llm-course/en/chapter6/6">Hugging Face 공식 교육자료</a> 역시 공개되지 않은 원래 학습 구현을 재구성한 설명임을 밝힙니다. 모든 WordPiece 구현의 확정 알고리즘으로 보편화하지 않습니다. 학습 후 분절에서는 어휘의 긴 접두 조각을 찾고 이어지는 조각을 찾는 방식과 <code>##</code> 같은 내부 조각 표기를 사용할 수 있습니다.</p>
+<p><strong>Unigram 보충 계산:</strong> 후보 어휘를 넉넉히 준비하고 각 토큰 확률의 곱으로 분절을 평가합니다. 교육용 사전의 확률이 <code>play=.4, ing=.3, pl=.1, ay=.1, x=.1</code>이면 합은 1입니다. <code>playing</code>의 <code>play+ing</code> 점수는 <code>.4×.3=.12</code>, <code>pl+ay+ing</code>은 <code>.1×.1×.3=.003</code>입니다. 두 경로만 가능하다는 조건에서 문자열 확률은 <code>.123</code>, 최선 경로는 첫째입니다. 두 경로를 그 점수에 비례해 샘플링하면 첫째 확률은 <code>.12/.123≈.97561</code>입니다. 실제 샘플링 온도·후보 제한에 따라 달라집니다.</p>
+<p>원문은 토큰을 지웠을 때 최선 분절이 어떻게 바뀌는지도 보여줍니다.</p>
+<p><img alt="Unigram의 hug 유지와 pu 삭제 전후 분절 및 확률 곱 비교" decoding="async" id="figure-4" loading="lazy" src="../resources/69608ad17a10e57dee6e-p087_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-4" type="button">그림 확대</button><a href="../resources/69608ad17a10e57dee6e-p087_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p><code>hug</code>가 있으면 그 단어의 점수는 <code>15/210≈.0714286</code>이고, 없으면 <code>hu+g</code>의 <code>(15/210)(20/210)≈.00680272</code>로 낮아집니다. <strong>원문 수치 정정:</strong> 위 후보 빈도표는 p=17, pu=17, hu=15이고 전체 합은 210입니다. 그런데 원문의 두 확률식은 p와 pu의 분자에 5를 써서 표와 불일치합니다. 빈도표를 기준으로 일관되게 계산하면 <code>p+u+g=(17/210)(36/210)(20/210)≈.00132167</code>, <code>pu+g=(17/210)(20/210)≈.00770975</code>입니다. 아래 pu 삭제 그림의 pug 점수 .0022676도 같은 기준에서는 .00770975로 고쳐야 합니다. pu와 p의 빈도가 같고 ug와 g의 빈도가 같으므로 <code>p+ug</code>도 .00770975로 동일합니다. 원문 식에 실제 적힌 분자 5를 그대로 계산하면 .000388727과 .00226757이지만 후보 빈도표 기준의 결과로 사용할 수 없습니다. 이 검산은 <strong>원문 후보 빈도를 고정해 한 경로씩 계산한 결과</strong>입니다. 실제 어휘 제거 학습은 말뭉치 전체의 손실 변화와 확률 재추정을 고려하므로 한 단어만 보고 결정하지 않습니다.</p>
+<p>원문 작은 말뭉치는 <code>hug:10,pug:5,pun:12,bun:4,hugs:5</code>입니다. 후보 빈도는 <code>h:15,u:36,g:20,hu:15,ug:20,p:17,pu:17,n:16,un:16,b:4,bu:4,s:5,hug:15,gs:5,ugs:5</code>이며 합계 210입니다. 원문 Best 조합을 같은 분모로 검산하면 hug=.0714286, pug=.00770975, pun=.00616780, bun=.00145125, hugs=.00170068입니다. hug 삭제 시 <code>hu+gs</code>로 표현한 hugs는 <code>.00170068</code>을 유지하지만 hug 자체 점수는 낮아집니다. pu 삭제 시 <code>p+un</code>으로 바뀐 pun은 <code>.00616780</code>을 유지합니다. 이 표는 왜 어떤 후보를 지울 때 손실 변화가 작은지 보여주는 고정 확률 비교이며, 삭제 뒤 재정규화까지 한 결과는 아닙니다.</p>
+<p><strong>정정:</strong> 87쪽의 ‘매번 조금씩 다르게 샘플링’은 선택 가능한 subword regularization입니다. 최선 경로만 고르는 결정적 분절도 가능합니다. 또한 Unigram이 항상 느리다는 속도 순위는 구현·어휘·하드웨어 조건 없이 확정할 수 없습니다. <a href="https://aclanthology.org/P18-1007/">Kudo 원 논문</a>과 <a href="https://huggingface.co/learn/llm-course/en/chapter6/7">공식 Unigram 설명</a>을 함께 참고했습니다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>비교 기준</th>
+<th>BPE</th>
+<th>WordPiece</th>
+<th>Unigram</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>어휘 구성 방향</td>
+<td>작은 조각 병합</td>
+<td>작은 조각 병합</td>
+<td>큰 후보 집합에서 제거</td>
+</tr>
+<tr>
+<td>이 교재의 선택 기준</td>
+<td>이웃 쌍 빈도</td>
+<td>결합 강도 점수의 교육용 근사</td>
+<td>제거 시 확률 모델 손실 변화</td>
+</tr>
+<tr>
+<td>고정 어휘로 분절</td>
+<td>학습된 병합 순서</td>
+<td>긴 조각 탐색</td>
+<td>최선 경로 또는 확률 샘플링</td>
+</tr>
+<tr>
+<td>공통 주의</td>
+<td>초기 단위·공백·정규화 확인</td>
+<td>알 수 없는 조각 처리 확인</td>
+<td>기본 문자 보존·확률 재추정 확인</td>
+</tr>
+</tbody>
+</table></div>
+<p>OOV는 out-of-vocabulary, 사전에 없는 항목입니다. 부분 단위가 문제를 줄이더라도 모든 문자에 대한 처리가 자동 보장되지는 않습니다. 바이트 기반인지, unknown이나 byte fallback을 쓰는지에 따라 다릅니다. 88쪽의 모델 이름은 대표 적용 예이며 모델 계열 전체의 영구 규칙은 아닙니다.</p>
+<h2 id="sec-8-벡터-공간을-읽고-직접-계산하기">8. 벡터 공간을 읽고 직접 계산하기</h2>
+<p>82쪽은 비디오·오디오·텍스트가 각 임베딩 모델을 거쳐 숫자 벡터가 되는 공통 형태를 보여줍니다. 숫자 목록의 길이가 같다고 서로 다른 모델의 좌표계가 같은 것은 아닙니다. 오른쪽 2차원 그림은 새 종류의 묶음, 나라와 수도, 형용사의 변화 관계를 배치한 개념도입니다. 축 이름은 첫째·둘째 차원이며 각 축이 고정된 인간 의미라는 보장은 없습니다.</p>
+<p>83쪽의 <code>Woman−Queen≈Man−King</code>은 관계를 나타내는 차이 벡터가 비슷하다는 뜻입니다. 양변을 정리하면 <code>Queen≈Woman−Man+King</code>입니다. <strong>교육용</strong> 좌표 <code>Woman=(0,1), Queen=(1,1), Man=(0,0), King=(1,0)</code>에서 양쪽 차이는 모두 <code>(-1,0)</code>입니다. 이것은 관계를 이해시키려고 만든 좌표이며 실제 단어 임베딩 측정값이나 모든 성별·직업 관계에 대한 법칙이 아닙니다.</p>
+<p>84쪽 외부 실습 없이 할 활동: <code>Korea=(0,0), Busan=(1,0), Japan=(0,2)</code>일 때 <code>Busan−Korea+Japan</code>을 계산하세요. <strong>예상 결과:</strong> <code>(1,2)</code>입니다. 이 점에 어떤 실제 도시 이름이 대응하는지는 사전과 학습 데이터 없이는 결정할 수 없습니다. <code>mother</code>의 연관어, <code>Soldier</code>의 위치, 시각화 목록 <code>car,tank,transport,computer,mouse,Moscow,Paris,London,Russia,France,Britain,clean,dirty,new</code>의 군집도 실제 임베딩 모델 없이는 결과를 확정하지 않습니다. 2차원 투영에서 가까워 보이는 것과 원래 고차원 공간에서의 유사성도 구분해야 합니다.</p>
+<h2 id="sec-9-자기회귀-생성에서-데이터셋까지">9. 자기회귀 생성에서 데이터셋까지</h2>
+<p>95쪽 그림은 <code>This → This is → This is an → This is an example</code>로 한 번 고른 결과를 다음 입력에 붙입니다. Autoregressive는 이미 나온 토큰을 조건으로 다음 토큰을 생성한다는 뜻입니다. 학습 자료의 문맥 길이와 생성 중 누적 문맥 길이를 혼동하지 마세요.</p>
+<p>96쪽은 문서→토큰열→어휘 ID 경로를 보여주며 <code>brown=0, dog=1, fox=2, jumps=3, lazy=4, over=5, quick=6, the=7</code>이라는 예시 표를 씁니다. 알파벳순 ID는 설명용 선택이며 실제 모델의 공통 규칙이 아닙니다. 대소문자 <code>The/the</code> 처리도 정규화 계약을 먼저 정해야 합니다. 97쪽은 기존 사전에 <code>&lt;|unk|&gt;=783</code>, <code>&lt;|endoftext|&gt;=784</code>를 추가합니다. unknown과 종료는 서로 다른 역할입니다.</p>
+<p>98쪽의 시작·종료·패딩, user·assistant·system, thought·file_separator·tool_call은 세 범주의 <strong>개념 예시</strong>입니다. 실제 토큰 문자열과 지원 기능은 모델에 따라 다르고, 문자열을 적었다고 자동으로 도구가 실행되지는 않습니다. 97쪽의 ‘Padding 제외’는 일반적인 학습 손실 규약을 말하며 토큰 ID 자체를 사전에서 지운다는 뜻이 아닙니다.</p>
+<p>다음 그림에서 입력과 정답의 오른쪽 끝을 비교하세요.</p>
+<p><img alt="LLMs learn to predict one word at a time에서 접두 문맥과 다음 토큰 정답을 만드는 구조" decoding="async" id="figure-5" loading="lazy" src="../resources/b1b82589199a32b979c0-p099_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-5" type="button">그림 확대</button><a href="../resources/b1b82589199a32b979c0-p099_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>첫 줄 입력은 <code>LLMs</code>, 정답은 <code>learn</code>이고 다음 줄에는 입력에 <code>learn</code>이 추가되고 정답은 <code>to</code>로 이동합니다. 오른쪽은 텍스트를 조각으로 나누어 한 칸 차이의 두 시퀀스를 만듭니다. <strong>정정:</strong> ‘Label 없이’는 사람이 라벨을 별도로 쓰지 않는다는 뜻이며, 실제 손실에는 다음 토큰이라는 정답이 존재합니다.</p>
+<p>100쪽 임베딩 표에서는 어떤 순서로 행을 뽑는지 보세요.</p>
+<p><img alt="fox jumps over dog의 ID 2 3 5 1이 임베딩 표의 해당 행을 같은 순서로 조회하는 그림" decoding="async" id="figure-6" loading="lazy" src="../resources/c082c908fbe61331c74f-p100_fig01.png"/></p><div class="image-actions"><button data-image-zoom="figure-6" type="button">그림 확대</button><a href="../resources/c082c908fbe61331c74f-p100_fig01.png" rel="noopener" target="_blank">그림 원본</a></div>
+<p>입력 <code>fox,jumps,over,dog</code>는 ID <code>[2,3,5,1]</code>이고 출력 첫 행은 <code>E[2]=[1.2753,-0.2010,-0.1606]</code>입니다. 다음 행들은 3,5,1번 순서이며 행 번호 크기에 따라 정렬하지 않습니다. 임베딩 표의 학습 가능한 값과 정수 ID를 구분하세요.</p>
+<h2 id="sec-10-자료-안에서-끝내는-데이터셋-실습">10. 자료 안에서 끝내는 데이터셋 실습</h2>
+<p>101쪽은 <code>Chapter_2_Exercise_Dataset.ipynb</code>를 지시하지만 실행 결과나 코드를 싣지 않습니다. 다음은 그 노트북을 실행했다고 주장하지 않는 독립 대체 활동입니다. 종이 또는 기본 Python으로 수행할 수 있습니다.</p>
+<pre><code class="language-python">ids = [11, 4, 8, 2, 9, 6]
+T, stride = 3, 2
+samples = [(ids[s:s+T], ids[s+1:s+T+1])
+           for s in range(0, len(ids)-T, stride)]
+print(samples)
+</code></pre>
+<p>예상 출력은 <code>[([11,4,8],[4,8,2]), ([8,2,9],[2,9,6])]</code>이며 Python 출력에는 쉼표 뒤 공백이 붙습니다. stride를 1로 바꾸면 중간 사례 <code>([4,8,2],[8,2,9])</code>가 추가됩니다. <code>len(ids)=T</code>로 줄이면 다음 토큰까지 있는 완전한 창이 없어 빈 목록입니다. 짧은 창을 채우는 padding은 이 코드에 포함하지 않았습니다.</p>
+<p>추가 질문: BPE의 동률 규칙을 바꾸면 첫 병합이 달라질까요? <strong>해설:</strong> 85쪽에서는 in과 ee가 동률이므로 가능합니다. WordPiece 예시에서 빈도가 높은 A가 선택되지 않는 이유는 무엇일까요? <strong>해설:</strong> 개별 조각 빈도로 나눈 상대 결합 강도는 B가 큽니다. Unigram에서 최선 경로를 쓴 결과가 늘 같으면 오류일까요? <strong>해설:</strong> 결정적 설정에서는 정상입니다.</p>
+<h2 id="sec-페이지별-원문-관찰">페이지별 원문 관찰</h2>
+<p><a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p078.html">78쪽 언어 모델 입력</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p079.html">79쪽 모델 학습 경로</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p080.html">80쪽 입력 전처리 파이프라인</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p081.html">81쪽 Tokenizer와 번호</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p082.html">82쪽 Embedding의 뜻</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p083.html">83쪽 벡터 공간의 유추</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p084.html">84쪽 벡터 공간 실습</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p085.html">85쪽 BPE</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p086.html">86쪽 WordPiece</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p087.html">87쪽 Unigram</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p088.html">88쪽 Subword 세 방법 비교</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p095.html">95쪽 자기회귀 Text 생성</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p096.html">96쪽 데이터셋 Token화</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p097.html">97쪽 특수 토큰 추가</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p098.html">98쪽 특수 토큰의 용도</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p099.html">99쪽 자기지도 데이터셋</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p100.html">100쪽 토큰 임베딩 조회</a> · <a href="%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84/p101.html">101쪽 데이터셋 실습</a></p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/04_LLM/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/%EB%B3%B8%EB%AC%B8/07_%ED%86%A0%ED%81%B0%ED%99%94_%EC%9E%84%EB%B2%A0%EB%94%A9%EA%B3%BC_%EB%8D%B0%EC%9D%B4%ED%84%B0.md">07. 언어 모델 입력 — 문자열이 학습 가능한 숫자가 되는 과정 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="06_%EC%96%B8%EC%96%B4%EB%AA%A8%EB%8D%B8%EA%B3%BC_Transformer.html"><small>이전 장</small>06. 언어 모델의 발전 — 문맥을 어디에 담고 어떻게 전달할까</a><a rel="next" href="08_%EC%9C%84%EC%B9%98%EC%A0%95%EB%B3%B4%EC%99%80_RoPE.html"><small>다음 장</small>08. 위치 정보와 RoPE - 같은 토큰의 순서를 계산에 넣기</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>13. GraphRAG — 관계를 찾아 근거 경로로 답하기 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/rag-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">RAG 전체 흐름</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">RAG 학습 안내 — 그림과 계산으로 이해하는 검색 증강 생성</a></li><li><a href="01_%EA%B2%80%EC%83%89%EC%9D%98_%EA%B8%B0%EB%B3%B8%EA%B3%BC_%EC%97%AD%EC%83%89%EC%9D%B8.html">01. 검색의 기본과 역색인</a></li><li><a href="02_TF_IDF%EC%99%80_BM25.html">02. TF-IDF와 BM25</a></li><li><a href="03_%EA%B2%80%EC%83%89_%ED%8F%89%EA%B0%80%EC%A7%80%ED%91%9C.html">03. 검색 평가지표</a></li><li><a href="04_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BC_%EA%B2%80%EC%83%89%EA%B8%B0_%ED%95%99%EC%8A%B5.html">04. 신경검색과 검색기 학습</a></li><li><a href="05_%EB%B2%A1%ED%84%B0%EA%B2%80%EC%83%89%EA%B3%BC_%EC%9D%B8%EB%8D%B1%EC%8A%A4.html">05. 벡터검색과 인덱스</a></li><li><a href="06_RAG%EC%9D%98_%EC%A0%84%EC%B2%B4_%EA%B5%AC%EC%A1%B0.html">06. RAG의 전체 구조 — 문서에서 근거를 찾아 답변까지 연결하기</a></li><li><a href="07_%EC%B2%AD%ED%82%B9%EA%B3%BC_%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1.html">07. 청킹과 컨텍스트 구성 — 잘 찾는 단위와 잘 읽는 단위를 나누기</a></li><li><a href="08_RAG_Sequence%EC%9D%98_%ED%95%99%EC%8A%B5%EA%B3%BC_%EB%94%94%EC%BD%94%EB%94%A9.html">08. RAG-Sequence의 학습과 디코딩</a></li><li><a href="09_%EA%B2%80%EC%83%89_%EA%B3%A0%EB%8F%84%ED%99%94.html">09. 검색 고도화 — 부족한 근거가 어느 단계에서 생기는지 찾기</a></li><li><a href="10_%EB%8B%B5%EB%B3%80%EC%83%9D%EC%84%B1%EA%B3%BC_%EA%B7%BC%EA%B1%B0_%EA%B4%80%EB%A6%AC.html">10. 답변생성과 근거 관리 — 관련 문서가 아니라 입증되는 주장으로 답하기</a></li><li><a href="11_%EB%8F%84%EA%B5%AC%EC%82%AC%EC%9A%A9%EA%B3%BC_Agentic_RAG.html">11. 도구 사용과 Agentic RAG</a></li><li><a href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html">12. RAG 평가와 운영</a></li><li><a href="13_GraphRAG.html" aria-current="page">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</a></li><li><a href="14_SPARQL%EA%B3%BCCypher.html">14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></li><li><a href="15_Text2SQL%EA%B3%BCMCP.html">15. Text2SQL과 MCP — 스키마에서 질의·행·답변까지</a></li><li><a href="16_%EC%8B%A0%EA%B2%BD%EA%B2%80%EC%83%89%EA%B3%BCANN_%EB%B3%B4%EC%B6%A9%EC%9B%90%EB%A6%AC.html">16. 신경검색과 ANN 보충 — 사전학습 목표와 근사 보장의 전제</a></li><li><a href="17_%EC%8B%A4%EC%8A%B5%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BCCRAG%ED%8F%89%EA%B0%80.html">17. 실습 파이프라인과 CRAG 평가 — 코드의 입력·상태·채점을 연결하기</a></li><li><a href="%EC%9A%A9%EC%96%B4%EC%A7%91.html">RAG 용어집</a></li><li><a href="%EC%8B%9C%EA%B0%81%ED%99%94_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">시각화로 공부할 주제와 그림 읽는 법</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">RAG</p><h1>13. GraphRAG — 관계를 찾아 근거 경로로 답하기</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>TAG·KG의 노드·관계·속성·출처와 GNN 메시지 전달, 그래프 인덱싱·검색기·반복·반환 단위의 세 축을 구분한다.</li><li>시점·관계·방향이 맞는 근거 경로를 추적하고 지역 entity 검색과 전역 community 보고서 합집합·예산을 계산한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="rag-graph-path" id="lab-rag-graph-path"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="rag-graph-scope" id="lab-rag-graph-scope"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-1-무엇이-입력되고-무엇이-나오는가">1. 무엇이 입력되고 무엇이 나오는가</a></li><li><a href="#sec-2-그래프는-어디에서-오는가">2. 그래프는 어디에서 오는가</a></li><li><a href="#sec-3-검색기반복-방식반환-단위는-다른-선택이다">3. 검색기·반복 방식·반환 단위는 다른 선택이다</a></li><li><a href="#sec-4-두-hop을-계산하고-실패-위치를-찾기">4. 두 hop을 계산하고 실패 위치를 찾기</a></li><li><a href="#sec-5-지역-검색과-전역-검색">5. 지역 검색과 전역 검색</a></li><li><a href="#sec-6-확인-질문과-해설">6. 확인 질문과 해설</a></li><li><a href="#sec-출처와-페이지-대응">출처와 페이지 대응</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-13-graphrag-관계를-찾아-근거-경로로-답하기">13. GraphRAG — 관계를 찾아 근거 경로로 답하기</h1>
+<p>이 장은 <code>Graph_RAG.pdf</code> 1~35쪽을 기준으로 그래프 표현·구축·검색·생성을 연결한다. 기존 05장의 ANN 그래프는 <strong>벡터를 빠르게 찾는 탐색 경로</strong>이고, 여기의 지식 그래프는 <strong>회사·도시 등의 관계를 나타내는 데이터</strong>다. 둘을 동시에 사용할 수 있지만 간선의 의미가 다르다. 예제 기업·관계·점수는 교육용이며 실제 그래프 DB·LLM을 실행하지 않는다.</p>
+<h2 id="sec-1-무엇이-입력되고-무엇이-나오는가">1. 무엇이 입력되고 무엇이 나오는가</h2>
+<p>질문이 “A사를 인수한 회사의 본사는 어디인가?”라면 <code>A → 인수자 B → 본사 부산</code>이라는 두 관계가 필요하다. A와 부산이 같은 문서에서 자주 등장했다는 유사도만으로 두 관계가 입증되지는 않는다. 그래프는 관계의 방향·종류를 명시하고 각 관계를 원문에 연결한다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구성</th>
+<th>입력</th>
+<th>출력</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>그래프 인덱싱</td>
+<td>문서·표·기존 KG와 버전·권한</td>
+<td>노드·관계·속성·원문 포인터 및 검색 인덱스</td>
+</tr>
+<tr>
+<td>질의 해석·entity linking</td>
+<td>원래 질문·시점·동명이인 후보</td>
+<td>시작 entity ID와 필요한 관계·제약</td>
+</tr>
+<tr>
+<td>G-Retrieval</td>
+<td>질문 q와 그래프 G</td>
+<td>노드·triplet·path·subgraph G*</td>
+</tr>
+<tr>
+<td>G-Generation</td>
+<td>질문과 G*의 구조·텍스트·출처</td>
+<td>근거가 연결된 답 또는 보류</td>
+</tr>
+</tbody>
+</table></div>
+<p>원본 3~4쪽의 Text-Attributed Graph(TAG)는 <span class="math-raw math-inline">$G=(V,E,A,\{x_v\},\{e_{ij}\})$</span>로 나타낼 수 있다. V는 노드, E는 연결, A는 인접 행렬, x는 노드의 텍스트 속성, e는 간선의 텍스트 속성이다. KG에서는 entity가 노드, 관계가 간선이 된다. 사람·회사·도시라는 타입과 실제 Alice·회사B·부산이라는 개체를 구별한다.</p>
+<pre><code class="language-text">(A, acquiredBy, B)   [원문 P1, 유효 2025~, 공식]
+(B, headquarters, 부산) [P2, 유효 2025~, 공식]
+(A, acquiredBy, C)   [P3, 유효 ~2024, 이전 판본]
+(C, headquarters, 서울) [P4, 유효 2024~, 공식]
+</code></pre>
+<p>현재 질문에 P3을 섞으면 서울이라는 다른 답이 생긴다. 추출된 그래프가 있다고 최신성·사실성·권한이 자동 보장되지는 않는다.</p>
+<p><img alt="원문에서 관계를 추출하고 시점을 확인한 두 hop 경로를 원문 P1·P2로 되돌리는 GraphRAG 구조" decoding="async" id="figure-1" loading="lazy" src="../resources/cb7168897096c244f617-13_graph_path.svg"/></p><div class="image-actions"><button data-image-zoom="figure-1" type="button">그림 확대</button><a href="../resources/cb7168897096c244f617-13_graph_path.svg" rel="noopener" target="_blank">그림 원본</a></div>
+<p><strong>그림 읽기:</strong> 위쪽은 문서 등록 시 실행하는 구축, 아래쪽은 질문 시 검색이다. A→B와 B→부산의 두 관계가 모두 있을 때만 답 경로가 완성된다. 회색 이전 관계는 현재 질문의 근거에서 제외한다. 화살표는 관계 방향이며 화면상의 거리는 벡터 유사도가 아니다.</p>
+<h2 id="sec-2-그래프는-어디에서-오는가">2. 그래프는 어디에서 오는가</h2>
+<p>원본 9~15쪽은 공개 KG와 자체 구축 그래프를 구분한다. Wikidata·DBpedia 같은 백과사전 KG, ConceptNet 같은 상식 KG, 분야별 KG를 가져올 수 있다. 자체 자료에서는 문서의 인용·동일 주제, passage의 공유 키워드, NER/LLM으로 추출한 entity 관계로 그래프를 만든다. 공유 키워드 간선과 실제 인수 관계를 같은 관계로 취급하면 안 된다.</p>
+<ol>
+<li>문서·표를 파싱하고 원문 ID·절·버전·유효기간·접근 조건을 저장한다.</li>
+<li>entity 후보와 관계를 추출한다. “인수 검토 중”을 완료된 인수로 바꾸지 않는다.</li>
+<li>entity resolution으로 별칭을 묶되 동명이인·동명 기업을 섞지 않는다.</li>
+<li>관계의 방향·타입·단위·시간·원문 span을 검증한다. 부정·추정·취소도 보존한다.</li>
+<li>그래프 인접 구조와 텍스트/벡터 검색 표현을 함께 저장한다.</li>
+<li>수정·삭제 시 관계와 연결된 청크·요약·임베딩을 함께 갱신한다.</li>
+</ol>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>인덱스</th>
+<th>저장·검색하는 것</th>
+<th>강점과 비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Graph</td>
+<td>노드 ID와 연결된 간선·속성</td>
+<td>관계 순회가 직접적, 그래프 구축·갱신 필요</td>
+</tr>
+<tr>
+<td>Text</td>
+<td>triplet·경로의 문장 표현</td>
+<td>키워드 검색 가능, 구조·방향을 잃지 않게 직렬화</td>
+</tr>
+<tr>
+<td>Vector</td>
+<td>노드/관계/텍스트의 임베딩</td>
+<td>의미 후보 확보, 가까운 벡터가 사실 증명을 대신하지 않음</td>
+</tr>
+<tr>
+<td>Hybrid</td>
+<td>구조·텍스트·벡터의 조합</td>
+<td>후보 확보와 관계 검증을 나눔, 중복·동기화 관리</td>
+</tr>
+</tbody>
+</table></div>
+<p>인덱싱의 세밀함이 반환 가능한 단위를 정한다. 문서 단위 벡터만 저장해 놓고 정확한 개체 관계를 자동 복원한다고 가정하지 않는다.</p>
+<h2 id="sec-3-검색기반복-방식반환-단위는-다른-선택이다">3. 검색기·반복 방식·반환 단위는 다른 선택이다</h2>
+<p>원본 16~35쪽의 세 축을 함께 읽는다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>축</th>
+<th>선택</th>
+<th>결정하는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>검색기</td>
+<td>규칙/비모수, LM 기반, GNN 기반</td>
+<td>관련 노드·간선을 어떻게 점수화·선택하는가</td>
+</tr>
+<tr>
+<td>실행 방식</td>
+<td>once, iterative, multi-stage</td>
+<td>검색 결과에 따라 다음 검색을 반복하는가</td>
+</tr>
+<tr>
+<td>반환 단위</td>
+<td>node, triplet, path, subgraph, hybrid</td>
+<td>생성기에 어떤 크기의 구조를 전달하는가</td>
+</tr>
+</tbody>
+</table></div>
+<p>규칙 검색은 entity linking 후 정한 k-hop·관계 타입·경로 패턴을 따라간다. PCST(Prize-Collecting Steiner Tree) 관점은 관련 노드의 보상과 연결 간선의 비용을 함께 고려해 연결된 부분그래프를 고른다. 단순 Top-K 노드 선택은 중요한 노드 사이의 연결 간선을 놓칠 수 있다. 작은 예의 목적함수를 <code>선택 노드 보상 합 − 간선 비용 합</code>으로 지정했다면 보상 4+3, 연결 비용2의 경로 점수는5다. 실제 논문·구현의 보상·제약·알고리즘까지 이 산술 예와 같다고 주장하지 않는다.</p>
+<p>LM 기반 검색기는 질문과 관계를 읽어 다음 관계를 고르거나 미리 정의된 이웃 조회 함수를 호출한다. 원본의 Subgraph Retriever, KG-GPT, StructGPT는 이런 역할을 서로 다른 방식으로 구성한다. 질문에 적합하지 않은 관계를 고르거나 잘못된 중간 개체를 확정하면 다음 hop도 오염된다.</p>
+<p>GNN 기반 검색기는 그래프의 연결 정보를 표현에 반영해 entity·경로를 점수화한다. 원본 5~6쪽의 메시지 전달은</p>
+<div class="math-raw math-display">$$h_i^{(l)}=UPD\left(h_i^{(l-1)},AGG_{j\in N(i)}MSG(h_i^{(l-1)},h_j^{(l-1)},e_{ij})\right)$$</div><p>이다. 이웃 메시지가 (2,0),(0,4)이고 AGG=mean이면 (1,2)다. UPD가 단순 합이고 현재 표현이 (1,1)이면 새 표현은 (2,3)이다. 이는 지정한 toy 함수의 계산이며 실제 GCN·GAT·GraphSAGE가 모두 같은 함수를 쓴다는 뜻이 아니다. 학습한 GNN 점수가 높아도 관계의 원문 진위 검사는 남는다.</p>
+<p>Once는 한 번의 질의 처리 안에서 필요한 근거를 모은다. 독립적인 여러 경로를 병렬 조회할 수도 있다. Iterative는 앞선 결과의 개체·누락에 따라 다음 질의를 바꾼다. 고정 반복 횟수는 non-adaptive, 충분성·종료 신호에 따른 중지는 adaptive다. Multi-stage는 후보 검색→정밀 관계 선택처럼 서로 다른 검색기를 단계로 연결한다. 반복과 다단계는 함께 사용할 수 있다. “LM/GNN이 항상 더 정확하다”, “반복이 항상 낫다”는 보장은 없으며 같은 질문·비용에서 평가해야 한다.</p>
+<h2 id="sec-4-두-hop을-계산하고-실패-위치를-찾기">4. 두 hop을 계산하고 실패 위치를 찾기</h2>
+<p>질문을 관계 패턴 <code>acquiredBy → headquarters</code>로 지정하고 현재 유효한 간선만 보자.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>현재 바인딩</th>
+<th>필요한 다음 관계</th>
+<th>새 바인딩·출처</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>시작</td>
+<td>company=A</td>
+<td>acquiredBy</td>
+<td>buyer=B, P1</td>
+</tr>
+<tr>
+<td>1 hop 후</td>
+<td>buyer=B</td>
+<td>headquarters</td>
+<td>city=부산, P2</td>
+</tr>
+<tr>
+<td>2 hop 후</td>
+<td>city=부산</td>
+<td>없음</td>
+<td>A→B→부산, P1+P2</td>
+</tr>
+</tbody>
+</table></div>
+<p>1 hop만 허용하면 인수자 B는 알아도 본사는 모른다. P1의 방향을 반대로 읽거나 P3을 현재 간선처럼 사용하면 다른 결과가 생긴다. 연결되어 있다는 이유만으로 <code>donatedTo</code> 같은 다른 관계를 <code>acquiredBy</code>로 해석하지 않는다. 반환 단위가 path라면 <strong>경로 전체의 관계 라벨·방향·출처</strong>를 전달하고, subgraph라면 질문과 무관한 가지가 컨텍스트를 차지하지 않도록 예산을 적용한다.</p>
+<p>원본 7쪽은 <span class="math-raw math-inline">$p(a\mid q,G)=\sum_{G'\subseteq G}p(a\mid q,G')p(G'\mid q,G)$</span>라는 잠재 부분그래프 혼합 관점을 제시한다. 한 G*만 고르는 것은 근사이며, 선택한 부분그래프의 관련 점수를 답변의 사실 정확도 확률로 읽지 않는다. 생성 입력 변환 F는 triplet 표·직렬화 문장·그래프 인코더 표현 등의 형태가 가능하다. 원본 20쪽은 텍스트·그래프 표현을 결합하는 구체 구조의 예이지 모든 GraphRAG의 필수 구조가 아니다.</p>
+<h2 id="sec-5-지역-검색과-전역-검색">5. 지역 검색과 전역 검색</h2>
+<p>‘GraphRAG’는 그래프를 활용하는 넓은 방법의 이름이며 Microsoft GraphRAG라는 구체 시스템과 동일한 정의가 아니다. 다음 구분은 추가한 공식 사례다. **지역 검색(local)**은 특정 개체에 가까운 관계와 연결 원문을 모은다. **전역 검색(global)**은 커뮤니티 보고서들을 나누어 읽고 부분 응답을 통합해 데이터 전체의 주제를 다룬다. <a href="https://microsoft.github.io/graphrag/query/local_search/">공식 Local Search</a>, <a href="https://microsoft.github.io/graphrag/query/global_search/">공식 Global Search</a></p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>질문</th>
+<th>필요한 범위</th>
+<th>주의점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“A사의 인수자와 본사는?”</td>
+<td>A 관련 entity·관계·원문</td>
+<td>국소 경로의 개체·시간·관계가 맞아야 함</td>
+</tr>
+<tr>
+<td>“전체 고객 문의에서 반복되는 주제는?”</td>
+<td>여러 커뮤니티 보고서·원문 연결</td>
+<td>한 개체의 이웃만으로 전체를 대표하지 않음</td>
+</tr>
+</tbody>
+</table></div>
+<p>교육용 보고서 C1에 사실 F1,F2, C2에 F2,F3,F4, C3에 F5,F6이 있다고 하자. 지역 C1은 두 사실, 전역에서 세 보고서를 모두 사용하면 <strong>중복 F2를 한 번만 세어 여섯 사실</strong>을 모은다. 보고서 길이가 80·100·60 단위이면 입력 합은240이다. 예산 때문에 C2가 빠지면 F3·F4를 놓친다. 이 숫자는 지정한 보고서의 집합·예산 계산이며 실제 LLM 요약·커뮤니티 탐지·정답률 측정이 아니다. 보고서 자체가 누락·오류를 담을 수 있으므로 원문으로 되돌아갈 수 있어야 한다.</p>
+<h2 id="sec-6-확인-질문과-해설">6. 확인 질문과 해설</h2>
+<ol>
+<li>A와 부산의 벡터 유사도가 높으면 A→B→부산의 관계가 증명되는가?</li>
+<li>k-hop을 늘리면 항상 답변이 좋아지는가?</li>
+<li>GNN을 쓰는가, 반복하는가, path를 반환하는가는 같은 선택인가?</li>
+<li>C1·C2·C3의 사실 수를 2+3+2=7로 보고하면 무엇이 잘못됐는가?</li>
+<li>보고서의 전역 요약에 출처가 없으면 어떤 검증이 어려운가?</li>
+</ol>
+<details><summary>해설</summary>
+<ol>
+<li>아니다. 명시된 두 관계와 각 관계의 원문·시점·방향을 확인해야 한다.</li>
+<li>아니다. 필요한 경로를 회수할 기회와 함께 무관한 가지·중복·비용·오류 전파도 늘 수 있다.</li>
+<li>아니다. 각각 검색기, 실행 방식, 반환 단위라는 다른 축이다.</li>
+<li>두 보고서에 반복된 F2를 두 번 센다. ID 기준 합집합은 여섯 사실이다.</li>
+<li>추출 오류·요약 누락·판본 충돌을 관계·원문 단위로 추적하기 어렵다. 생성 보고서는 원문 증거 자체와 구분한다.</li>
+</ol>
+</details>
+<h2 id="sec-출처와-페이지-대응">출처와 페이지 대응</h2>
+<ul>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EA%B5%90%EC%95%88/2%EC%9D%BC%EC%B0%A8/Graph_RAG.pdf">Graph_RAG.pdf</a>: 2~6쪽 TAG·GNN, 7~11쪽 확률·검색·생성, 12~15쪽 자료·인덱스, 16~24쪽 검색기, 25~28쪽 반복 방식, 29~35쪽 반환 단위. 페이지는 PDF의 1-based 순서다.</li>
+<li><a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/09.RAG/%EC%8B%A4%EC%8A%B5/2%EC%9D%BC%EC%B0%A8/A%20Tutorial%20on%20Graph%20RAG%20%20%26%20Meta%20KDD%20cup.pptx.pdf">Graph RAG·Meta KDD Cup 실습 교안</a>: 9~10쪽 구조 사례, 25~29쪽 웹/KG·MCP 연결. CRAG 평가·실습 흐름은 17장에서 이어진다.</li>
+<li>05장의 ANN 그래프와 구별하고 09장의 multi-hop, 10장의 근거 관리, 14장의 질의 언어, 15장의 도구 실행과 함께 읽는다. 이 장의 자체 SVG와 계산 예제는 원본을 바꾸지 않고 새 폴더에 작성했다.</li>
+</ul>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/96_%EC%9B%B9%EC%8B%9C%EA%B0%81%ED%99%94%EC%9E%90%EB%A3%8C/%EA%B8%B0%EC%A4%80%EB%B3%B8%EB%AC%B8/09_RAG/13_GraphRAG.md">13. GraphRAG — 관계를 찾아 근거 경로로 답하기 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="12_RAG_%ED%8F%89%EA%B0%80%EC%99%80_%EC%9A%B4%EC%98%81.html"><small>이전 장</small>12. RAG 평가와 운영</a><a rel="next" href="14_SPARQL%EA%B3%BCCypher.html"><small>다음 장</small>14. SPARQL과 Cypher — 그래프 질의의 바인딩·경로·중복</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>

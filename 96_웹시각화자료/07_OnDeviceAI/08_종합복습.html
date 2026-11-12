@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>8. 종합 복습: 조건에 맞는 수단을 선택하기 | AI 학습 교안</title><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/learning.css"><link rel="stylesheet" href="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.css"><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/katex.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/vendor/katex/contrib/auto-render.min.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/learning.js"></script><script defer src="../%EA%B3%B5%ED%86%B5/ondevice-labs.js"></script></head><body><a class="skip-link" href="#main">본문 바로 가기</a><header class="topbar"><a class="brand" href="../index.html">AI 학습 교안</a><div class="top-actions"><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="course-navigation">과정 목차</button><button type="button" data-reading aria-pressed="false">읽기 모드</button><a href="../index.html">전체 과정</a></div></header><div class="layout"><nav class="course-nav" id="course-navigation" aria-label="과정 목차"><h2>과정 목차</h2><ul><li><a class="course-home" href="index.html">On-Device AI 전체 흐름</a></li><li><a href="ODAI-1_01_AI%EC%97%B0%EC%82%B0%EA%B3%BC%EC%84%B1%EB%8A%A5.html">1장. AI 연산과 성능·메모리 병목</a></li><li><a href="ODAI-1_02_%EC%8B%A4%ED%96%89%ED%99%98%EA%B2%BD.html">2장. 온디바이스 AI 실행 환경</a></li><li><a href="ODAI-1_03_%EC%96%91%EC%9E%90%ED%99%94%EA%B8%B0%EC%B4%88.html">3장. 수 표현과 선형 양자화의 원리</a></li><li><a href="ODAI-1_04_PTQ%EC%99%80%EB%B9%84%EA%B7%A0%EC%9D%BC%EC%96%91%EC%9E%90%ED%99%94.html">4장. 비균일 양자화와 PTQ 오차 제어</a></li><li><a href="ODAI-1_05_QAT%EC%99%80%EC%A0%95%EC%88%98%EC%B6%94%EB%A1%A0.html">5. QAT와 정수 추론</a></li><li><a href="ODAI-1_06_LLM%EC%96%91%EC%9E%90%ED%99%94.html">6. 고급 LLM 양자화와 적용 판단</a></li><li><a href="ODAI-1_%EB%B6%80%EB%A1%9D_%ED%95%99%EC%8A%B5%EC%97%B0%EA%B2%B0%EA%B3%BC%EB%B3%B5%EC%8A%B5.html">부록 — 개념 사이의 연결과 종합 복습</a></li><li><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">On-Device AI Part 2: 작은 모델을 실제로 빠르게 실행하기</a></li><li><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1. 가지치기: 무엇을 없애고 무엇을 보존할까?</a></li><li><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2. 희소 저장과 실행: 0을 만든 뒤 무엇이 더 필요한가?</a></li><li><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3. LLM 가지치기: 크기, 손실 민감도, activation을 함께 보기</a></li><li><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4. 지식 증류: 작은 모델에 무엇을 가르칠까?</a></li><li><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5. Attention·KV·MoE: 어떤 계산과 데이터를 줄일까?</a></li><li><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6. 투기적 디코딩: 초안은 빠르게, 확정은 큰 모델로</a></li><li><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a></li><li><a href="08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.html" aria-current="page">8. 종합 복습: 조건에 맞는 수단을 선택하기</a></li><li><a href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html">LLM 양자화 실무 의사결정 가이드</a></li></ul></nav><main id="main" tabindex="-1"><header class="page-header"><p class="course-label">On-Device AI</p><h1>8. 종합 복습: 조건에 맞는 수단을 선택하기</h1><details class="objectives"><summary>이 장에서 확인할 것</summary><ul><li>희소 실행·교사 정보·KV 보존·SD 비용·patch 의존성 시나리오를 풀어 설명한다.</li><li>CSR·OBS·KV·SD·타일 softmax의 종합 수치를 가정과 함께 검산한다.</li><li>동일 품질 조건에서 측정 지표와 적용 후보를 선택한다.</li></ul></details></header><section class="interactive-labs" aria-label="계산 실습"><h2 class="sr-only">입력을 바꾸며 계산하기</h2><section data-lab="od-sparse" id="lab-od-sparse"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section><section data-lab="od-speculative" id="lab-od-speculative"><p>계산 실습은 JavaScript를 켜면 사용할 수 있습니다. 이론과 계산 예제는 아래 본문에서 읽을 수 있습니다.</p></section></section><nav class="page-toc" aria-label="이 장의 이론 목차"><h2>이 장의 이론</h2><ol><li><a href="#sec-81-먼저-목적과-제약을-적기">8.1 먼저 목적과 제약을 적기</a></li><li><a href="#sec-82-적용-시나리오">8.2 적용 시나리오</a></li><li><a href="#sec-83-혼동하기-쉬운-쌍">8.3 혼동하기 쉬운 쌍</a></li><li><a href="#sec-84-종합-문제">8.4 종합 문제</a></li><li><a href="#sec-85-용어-찾아보기">8.5 용어 찾아보기</a></li><li><a href="#sec-86-스스로-설명해-볼-마지막-질문">8.6 스스로 설명해 볼 마지막 질문</a></li></ol></nav><article class="source-content" aria-label="전체 이론 본문"><h1 id="sec-8-종합-복습-조건에-맞는-수단을-선택하기">8. 종합 복습: 조건에 맞는 수단을 선택하기</h1>
+<p><a href="00_%ED%95%99%EC%8A%B5%EC%95%88%EB%82%B4.html">학습 안내</a> · <a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">이전</a> · <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-2/09_%EC%9B%90%EB%AC%B8%EB%8C%80%EC%9D%91%EA%B3%BC%EA%B2%80%ED%86%A0.md">원문 대응과 검토</a></p>
+<p>이 문서는 원문 전체를 연결하는 <strong>교육용 보충</strong>이다. 아래 시나리오의 조건·숫자는 원문 실험 결과가 아니다. 본문에서 배운 원리로 선택 이유와 필요한 검증을 설명하는 데 사용한다.</p>
+<h2 id="sec-81-먼저-목적과-제약을-적기">8.1 먼저 목적과 제약을 적기</h2>
+<p>“빠른 모델” 대신 <strong>정해진 입력 길이·동시 요청 수에서 품질 하한을 지키면서 지연시간과 최대 메모리를 줄인다</strong>고 목표를 쓴다. 모바일 단일 요청 지연과 서버 다중 요청 처리량은 다른 목표일 수 있다.</p>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>기록</th>
+<th>예시 또는 기록할 값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력과 생성 조건</td>
+<td>batch, prompt 길이, 최대 출력 길이, decoding 방식</td>
+</tr>
+<tr>
+<td>품질 기준</td>
+<td>같은 검증셋 정확도·PPL·과제 성공률과 허용 하락폭</td>
+</tr>
+<tr>
+<td>장치·runtime</td>
+<td>장치 모델, 메모리, OS, backend·라이브러리 버전</td>
+</tr>
+<tr>
+<td>기준 모델</td>
+<td>모델 revision, dtype, KV dtype, attention 구현</td>
+</tr>
+<tr>
+<td>속도</td>
+<td>초기 응답 시간(TTFT), token 간 지연(ITL), 전체 시간, 처리량</td>
+</tr>
+<tr>
+<td>메모리</td>
+<td>가중치 본체, KV, activation, workspace, 실제 peak</td>
+</tr>
+<tr>
+<td>측정 절차</td>
+<td>warm-up, 반복 수, 동기화, 전원·온도 조건</td>
+</tr>
+</tbody>
+</table></div>
+<p>**TTFT(Time To First Token)**는 요청 시작부터 첫 token까지의 시간, **ITL(Inter-Token Latency)**은 연속 출력 token 간 시간이다. 전처리·대기열 포함 여부도 함께 기록한다. **PPL(perplexity, 혼란도)**은 같은 데이터·tokenizer·평가 조건에서 낮을수록 좋은 언어모델 예측 지표이며 다른 조건 간 직접 비교는 피한다.</p>
+<h2 id="sec-82-적용-시나리오">8.2 적용 시나리오</h2>
+<h3 id="sec-a-비구조적-70-희소-모델인데-속도는-그대로다">A. 비구조적 70% 희소 모델인데 속도는 그대로다</h3>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>확인 순서</th>
+<th>판단</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>실제 사용 커널 확인</td>
+<td>Dense 커널이면 원래 크기대로 계산할 수 있음</td>
+</tr>
+<tr>
+<td>Sparse 커널 비용 확인</td>
+<td>인덱스 처리·불규칙 접근·작은 행렬의 부가 비용 점검</td>
+</tr>
+<tr>
+<td>대안 비교</td>
+<td>채널 가지치기로 작은 dense 연산을 만들 수 있는지 검토</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>돌아갈 곳:</strong> <a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2장</a>. 희소 패턴 → 압축 표현 → 지원 커널 → 실제 실행 여부를 연결해 설명한다. 대안의 품질도 다시 평가한다.</p>
+<h3 id="sec-b-긴-문맥에서-메모리가-넘친다">B. 긴 문맥에서 메모리가 넘친다</h3>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>조건</th>
+<th>선택·주의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KV가 실제 메모리의 큰 부분</td>
+<td>KV 양자화·퇴거 검토</td>
+</tr>
+<tr>
+<td>모든 문맥 보존 필요</td>
+<td>영구 퇴거가 중요한 정보를 잃는지 평가</td>
+</tr>
+<tr>
+<td>저장량보다 읽기 대역폭이 병목</td>
+<td>Quest 같은 읽기 선택 검토</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>돌아갈 곳:</strong> <a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5장</a>. 먼저 peak 메모리를 가중치·KV·activation·임시 공간으로 나눠 본다. 읽기만 줄이는 방법이 cache 전체 저장량도 줄인다고 가정하지 않는다.</p>
+<h3 id="sec-c-작은-학생의-품질이-낮고-교사-응답만-얻을-수-있다">C. 작은 학생의 품질이 낮고 교사 응답만 얻을 수 있다</h3>
+<ul>
+<li><strong>가능한 학습:</strong> 교사 응답을 모범 데이터로 사용하는 sequence/response KD.</li>
+<li><strong>부족한 정보:</strong> 응답 문자열만으로 전체 어휘의 token-level KL을 정확히 계산할 수 없음.</li>
+<li><strong>확인할 품질:</strong> 교사 응답의 오류, 데이터 중복, 과제 편향.</li>
+</ul>
+<p><strong>돌아갈 곳:</strong> <a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4장</a>. 작은 구조를 준비하는 일과 좋은 학습 신호를 제공하는 일을 구분한다.</p>
+<h3 id="sec-d-단일-요청-decode에서-큰-모델-호출이-비싸다">D. 단일 요청 decode에서 큰 모델 호출이 비싸다</h3>
+<ul>
+<li><strong>후보 방법:</strong> 투기적 디코딩.</li>
+<li><strong>측정 항목:</strong> 초안 시간, 검증 시간, 실제 연속 수용 길이.</li>
+<li><strong>조건 변화:</strong> 동시 요청이 늘면 검증이 처리 용량을 차지해 결과가 달라질 수 있음.</li>
+<li><strong>분포 보존 요구:</strong> 수용·잔차 보정·KV cache 관리 조건 확인.</li>
+</ul>
+<p><strong>돌아갈 곳:</strong> <a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6장</a>. 긴 초안과 높은 수용률만으로 가속을 판정하지 않는다.</p>
+<h3 id="sec-e-가중치는-작은데-초기-activation이-sram을-넘는다">E. 가중치는 작은데 초기 activation이 SRAM을 넘는다</h3>
+<ul>
+<li><strong>원인 후보:</strong> 동시에 필요한 중간 활성값이 너무 큼.</li>
+<li><strong>후보 방법:</strong> 메모리 재사용 계획, patch 실행.</li>
+<li><strong>절충:</strong> Peak 활성값 감소와 halo 중복 계산 증가.</li>
+</ul>
+<p><strong>돌아갈 곳:</strong> <a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7장</a>. 가중치 정밀도를 줄이는 방법이 모든 실행 메모리 문제를 해결하지는 않는다.</p>
+<h2 id="sec-83-혼동하기-쉬운-쌍">8.3 혼동하기 쉬운 쌍</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>구별할 개념</th>
+<th>구별하는 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>양자화 / 가지치기</td>
+<td>값을 적은 비트로 표현하는가, 연결·계산 단위를 없애는가?</td>
+</tr>
+<tr>
+<td>파라미터 희소성 / activation 희소성</td>
+<td>고정 가중치의 0인가, 입력마다 달라지는 값의 0인가?</td>
+</tr>
+<tr>
+<td>중요도 점수 / 제거 패턴</td>
+<td>어떤 연결을 고를지의 기준인가, 허용 위치의 제약인가?</td>
+</tr>
+<tr>
+<td>학생 구조 축소 / KD</td>
+<td>작은 모델을 만드는 구조인가, 그것을 학습하는 신호인가?</td>
+</tr>
+<tr>
+<td>KV 퇴거 / query별 선택</td>
+<td>원 데이터를 없애는가, 이번 단계에만 읽지 않는가?</td>
+</tr>
+<tr>
+<td>KV 양자화 / FlashAttention</td>
+<td>cache 값 정밀도를 줄이는가, 큰 중간 행렬 IO를 줄이는가?</td>
+</tr>
+<tr>
+<td>근사 희소 attention / 기본 FlashAttention</td>
+<td>연결 자체가 달라지는가, 같은 dense attention을 다른 실행 순서로 계산하는가?</td>
+</tr>
+<tr>
+<td>MoE 총 파라미터 / 활성 파라미터</td>
+<td>저장 가능한 전체 expert와 현재 계산하는 expert를 구분했는가?</td>
+</tr>
+<tr>
+<td>sampling 분포 동일 / 같은 seed 출력 동일</td>
+<td>확률 법칙이 같은가, 난수 사용 경로까지 같은가?</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-84-종합-문제">8.4 종합 문제</h2>
+<p>해설을 열기 전에 식·중간값·가정을 적는다.</p>
+<ol>
+<li>원래 dense FP16 행렬이 1000×1000이다. 80%를 0으로 만들고 비영 값은 FP16, column index와 row pointer는 각각 32비트로 CSR 저장한다. 배열 header·padding을 제외한 byte 수와 dense 대비 비율은?</li>
+<li>OBS에서 <span class="math-raw math-inline">$w_q=0.4$</span>, <span class="math-raw math-inline">$[H^{-1}]_{qq}=2$</span>라면 q번째 업데이트와 근사 손실 증가를 구하라. 역헤시안 q번째 열 전체를 모르면 다른 가중치 업데이트까지 계산할 수 있는가?</li>
+<li>KV 설정이 32 layer, B=2, L=8192, KV head=8, head dimension=128, FP16일 때 본체는 몇 GiB인가? metadata를 무시하고 4 bit로 바꾸면?</li>
+<li>SD에서 일정 수용률 a=0.5, 초안 길이 3, 초안 1개 1ms, 검증 전체 8ms, 기준 목표 1-token 10ms라면 예상 가속률은?</li>
+<li><code>[1,4,2]</code>와 <code>[2,3,5]</code>의 softmax를 각각 정규화해 합치면 어떤 오류가 있는가? 같은 최대·분모를 구하는 식을 적어라.</li>
+<li>출력 patch를 반으로 나누면 메모리도 절반이고 연산량도 절반이라는 주장의 문제를 설명하라.</li>
+</ol>
+<details><summary>종합 해설</summary>
+<ol>
+<li>nnz=200,000. CSR은 <span class="math-raw math-inline">$200000(2+4)+1001\times4=1,204,004$</span> byte, dense는 2,000,000 byte다. 비율은 약 **60.2002%**다. 20% 밀도라고 저장량도 20%가 되는 것은 아니다. <a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2장 2.3</a>으로 돌아간다.</li>
+<li><span class="math-raw math-inline">$\Delta w_q=-0.4$</span>여서 제거 후 0, 근사 손실 증가는 <span class="math-raw math-inline">$0.4^2/(2\times2)=0.04$</span>다. 다른 성분을 구하려면 역헤시안 열의 해당 성분도 알아야 한다. <a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3장 3.3</a>을 확인한다.</li>
+<li><span class="math-raw math-inline">$2\times32\times2\times8192\times8\times128\times2=2,147,483,648$</span> byte=<strong>2 GiB</strong>다. 4 bit 본체는 0.5 GiB다. KV scale·고정밀 residual·정렬·전체 실행 메모리는 별도다. <a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5장 5.6</a>을 확인한다.</li>
+<li>기대 확정 길이는 <span class="math-raw math-inline">$1+0.5+0.25+0.125=1.875$</span>, 라운드는 11ms다. 시간/token은 약 5.8667ms, 가속률은 <span class="math-raw math-inline">$10\times1.875/11\approx1.7045$</span>배다. 이론적 설명용 가정이며 실측은 아니다. <a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6장 6.3</a>을 확인한다.</li>
+<li>각 타일 합이 1이어서 결합하면 합이 2다. <span class="math-raw math-inline">$m=\max(m_a,m_b)$</span>, <span class="math-raw math-inline">$l=e^{m_a-m}l_a+e^{m_b-m}l_b$</span>로 전체 분모를 맞춘다. <a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7장 7.4</a>를 확인한다.</li>
+<li>layer를 넘는 의존성·출력 조립·halo가 남고 경계 입력을 중복 처리할 수 있다. peak 메모리와 전체 연산량은 별개다. <a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7장 7.5</a>를 확인한다.</li>
+</ol>
+</details>
+<h2 id="sec-85-용어-찾아보기">8.5 용어 찾아보기</h2>
+<div aria-label="본문 표" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>용어</th>
+<th>짧은 뜻</th>
+<th>주 설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sparsity / density</td>
+<td>0의 비율 / 남은 값 비율</td>
+<td><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1장</a></td>
+</tr>
+<tr>
+<td>Weight Saliency / Magnitude</td>
+<td>제거 영향의 중요도 / 절댓값 기반 대용 기준</td>
+<td><a href="01_%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0%EA%B8%B0%EC%B4%88.html">1장</a> 1.3</td>
+</tr>
+<tr>
+<td>Channel Permutation</td>
+<td>현재 출력 채널과 다음 입력 채널의 순서를 함께 재배열</td>
+<td><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2장</a> 2.4</td>
+</tr>
+<tr>
+<td>OBD(Optimal Brain Damage) / OBS(Optimal Brain Surgeon)</td>
+<td>교차항을 생략한 중요도 / 상호작용을 반영한 보상</td>
+<td><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3장</a> 3.2·3.3</td>
+</tr>
+<tr>
+<td>SparseGPT / PPL(Perplexity)</td>
+<td>레이어별 마스크·가중치 복원 / 다음 토큰 예측 혼란도</td>
+<td><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3장</a> 3.4</td>
+</tr>
+<tr>
+<td>Calibration</td>
+<td>실제 분포를 대표하는 입력으로 통계·오차 확인</td>
+<td><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3장</a></td>
+</tr>
+<tr>
+<td>CSR / CSC / nnz</td>
+<td>행·열 중심 압축 저장 / 비영 원소 개수</td>
+<td><a href="02_%ED%9D%AC%EC%86%8C%EC%A0%80%EC%9E%A5%EA%B3%BC%EC%8B%A4%ED%96%89.html">2장</a></td>
+</tr>
+<tr>
+<td>Hessian / damping</td>
+<td>손실 2차 미분 행렬 / 수치 안정화를 위한 보정</td>
+<td><a href="03_LLM%EA%B0%80%EC%A7%80%EC%B9%98%EA%B8%B0.html">3장</a></td>
+</tr>
+<tr>
+<td>Logit / temperature</td>
+<td>확률 전 점수 / 분포의 날카로움 조절</td>
+<td><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4장</a></td>
+</tr>
+<tr>
+<td>KL / CE</td>
+<td>분포 간 차이 / 정답·분포에 대한 교차 엔트로피</td>
+<td><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4장</a></td>
+</tr>
+<tr>
+<td>Hint / projection</td>
+<td>교사의 중간 지도 / 비교 차원 변환</td>
+<td><a href="04_%EC%A7%80%EC%8B%9D%EC%A6%9D%EB%A5%98.html">4장</a></td>
+</tr>
+<tr>
+<td>SpAtten / Deja Vu</td>
+<td>토큰·헤드 단계적 제거 / 선행 예측으로 실행할 부분 선택</td>
+<td><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5장</a> 5.2</td>
+</tr>
+<tr>
+<td>H₂(Heavy Hitters) / 최근 KV(Key–Value)</td>
+<td>자주 참조한 과거와 최신 문맥을 함께 보존</td>
+<td><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5장</a> 5.3</td>
+</tr>
+<tr>
+<td>SnapKV / Quest</td>
+<td>생성 전 프롬프트 KV 압축 / 현재 질의별 페이지 읽기 선택</td>
+<td><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5장</a> 5.3</td>
+</tr>
+<tr>
+<td>Eviction / selection</td>
+<td>cache 제거 / 현재 사용할 cache 선택</td>
+<td><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5장</a></td>
+</tr>
+<tr>
+<td>Router / expert</td>
+<td>사용할 경로 선택 / 선택되는 하위 네트워크</td>
+<td><a href="05_Attention%EA%B3%BCKV%EC%B5%9C%EC%A0%81%ED%99%94.html">5장</a></td>
+</tr>
+<tr>
+<td>Draft / target / acceptance</td>
+<td>초안 / 최종 검증 모델 / 제안 수용</td>
+<td><a href="06_%ED%88%AC%EA%B8%B0%EC%A0%81%EB%94%94%EC%BD%94%EB%94%A9.html">6장</a></td>
+</tr>
+<tr>
+<td>Fusion / tiling</td>
+<td>연산 결합 / 작은 블록으로 나누어 계산</td>
+<td><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7장</a></td>
+</tr>
+<tr>
+<td>Halo / receptive field</td>
+<td>patch 경계의 추가 입력 / 출력에 영향을 주는 입력 범위</td>
+<td><a href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html">7장</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sec-86-스스로-설명해-볼-마지막-질문">8.6 스스로 설명해 볼 마지막 질문</h2>
+<p>다음 중 한 상황을 고른다.</p>
+<ol>
+<li>“0이 많아진 모델을 배포했는데 느리다.”</li>
+<li>“KV 메모리가 크지만 모든 문맥이 필요하다.”</li>
+<li>“초안 수용률은 높은데 SD가 느리다.”</li>
+</ol>
+<p><strong>설명할 항목</strong></p>
+<ul>
+<li>가능한 원인 두 가지</li>
+<li>확인할 측정 지표</li>
+<li>선택할 수 있는 방법과 그 이유</li>
+<li>품질이 나빠질 수 있는 조건</li>
+</ul>
+<p>답이 막히면 8.2의 해당 시나리오로 돌아간다. 질문·해설의 자체 점검과 실제 초보 독자의 이해도 검증은 구분한다.</p>
+</article><p class="source-note">출처: <a href="https://github.com/kihanyu/ai-specialist-2026-13/blob/016110ccd781f9400ca09bd3919c8646a4b71fd9/07_OnDeviceAI/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/ODAI-2/08_%EC%A2%85%ED%95%A9%EB%B3%B5%EC%8A%B5.md">8. 종합 복습: 조건에 맞는 수단을 선택하기 학습 원문</a>. 그림·표·수식과 확인 질문은 원문의 순서와 함께 제공합니다.</p><nav class="chapter-nav" aria-label="장 이동"><a rel="prev" href="07_%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4%EC%8B%A4%ED%96%89%EC%B5%9C%EC%A0%81%ED%99%94.html"><small>이전 장</small>7. 하드웨어 실행 최적화: 같은 계산을 덜 이동하며 수행하기</a><a rel="next" href="LLM_%EC%96%91%EC%9E%90%ED%99%94_%EC%8B%A4%EB%AC%B4_%EC%9D%98%EC%82%AC%EA%B2%B0%EC%A0%95_%EA%B0%80%EC%9D%B4%EB%93%9C.html"><small>다음 장</small>LLM 양자화 실무 의사결정 가이드</a></nav></main></div><footer class="site-footer">입력을 바꾸고, 계산 과정을 확인하고, 근거를 설명해 보세요.</footer><dialog class="image-dialog" id="image-dialog" aria-label="그림 확대"><div class="dialog-toolbar"><a class="dialog-original" href="#" target="_blank" rel="noopener">그림 원본 열기</a><button type="button" data-dialog-close>닫기</button></div><div class="dialog-image"></div><p class="dialog-caption"></p></dialog></body></html>
